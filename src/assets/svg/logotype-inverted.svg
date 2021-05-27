@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 880.6 325" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <style>.cls-1{fill:#291e00;}.cls-1,.cls-2,.cls-3{fill-rule:evenodd;}.cls-2{fill:#795900;}.cls-3,.cls-4{fill:#d09800;}.cls-4{font-size:143.08px;font-family:Montserrat-SemiBoldItalic, Montserrat;font-weight:600;font-style:italic;}.cls-5{letter-spacing:-0.02em;}.cls-6{fill:#fff;}</style>
+ </defs>
+ <g data-name="Camada 2">
+  <g data-name="Camada 1">
+   <g id="VETHER" transform="matrix(.69362 0 0 .69362 30.638 49.787)" fill-rule="evenodd">
+    <polygon class="cls-1" points="100 225 200 167 100 122" fill="#291e00"/>
+    <polygon class="cls-2" points="100 225 0 167 100 122" fill="#795900" data-name="Path-4"/>
+    <polygon class="cls-3" points="100 122 0 167 100 0" fill="#d09800"/>
+    <polygon class="cls-2" points="100 122 200 167 100 0" fill="#795900" data-name="Path-3"/>
+    <polygon class="cls-3" points="100 325 0 185 100 243" fill="#d09800"/>
+    <polygon class="cls-2" points="100 325 200 185 100 243" fill="#795900" data-name="Path-5"/>
+   </g>
+   <g transform="translate(218.08,224.96)" fill="#d09800" aria-label="VETHER">
+    <path d="m48.79-23.179 49.22-76.977h19.316l-63.671 100.16h-18.314l-23.608-100.16h19.173z"/>
+    <g fill="#000">
+     <path d="m201.17-100.16-3.1478 15.596h-54.657l-5.1509 26.041h48.504l-3.0047 15.31h-48.647l-5.437 27.614h56.66l-3.1478 15.596h-75.117l20.031-100.16z"/>
+     <path d="m242.8 0h-18.6l16.883-84.417h-33.195l3.1478-15.739h84.99l-3.2908 15.739h-33.195z"/>
+     <path d="m372.08-58.806 8.2986-41.35h18.457l-20.031 100.16h-18.457l8.5848-42.924h-51.795l-8.5848 42.924h-18.6l20.031-100.16h18.6l-8.2986 41.35z"/>
+     <path d="m499.07-100.16-3.1478 15.596h-54.657l-5.1509 26.041h48.504l-3.0047 15.31h-48.647l-5.437 27.614h56.66l-3.1478 15.596h-75.117l20.031-100.16z"/>
+     <path d="m598.78-69.966q0 14.451-7.7263 24.467-7.7263 9.8725-21.605 13.736l17.885 31.764h-19.745l-16.454-29.331h-24.896l-5.7232 29.331h-18.743l20.031-100.16h38.918q18.171 0 28.044 8.0125 10.016 7.8694 10.016 22.177zm-47.216 25.325q13.593 0 21.033-6.0094 7.4402-6.1524 7.4402-17.599 0-8.0125-5.5801-12.019-5.437-4.1493-15.739-4.1493h-21.319l-8.0125 39.776z"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

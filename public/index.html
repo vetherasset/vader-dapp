@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="Vether Dapp"
+      content="Vether: A strictly-scarce Ethereum-based asset"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Thin.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-ThinItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-ExtraLight.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-ExtraLightItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Light.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-LightItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Regular.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Italic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Medium.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-MediumItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-SemiBold.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-SemiBoldItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Bold.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-BoldItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-ExtraBold.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-ExtraBoldItalic.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-Black.woff2" />
+    <link rel="preload" as="font" href="%PUBLIC_URL%/fonts/Montserrat-BlackItalic.woff2" />    
+    <style>
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Thin.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 100;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-ThinItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 100;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-ExtraLight.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 200;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-ExtraLightItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 200;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Light.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 300;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-LightItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 300;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Regular.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 400;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Italic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 400;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Medium.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 500;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-MediumItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 500;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-SemiBold.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 600;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-SemiBoldItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 600;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Bold.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 700;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-BoldItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 700;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        font-weight: 800;
+        font-style: normal;
+        src: url('%PUBLIC_URL%/fonts/Montserrat-ExtraBold.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-ExtraBoldItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 800;
+        font-style: italic;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-Black.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 900;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: 'Body';
+        src: url('%PUBLIC_URL%/fonts/Montserrat-BlackItalic.woff2') format('woff2');
+        font-size: 1em;
+        line-height: 1.5;
+        font-weight: 900;
+        font-style: italic;
+        font-display: block;
+      }
+    </style>
+    <title>Vether Dapp - Acquire a share by burning Ether.</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
