@@ -1,14 +1,14 @@
 import { ColorModeScript } from '@chakra-ui/react'
 import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
-import vether from './themes/vether'
+import theme from './themes/vader'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
 	<StrictMode>
-		<ColorModeScript initialColorMode={vether.config.initialColorMode} />
+		<ColorModeScript initialColorMode={theme.config.initialColorMode} />
 		<App />
 	</StrictMode>,
 	document.getElementById('root'),

@@ -17,6 +17,11 @@ export default {
 				backgroundSize: '150% auto',
 				backgroundPosition: 'right center',
 				backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
+				_disabled: {
+					backgroundSize: '150% auto',
+					backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
+					background: 'transparent',
+				},
 			},
 			_active: {
 				backgroundSize: '150% auto',
@@ -24,21 +29,22 @@ export default {
 				backgroundImage: 'linear-gradient(90deg, rgba(244,139,194,1) 0%, rgba(83,145,245,1) 100%)',
 			},
 			_disabled: {
-				bg: 'transparent',
+				color: '#fff',
 			},
 		}),
 		outline: () => ({
 			color: 'accent',
 			border: 'none',
-			p: '43px',
-			transition: '1s',
+			backgroundSize: '150% auto',
+			backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
+			p: '1px',
 			_hover: {
-				transition: '1s',
-				color: 'red',
-				background: 'red',
+				backgroundSize: '150% auto',
+				backgroundPosition: 'right center',
+				backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
 			},
 			_active: {
-				bg: '#f472b6',
+				backgroundImage: 'linear-gradient(90deg,#f280bc  0%, #5391f5 100%)',
 			},
 			_disabled: {
 				bg: 'transparent',

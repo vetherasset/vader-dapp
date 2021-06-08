@@ -1,6 +1,6 @@
 {
-  "short_name": "Vether Dapp",
-  "name": "Acquire a share by burning Ether.",
+  "short_name": "Vader Protocol",
+  "name": "Vader - decentralized liquidity protocol",
   "icons": [
     {
       "src": "favicon.ico",
@@ -13,6 +13,11 @@
       "sizes": "192x192"
     },
     {
+      "src": "logo256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
@@ -21,5 +26,5 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#000000"
 }
