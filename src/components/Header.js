@@ -17,6 +17,7 @@ export const Header = (props) => {
 			<Flex w='33%'
 				alignItems='center'
 				justifyContent='space-around'
+				textTransform='uppercase'
 			>
 				<Link to='/'>Swap</Link>
 				<Link to='/'>Liquidity</Link>

@@ -1,4 +1,7 @@
 export default {
+	uppercase: {
+		textTransform: 'uppercase',
+	},
 	noLigs: {
 		fontVariantLigatures: 'none',
 	},

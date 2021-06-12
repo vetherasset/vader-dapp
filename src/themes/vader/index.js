@@ -77,6 +77,16 @@ const overrides = {
 		},
 	},
 	layerStyles: {
+		colorful: {
+			borderRadius: '12px',
+			background: 'linear-gradient(90deg,#ff9ddb 0%, #26a4fe 100%)',
+			maxHeight: '660px',
+		},
+		inputLike: {
+			background: 'linear-gradient(90deg,#a25b80 0%, #406299 100%)',
+			borderRadius: '0.8rem',
+			padding: '0.6rem 1rem',
+		},
 		overview: {
 			bg: 'black',
 			border: '1px solid #ffc300ce',
