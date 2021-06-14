@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Flex, Text, Input, Button } from '@chakra-ui/react'
+import { Box, Flex, Center, Text } from '@chakra-ui/react'
 import {
 	FormControl,
 	FormLabel,
