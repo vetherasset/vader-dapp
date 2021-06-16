@@ -9,7 +9,6 @@ import {
 	Image,
 	List,
 	ListItem,
-	ListIcon,
 } from '@chakra-ui/react'
 import vaderIcon from '../static/icons/vader.svg'
 
@@ -17,10 +16,8 @@ import {
 	FormControl,
 	FormLabel,
 	FormErrorMessage,
-	Select,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
-import axios from 'axios'
 import { TriangleDownIcon } from '@chakra-ui/icons'
 
 const HiddenList = {
