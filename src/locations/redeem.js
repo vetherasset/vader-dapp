@@ -18,7 +18,7 @@ import {
 	FormErrorMessage,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
-import { TriangleDownIcon } from '@chakra-ui/icons'
+import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 
 const HiddenList = {
 	visibility: 'hidden',
@@ -65,6 +65,23 @@ export const Redeem = () => {
 		console.log(burnAmount)
 	}
 
+	const calculateBurn = (e) => {
+	  const amount = Number(e.target.value)
+		if(!amount || amount <= 0) {
+			return
+		}
+		setBurnAmount(amount)
+		// TODO change it
+		setTokenToGet('USDV')
+		// TODO get the real rate
+		setTokenAmountToGet(amount * 100)
+	}
+
+	useEffect(() => {
+		// placeholder
+		setTokens(fakeTokens)
+	}, [])
+
 	return (
 		<Box
 			maxWidth={defaults.layout.container.sm.width}
@@ -91,7 +108,7 @@ export const Redeem = () => {
 						<Flex layerStyle='inputLike'>
 							<Box flex='1' pr='0.5rem'>
 								<NumberInput>
-									<NumberInputField placeholder='0.0' border='none' fontSize="1.5rem"/>
+									<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' onChange={calculateBurn} />
 								</NumberInput>
 							</Box>
 							<Box position='relative' cursor='pointer' onClick={() => setShowTokenList(!showTokenList)}>
@@ -102,7 +119,7 @@ export const Redeem = () => {
 										src={vaderIcon}
 									/>
 									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenToBurn}</Box>
-									<TriangleDownIcon ml={1} />
+									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 								</Box>
 								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle="colorful" padding="1rem" mt=".7rem">
 									<List {...ToggleList}>
@@ -138,7 +155,7 @@ export const Redeem = () => {
 								textTransform='uppercase'
 								color="white"
 								onClick={burnToken}>
-                Burn
+                    Burn
 							</Button>
 						</Box>
 					</FormControl>
