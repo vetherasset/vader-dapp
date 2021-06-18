@@ -12,6 +12,7 @@ import menuitem from './menuitem'
 import link from './link'
 import { extendTheme } from '@chakra-ui/react'
 import spinner from './spinner'
+import modal from './modal'
 
 const overrides = {
 	config: {
@@ -69,12 +70,7 @@ const overrides = {
 		MenuItem: menuitem,
 		Link: link,
 		Spinner: spinner,
-		Toast: {
-			minWidth: '440px',
-			baseStyle: {
-				bg: 'red',
-			},
-		},
+		Modal: modal,
 	},
 	layerStyles: {
 		colorful: {

@@ -9,7 +9,8 @@ export default {
 	},
 	variants: {
 		solid: () => ({
-			color: '#000',
+			color: '#fff',
+			textTransform: 'uppercase',
 			backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 			_hover: {
 				backgroundImage: 'linear-gradient(90deg, rgb(254, 201, 254) 0%, rgb(56, 233, 253) 100%)',
@@ -22,12 +23,13 @@ export default {
 				opacity: '0.7',
 			},
 			_disabled: {
-				color: '#000',
+				color: '#fff',
 				background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
 			},
 		}),
 		solidRadial: () => ({
-			color: '#000',
+			color: '#fff',
+			textTransform: 'uppercase',
 			borderRadius: '9rem',
 			backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 			_hover: {
@@ -41,7 +43,7 @@ export default {
 				opacity: '0.7',
 			},
 			_disabled: {
-				color: '#000',
+				color: '#fff',
 				background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
 			},
 		}),
@@ -78,6 +80,19 @@ export default {
 			},
 			_active: {
 				background: 'transparent',
+			},
+		}),
+		ghostSelectable: () => ({
+			p: '0',
+			borderRadius: '0',
+			_hover: {
+				background: '#ffffff30',
+			},
+			_active: {
+				background: '#ffffff50',
+			},
+			_focus: {
+				background: '#ffffff30',
 			},
 		}),
 		linkAccent: () => ({
