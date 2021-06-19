@@ -41,28 +41,40 @@ const ToggleList = {
 
 
 export const Redeem = () => {
-	const fakeTokens = [{
-		name: 'Vader',
-		value: 'vader',
-		icon: 'blue',
-	},
-	{
-		name: 'Vether',
-		value: 'vether',
-		color: 'pink',
-	},
+	const defaultTokens = [
+		{
+			name: 'Vader',
+			value: 'vader',
+		},
+		{
+			name: 'Vether',
+			value: 'vether',
+		},
+		{
+			name: 'USDV',
+			value: 'usdv',
+		},
 	]
-	const [tokens, setTokens] = useState(fakeTokens)
-	const [tokenToBurn, setTokenToBurn] = useState('Vader')
+
+	const burnPair = {
+	  'vader': 'usdv',
+		'usdv': 'vader',
+		'vether': 'vader',
+	}
+
+	const [tokens, setTokens] = useState(defaultTokens)
+	const [tokenToBurn, setTokenToBurn] = useState('vader')
 	const [burnAmount, setBurnAmount] = useState(0)
-	const [tokenToGet, setTokenToGet] = useState('USDV')
-	const [tokenAmountToGet, setTokenAmountToGet] = useState(10000)
+	const [tokenToGet, setTokenToGet] = useState('usdv')
+	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
 
 
 	const burnToken = () => {
-		console.log(tokenToBurn)
-		console.log(burnAmount)
+	  if(tokenToBurn < 0 || burnAmount < 0) {
+	    return
+		}
+	  console.log(tokenToBurn, burnAmount)
 	}
 
 	const calculateBurn = (e) => {
@@ -71,16 +83,17 @@ export const Redeem = () => {
 			return
 		}
 		setBurnAmount(amount)
-		// TODO change it
-		setTokenToGet('USDV')
 		// TODO get the real rate
 		setTokenAmountToGet(amount * 100)
 	}
 
-	useEffect(() => {
-		// placeholder
-		setTokens(fakeTokens)
-	}, [])
+	const getTokenNameByValue = (value)=>{
+	  return tokens.find(token=>token.value === value).name
+	}
+
+	useEffect(()=>{
+		setTokenToGet(burnPair[tokenToBurn])
+	}, [tokenToBurn])
 
 	return (
 		<Box
@@ -118,10 +131,10 @@ export const Redeem = () => {
 										mr='10px'
 										src={vaderIcon}
 									/>
-									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenToBurn}</Box>
+									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{getTokenNameByValue(tokenToBurn)}</Box>
 									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 								</Box>
-								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle="colorful" padding="1rem" mt=".7rem">
+								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle="colorful" padding="1rem" mt=".7rem" zIndex='2'>
 									<List {...ToggleList}>
 										{tokens.map(token =>
 											<ListItem key={token.name} mb="0.5rem" d="flex" alignItems="center" onClick={()=> setTokenToBurn(token.value)}>
@@ -145,7 +158,7 @@ export const Redeem = () => {
 								mr='10px'
 								src={vaderIcon}
 							/>
-							<Box fontSize='1.5rem' fontWeight='bolder'>{tokenToGet}</Box>
+							<Box fontSize='1.5rem' fontWeight='bolder'>{getTokenNameByValue(tokenToGet)}</Box>
 						</Box>
 						<Box d='flex' justifyContent='center' marginY='1.5rem'>
 							<Button variant='solidRadial'
