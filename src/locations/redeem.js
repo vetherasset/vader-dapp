@@ -61,7 +61,7 @@ export const Redeem = () => {
 		'vether': 'vader',
 	}
 
-	const [tokens, setTokens] = useState(defaultTokens)
+	const [tokens] = useState(defaultTokens)
 	const [tokenToBurn, setTokenToBurn] = useState('vader')
 	const [burnAmount, setBurnAmount] = useState(0)
 	const [tokenToGet, setTokenToGet] = useState('usdv')
