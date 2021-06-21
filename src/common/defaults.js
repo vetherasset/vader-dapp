@@ -4,12 +4,17 @@ const defaults = {}
 
 defaults.network = {}
 defaults.network.connector = undefined
-defaults.network.chainId = Number(process.env.REACT_APP_CHAIN_ID)
-
+// defaults.network.chainId = Number(process.env.REACT_APP_CHAIN_ID)
+// ropsten
+defaults.network.chainId = 3
 defaults.network.provider = new ethers.providers.WebSocketProvider(
 	process.env.REACT_APP_WS_URL,
 	defaults.network.chainId,
 )
+defaults.contract = {}
+defaults.contract.vader = '0xe1e6f994E01B66B4787622Be050BD0d58a578Ff1'
+defaults.contract.vether = '0xF89082707F9f97cCE14400f1F6D7456855B506EE'
+defaults.contract.usdv = '0xC9c95dC1560e504Ade008bc74fB371b3AbDB97cF'
 
 defaults.layout = {}
 

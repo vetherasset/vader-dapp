@@ -11,6 +11,7 @@ import {
 	ListItem,
 } from '@chakra-ui/react'
 
+import { useWallet } from 'use-wallet'
 import {
 	FormControl,
 	FormLabel,
@@ -18,6 +19,10 @@ import {
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { BigNumber, ethers } from 'ethers'
+
+import getVetherBalance from '../common/ethereum'
+import useBalanceHooks from '../hooks/useBalance.hooks'
 
 const HiddenList = {
 	visibility: 'hidden',
@@ -56,7 +61,7 @@ export const Redeem = () => {
 	]
 
 	const burnPair = {
-	  'vader': 'usdv',
+		'vader': 'usdv',
 		'usdv': 'vader',
 		'vether': 'vader',
 	}
@@ -68,17 +73,18 @@ export const Redeem = () => {
 	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
 
+	const wallet = useWallet()
 
 	const burnToken = () => {
-	  if(tokenToBurn < 0 || burnAmount < 0) {
-	    return
+		if (tokenToBurn < 0 || burnAmount < 0) {
+			return
 		}
-	  console.log(tokenToBurn, burnAmount)
+		console.log(tokenToBurn, burnAmount)
 	}
 
 	const calculateBurn = (e) => {
-	  const amount = Number(e.target.value)
-		if(!amount || amount <= 0) {
+		const amount = Number(e.target.value)
+		if (!amount || amount <= 0) {
 			return
 		}
 		setBurnAmount(amount)
@@ -86,13 +92,14 @@ export const Redeem = () => {
 		setTokenAmountToGet(amount * 100)
 	}
 
-	const getTokenNameByValue = (value)=>{
-	  return tokens.find(token=>token.value === value).name
+	const getTokenNameByValue = (value) => {
+		return tokens.find(token => token.value === value).name
 	}
 
-	useEffect(()=>{
+	useEffect(() => {
 		setTokenToGet(burnPair[tokenToBurn])
 	}, [tokenToBurn])
+
 
 	return (
 		<Box
@@ -129,13 +136,16 @@ export const Redeem = () => {
 										width='42px'
 										mr='10px'
 									/>
-									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{getTokenNameByValue(tokenToBurn)}</Box>
+									<Box as='h3' m='0' fontSize='xl' fontWeight='bold'
+										textTransform='capitalize'>{getTokenNameByValue(tokenToBurn)}</Box>
 									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 								</Box>
-								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle="colorful" padding="1rem" mt=".7rem" zIndex='2'>
+								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle='colorful' padding='1rem' mt='.7rem'
+									zIndex='2'>
 									<List {...ToggleList}>
 										{tokens.map(token =>
-											<ListItem key={token.name} mb="0.5rem" d="flex" alignItems="center" onClick={()=> setTokenToBurn(token.value)}>
+											<ListItem key={token.name} mb='0.5rem' d='flex' alignItems='center'
+												onClick={() => setTokenToBurn(token.value)}>
 												<Image
 													width='42px'
 													mr='10px'
@@ -149,7 +159,7 @@ export const Redeem = () => {
 						</Flex>
 						<Box textAlign='center' marginY='15px'>Mint:</Box>
 						<Box d='flex' justifyContent='center' alignItems='center'>
-							<Box fontSize='1.5rem' fontWeight='bolder' mr="1rem">{tokenAmountToGet}</Box>
+							<Box fontSize='1.5rem' fontWeight='bolder' mr='1rem'>{tokenAmountToGet}</Box>
 							<Image
 								width='42px'
 								mr='10px'
@@ -162,9 +172,9 @@ export const Redeem = () => {
 								size='lg'
 								minWidth='230px'
 								textTransform='uppercase'
-								color="white"
+								color='white'
 								onClick={burnToken}>
-                    Burn
+                Burn
 							</Button>
 						</Box>
 					</FormControl>
