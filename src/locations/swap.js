@@ -26,6 +26,36 @@ const span = {
 	opacity: '0.9',
 }
 
+const TokenSelectButton = ({ data, index, style }) => {
+	TokenSelectButton.propTypes = {
+		index: PropTypes.number.isRequired,
+		style: PropTypes.object.isRequired,
+		data: PropTypes.array.isRequired,
+	}
+	return (
+		<Button
+			variant='ghostSelectable'
+			fontWeight='600'
+			fontSize='1.2rem'
+			justifyContent='left'
+			p='2rem 1.5rem'
+			style={style}
+			key={index}>
+			{data &&
+			<>
+				<Image
+					width='42px'
+					mr='10px'
+					src={data[index].logoURI}
+				/>
+				{data[index].name}
+			</>
+			}
+			{index}
+		</Button>
+	)
+}
+
 export const Swap = () => {
 
 	const { isOpen, onOpen, onClose } = useDisclosure()
@@ -33,7 +63,7 @@ export const Swap = () => {
 
 	const [isSelect, setIsSelect] = useState(-1)
 	const [tokenListDefault, setTokenListDefault] = useState(false)
-	const list = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
+	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
 
 	useEffect(() => {
 		getTokenList('https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json')
@@ -47,35 +77,6 @@ export const Swap = () => {
 	}, [isOpen])
 
 	console.log(isSelect)
-
-	const TokenSelectButton = ({ index, style }) => {
-		TokenSelectButton.propTypes = {
-			index: PropTypes.number.isRequired,
-			style: PropTypes.object.isRequired,
-		}
-		return (
-			<Button
-				variant='ghostSelectable'
-				fontWeight='600'
-				fontSize='1.2rem'
-				justifyContent='left'
-				p='2rem 1.5rem'
-				style={style}
-				key={index}>
-				{list &&
-				<>
-					<Image
-						width='42px'
-						mr='10px'
-						src={list[index].logoURI}
-					/>
-					{list[index].name}
-				</>
-				}
-				{index}
-			</Button>
-		)
-	}
 
 	return (
 		<>
@@ -193,12 +194,13 @@ export const Swap = () => {
 						display='flex'
 						flexDir='column'
 						p='0'>
-						{list &&
+						{tokenList &&
 							<List
 								width={448}
 								height={600}
-								itemCount={list.length}
-								itemSize={64}>
+								itemCount={tokenList.length}
+								itemSize={64}
+								itemData={tokenList}>
 								{TokenSelectButton}
 							</List>
 						}
