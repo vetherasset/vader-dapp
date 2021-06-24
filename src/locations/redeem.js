@@ -22,6 +22,8 @@ import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 
 import Balance from '../components/Balance'
+import { convertToken } from '../common/ethereum'
+import { ethers } from 'ethers'
 
 const HiddenList = {
 	visibility: 'hidden',
@@ -72,12 +74,12 @@ export const Redeem = () => {
 	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
 
-
-	const burnToken = () => {
+	const burnToken = async () => {
 		if (tokenToBurn < 0 || burnAmount < 0) {
 			return
 		}
-		console.log(tokenToBurn, burnAmount)
+		const result = await convertToken({ name: tokenToBurn, amount: burnAmount.toString() })
+		console.log(result)
 	}
 
 	const calculateBurn = (e) => {

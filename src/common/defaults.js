@@ -11,6 +11,9 @@ defaults.network.provider = new ethers.providers.WebSocketProvider(
 	process.env.REACT_APP_WS_URL,
 	defaults.network.chainId,
 )
+
+defaults.user = { account: '' }
+
 defaults.contract = {}
 defaults.contract.vader = '0xe1e6f994E01B66B4787622Be050BD0d58a578Ff1'
 defaults.contract.vether = '0xF89082707F9f97cCE14400f1F6D7456855B506EE'

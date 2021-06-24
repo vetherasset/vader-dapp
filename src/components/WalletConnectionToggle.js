@@ -5,6 +5,7 @@ import { Button, useToast } from '@chakra-ui/react'
 import { prettifyAddress } from '../common/utils'
 import Jazzicon from '@metamask/jazzicon'
 import { connected } from '../messages'
+import { ethers } from 'ethers'
 
 export const WalletConnectionToggle = (props) => {
 
@@ -14,6 +15,11 @@ export const WalletConnectionToggle = (props) => {
 	const toast = useToast()
 	const [working, setWorking] = useState(false)
 	const [text, setText] = useState(initialText)
+
+	const setDefaults = ()=>{
+		defaults.network.provider = wallet.ethereum ? new ethers.providers.Web3Provider(wallet.ethereum) : null
+		defaults.user.account = wallet.account ? wallet.account : ''
+	}
 
 	const toggle = () => {
 		if (!wallet.account) {
@@ -31,6 +37,7 @@ export const WalletConnectionToggle = (props) => {
 				wallet.account.slice(2, 10), 16)))
 				.style.marginLeft = '7px'
 			toast(connected)
+			setDefaults()
 		}
 		return () => {
 			if (wallet.account) {
