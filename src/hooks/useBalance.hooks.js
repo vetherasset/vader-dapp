@@ -1,21 +1,25 @@
 import { BigNumber, ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-const useBalanceHooks = (getBalanceFn)=>{
+const useBalanceHooks = (getBalanceFn) => {
 	const wallet = useWallet()
+	const [balance, setBalance] = useState(0)
 
-	useEffect(()=>{
-	  if(wallet.account) {
+	useEffect(() => {
+		// reset balance to 0
+		setBalance(0)
+		if (wallet.account) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getBalanceFn(provider, wallet.account).then(data => {
-				return +ethers.utils.formatEther(BigNumber.from(data))
-			}).catch(e =>{
+			getBalanceFn({ provider, account: wallet.account }).then(data => {
+				setBalance(BigNumber.from(data))
+			}).catch(e => {
 				console.log(e)
-				return 0
+				setBalance(0)
 			})
 		}
-	}, [wallet.account])
+	}, [wallet.account, getBalanceFn])
+	return balance
 }
 
 export default useBalanceHooks
