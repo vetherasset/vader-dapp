@@ -19,10 +19,8 @@ import {
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { BigNumber, ethers } from 'ethers'
 
-import getVetherBalance from '../common/ethereum'
-import useBalanceHooks from '../hooks/useBalance.hooks'
+import Balance from '../components/Balance'
 
 const HiddenList = {
 	visibility: 'hidden',
@@ -73,7 +71,6 @@ export const Redeem = () => {
 	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
 
-	const wallet = useWallet()
 
 	const burnToken = () => {
 		if (tokenToBurn < 0 || burnAmount < 0) {
@@ -88,8 +85,6 @@ export const Redeem = () => {
 			return
 		}
 		setBurnAmount(amount)
-		// TODO get the real rate
-		setTokenAmountToGet(amount * 100)
 	}
 
 	const getTokenNameByValue = (value) => {
@@ -145,7 +140,9 @@ export const Redeem = () => {
 									<List {...ToggleList}>
 										{tokens.map(token =>
 											<ListItem key={token.name} mb='0.5rem' d='flex' alignItems='center'
-												onClick={() => setTokenToBurn(token.value)}>
+												onClick={() => {
+													setTokenToBurn(token.value)
+												}}>
 												<Image
 													width='42px'
 													mr='10px'
@@ -157,6 +154,9 @@ export const Redeem = () => {
 								</Box>
 							</Box>
 						</Flex>
+						<Box textAlign='left' margin='15px'>
+							<Balance tokenName={tokenToBurn}/>
+						</Box>
 						<Box textAlign='center' marginY='15px'>Mint:</Box>
 						<Box d='flex' justifyContent='center' alignItems='center'>
 							<Box fontSize='1.5rem' fontWeight='bolder' mr='1rem'>{tokenAmountToGet}</Box>
