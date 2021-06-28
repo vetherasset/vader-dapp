@@ -65,14 +65,22 @@ const convertToken = async ({ name, amount }) => {
 	if (!defaults.user.account) {
 		return null
 	}
-	const { abi, address } = getTokenConfig(name)
+	const { abi, address } = getTokenConfig(VADER)
 	const contract = new ethers.Contract(
 		address,
 		abi,
 		defaults.network.provider.getSigner(0),
 	)
 	// WIP, this only works for Vader -> USDV now
-	return await contract.convertToUSDV(ethers.utils.parseUnits(amount), { from: defaults.user.account })
+	switch (name) {
+	case VETHER:
+		break
+	case USDV:
+		return await contract.withdrawToVader(ethers.utils.parseUnits(amount), { from: defaults.user.account })
+	case VADER:
+		return await contract.convertToUSDV(ethers.utils.parseUnits(amount), { from: defaults.user.account })
+	}
+
 }
 
 

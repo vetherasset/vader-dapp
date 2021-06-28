@@ -5,11 +5,14 @@ import { utils } from 'ethers'
 
 
 // eslint-disable-next-line
-const Balance = React.memo(({ tokenName }) => {
+const Balance = React.memo(({ tokenName, setBurnTokenTotalValue }) => {
 	const tokenBalance = useBalanceHooks(tokenName)
-	return <Box>
-		{utils.formatEther(tokenBalance)}
-	</Box>
+	setBurnTokenTotalValue(tokenBalance)
+	return(
+		tokenName &&	<Box>
+			{utils.formatEther(tokenBalance)}
+		</Box>)
+
 })
 
 export default Balance
