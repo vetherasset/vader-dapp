@@ -9,20 +9,19 @@ import {
 	Image,
 	List,
 	ListItem,
-} from '@chakra-ui/react'
-
-import { useWallet } from 'use-wallet'
-import {
+	useToast,
+	Spinner,
 	FormControl,
 	FormLabel,
 	FormErrorMessage,
 } from '@chakra-ui/react'
+import vaderIcon from '../static/icons/vader.svg'
+import { BigNumber, ethers, utils } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 
 import Balance from '../components/Balance'
 import { convertToken } from '../common/ethereum'
-import { ethers } from 'ethers'
 
 const HiddenList = {
 	visibility: 'hidden',
@@ -66,19 +65,47 @@ export const Redeem = () => {
 		'vether': 'vader',
 	}
 
+	const toast = useToast()
+
 	const [tokens] = useState(defaultTokens)
 	const [tokenToBurn, setTokenToBurn] = useState('vader')
 	const [burnAmount, setBurnAmount] = useState(0)
 	const [tokenToGet, setTokenToGet] = useState('usdv')
 	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
+	const [canBurn, setCanBurn] = useState(false)
+	const [totalTokenCanBurn, setTotalTokenCanBurn] = useState(BigNumber.from(0))
+	const [submitting, setSubmitting] = useState(false)
 
 	const burnToken = async () => {
 		if (tokenToBurn < 0 || burnAmount < 0) {
 			return
 		}
-		const result = await convertToken({ name: tokenToBurn, amount: burnAmount.toString() })
-		console.log(result)
+		if(!canBurn) {
+			return
+		}
+		setSubmitting(true)
+		setCanBurn(false)
+		const result = await convertToken({ name: tokenToBurn, amount: String(burnAmount) })
+		setSubmitting(false)
+		if(result && result.hash) {
+			toast({
+				title: 'Transaction submitted',
+				description: `You can check the result later on Ether Scan with tx id: ${result.hash}`,
+				status: 'success',
+				duration: 9000,
+				isClosable: true,
+			})
+		}
+		else{
+			toast({
+				title: 'Error',
+				description: 'An error occured, please try again later',
+				status: 'error',
+				duration: 9000,
+				isClosable: true,
+			})
+		}
 	}
 
 	const calculateBurn = (e) => {
@@ -93,10 +120,18 @@ export const Redeem = () => {
 		return tokens.find(token => token.value === value).name
 	}
 
+	const setBurnTokenTotalValue = (value)=>{
+		setTotalTokenCanBurn(value)
+	}
+
 	useEffect(() => {
 		setTokenToGet(burnPair[tokenToBurn])
 	}, [tokenToBurn])
 
+	useEffect(()=>{
+		const bigBurnAmount = utils.parseUnits(String(burnAmount))
+		setCanBurn(totalTokenCanBurn > 0 && bigBurnAmount.lte(totalTokenCanBurn))
+	}, [burnAmount, tokenToBurn, totalTokenCanBurn])
 
 	return (
 		<Box
@@ -157,7 +192,7 @@ export const Redeem = () => {
 							</Box>
 						</Flex>
 						<Box textAlign='left' margin='15px'>
-							<Balance tokenName={tokenToBurn}/>
+							<Balance tokenName={tokenToBurn} setBurnTokenTotalValue={setBurnTokenTotalValue}/>
 						</Box>
 						<Box textAlign='center' marginY='15px'>Mint:</Box>
 						<Box d='flex' justifyContent='center' alignItems='center'>
@@ -175,7 +210,9 @@ export const Redeem = () => {
 								minWidth='230px'
 								textTransform='uppercase'
 								color='white'
+								disabled={!canBurn}
 								onClick={burnToken}>
+								<Spinner display={submitting ? 'block' : 'none'} mr="1rem"/>
                 Burn
 							</Button>
 						</Box>
