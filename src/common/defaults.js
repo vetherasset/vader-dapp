@@ -18,6 +18,7 @@ defaults.contract = {}
 defaults.contract.vader = '0xe1e6f994E01B66B4787622Be050BD0d58a578Ff1'
 defaults.contract.vether = '0xF89082707F9f97cCE14400f1F6D7456855B506EE'
 defaults.contract.usdv = '0xC9c95dC1560e504Ade008bc74fB371b3AbDB97cF'
+defaults.contract.vault = '0xAd34302778D01eA81fc5C984E8A7C32C5955a484'
 
 defaults.layout = {}
 
