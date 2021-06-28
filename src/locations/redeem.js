@@ -91,7 +91,7 @@ export const Redeem = () => {
 			if(result && result.hash) {
 				toast({
 					title: 'Transaction submitted',
-					description: <Box wordBreak="break-all">You can check the result later on Ether Scan with tx id: <p>{result.hash}</p></Box>,
+					description: <Box wordBreak="break-all">You can check the result later on Etherscan with tx id: <p>{result.hash}</p></Box>,
 					status: 'success',
 					duration: 9000,
 					isClosable: true,

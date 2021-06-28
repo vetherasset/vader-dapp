@@ -4,13 +4,13 @@ import vetherTokenAbi from '../abi/Vether.sol/Vether.json'
 import vaderTokenAbi from '../abi/Vader.sol/Vader.json'
 import USDVTokenAbi from '../abi/USDV.sol/USDV.json'
 import humanStandardTokenAbi from '../abi/humanStandardTokenAbi.json'
-import { VADER, USDV, VETHER } from './consts'
+import VaultAbi from '../abi/Vault.sol/Vault.json'
+import { VADER, USDV, VETHER, VAULT } from './consts'
 
 
 /**
  * get address, abi for a token
  * @param tokenName
- *
  * @returns config {Object: {abi: tokenAbi, address: token address}}
  */
 const getTokenConfig = (tokenName) => {
@@ -29,6 +29,11 @@ const getTokenConfig = (tokenName) => {
 		return {
 			abi: USDVTokenAbi.abi,
 			address: defaults.contract.usdv,
+		}
+	case VAULT :
+		return {
+			abi: VaultAbi.abi,
+			address: defaults.contract.vault,
 		}
 	default:
 		return null
@@ -65,20 +70,29 @@ const convertToken = async ({ name, amount }) => {
 	if (!defaults.user.account) {
 		return null
 	}
-	const { abi, address } = getTokenConfig(VADER)
-	const contract = new ethers.Contract(
-		address,
-		abi,
-		defaults.network.provider.getSigner(0),
-	)
+	let config = null
+	let contract = null
 	// WIP, this only works for Vader -> USDV now
 	switch (name) {
 	case VETHER:
-		break
 	case USDV:
-		return await contract.withdrawToVader(ethers.utils.parseUnits(amount), { from: defaults.user.account })
-	case VADER:
+		 config = getTokenConfig(VAULT)
+		 contract = new ethers.Contract(
+			config.address,
+			VaultAbi.abi,
+			defaults.network.provider.getSigner(0),
+		)
+		return await contract.withdrawToVader(defaults.contract.usdv, ethers.utils.parseUnits(amount), { from: defaults.user.account })
+	case VADER: {
+		 config = getTokenConfig(VADER)
+		 contract = new ethers.Contract(
+			config.address,
+			config. abi,
+			defaults.network.provider.getSigner(0),
+		)
 		return await contract.convertToUSDV(ethers.utils.parseUnits(amount), { from: defaults.user.account })
+	}
+
 	}
 
 }
