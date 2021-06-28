@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { Box, Flex, NumberInput, NumberInputField, Button, Image, useDisclosure,
+import { Box, Flex, NumberInput, NumberInputField, Input, Button, Image, useDisclosure,
 	Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
 } from '@chakra-ui/react'
 import { FixedSizeList as List } from 'react-window'
 import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
+import { searchFor } from '../common/utils'
 import getTokenList from 'get-token-list'
 
 const flex = {
@@ -64,6 +65,7 @@ export const Swap = () => {
 	const [isSelect, setIsSelect] = useState(-1)
 	const [tokenListDefault, setTokenListDefault] = useState(false)
 	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
+	const [tokenListModified, setTokenListModified] = useState(false)
 
 	useEffect(() => {
 		getTokenList('https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json')
@@ -77,6 +79,8 @@ export const Swap = () => {
 	}, [isOpen])
 
 	console.log(isSelect)
+	console.log(tokenList)
+	console.log(tokenListModified)
 
 	return (
 		<>
@@ -194,15 +198,27 @@ export const Swap = () => {
 						display='flex'
 						flexDir='column'
 						p='0'>
-						{tokenList &&
-							<List
-								width={448}
-								height={600}
-								itemCount={tokenList.length}
-								itemSize={64}
-								itemData={tokenList}>
-								{TokenSelectButton}
-							</List>
+						<Box
+							p='0 1.5rem 1rem'>
+							<Input
+								size='lg'
+								placeholder='Search name or paste address'
+								onChange={e => searchFor(tokenList, e.target.value, setTokenListModified)}
+							/>
+						</Box>
+						{tokenListModified &&
+							<>
+								{console.log('is here')}
+								{console.log(tokenListModified)}
+								<List
+									width={448}
+									height={600}
+									itemCount={tokenListModified.length}
+									itemSize={64}
+									itemData={tokenListModified}>
+									{TokenSelectButton}
+								</List>
+							</>
 						}
 					</ModalBody>
 					<ModalFooter/>

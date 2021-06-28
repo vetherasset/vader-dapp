@@ -80,7 +80,20 @@ const promiseAllProgress = (promises, tickCallback) => {
 	return Promise.all(promises.map(tick))
 }
 
+const searchFor = (array, string, callBack, regEx = new RegExp(`(${string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})+`, 'gi')) => {
+	const object = array.reduce((acc, item, index) => {
+		if (Object.keys(item).find(key => String(item[key]).match(regEx))) acc[index] = item
+		return acc
+	}, {})
+	if(callBack) {
+		callBack(Object.values(object))
+	}
+	else {
+		return Object.values(object)
+	}
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
-	promiseAllProgress,
+	promiseAllProgress, searchFor,
 }
