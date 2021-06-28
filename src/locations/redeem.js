@@ -78,7 +78,7 @@ export const Redeem = () => {
 	const [submitting, setSubmitting] = useState(false)
 
 	const burnToken = async () => {
-		if (tokenToBurn < 0 || burnAmount < 0) {
+		if (totalTokenCanBurn.lte(BigNumber.from(0)) || burnAmount <= 0) {
 			return
 		}
 		if(!canBurn) {
@@ -86,34 +86,54 @@ export const Redeem = () => {
 		}
 		setSubmitting(true)
 		setCanBurn(false)
-		const result = await convertToken({ name: tokenToBurn, amount: String(burnAmount) })
-		setSubmitting(false)
-		if(result && result.hash) {
-			toast({
-				title: 'Transaction submitted',
-				description: `You can check the result later on Ether Scan with tx id: ${result.hash}`,
-				status: 'success',
-				duration: 9000,
-				isClosable: true,
-			})
+		try{
+			const result = await convertToken({ name: tokenToBurn, amount: String(burnAmount) })
+			if(result && result.hash) {
+				toast({
+					title: 'Transaction submitted',
+					description: <Box wordBreak="break-all">You can check the result later on Ether Scan with tx id: <p>{result.hash}</p></Box>,
+					status: 'success',
+					duration: 9000,
+					isClosable: true,
+					position: 'top',
+				})
+			}
+			else{
+				toast({
+					title: 'Error',
+					description: 'An error occurred, please try again later',
+					status: 'error',
+					duration: 9000,
+					isClosable: true,
+					position: 'top',
+				})
+			}
 		}
-		else{
+		catch (e) {
+			let description = 'An error occurred, please try again later'
+			if(e && e.code === 4001) {
+				description = 'Seems you rejected the transaction'
+			}
 			toast({
 				title: 'Error',
-				description: 'An error occured, please try again later',
+				description,
 				status: 'error',
 				duration: 9000,
 				isClosable: true,
+				position: 'top',
 			})
+		}
+		finally {
+			setSubmitting(false)
 		}
 	}
 
 	const calculateBurn = (e) => {
-		const amount = Number(e.target.value)
-		if (!amount || amount <= 0) {
-			return
+		let { value } = e.target
+		if(isNaN(value) || !value) {
+			value = 0
 		}
-		setBurnAmount(amount)
+		setBurnAmount(value)
 	}
 
 	const getTokenNameByValue = (value) => {
@@ -130,7 +150,7 @@ export const Redeem = () => {
 
 	useEffect(()=>{
 		const bigBurnAmount = utils.parseUnits(String(burnAmount))
-		setCanBurn(totalTokenCanBurn > 0 && bigBurnAmount.lte(totalTokenCanBurn))
+		setCanBurn(totalTokenCanBurn > 0 && burnAmount > 0 && bigBurnAmount.lte(totalTokenCanBurn))
 	}, [burnAmount, tokenToBurn, totalTokenCanBurn])
 
 	return (
