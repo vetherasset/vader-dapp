@@ -30,4 +30,14 @@ defaults.toast.duration = 5000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
 
+defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
+defaults.tokenDefault = {
+	'chainId':1,
+	'address':'0x4ba6ddd7b89ed838fed25d208d4f644106e34279',
+	'name':'Vether',
+	'symbol':'VETH',
+	'decimals':18,
+	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+}
+
 export default defaults
