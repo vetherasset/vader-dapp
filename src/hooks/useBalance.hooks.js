@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { useEffect, useState } from 'react'
 import { getTokenBalance } from '../common/ethereum'

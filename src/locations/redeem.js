@@ -16,7 +16,7 @@ import {
 	FormErrorMessage,
 } from '@chakra-ui/react'
 import vaderIcon from '../static/icons/vader.svg'
-import { BigNumber, ethers, utils } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 
@@ -71,7 +71,7 @@ export const Redeem = () => {
 	const [tokenToBurn, setTokenToBurn] = useState('vader')
 	const [burnAmount, setBurnAmount] = useState(0)
 	const [tokenToGet, setTokenToGet] = useState('usdv')
-	const [tokenAmountToGet, setTokenAmountToGet] = useState(0)
+	const [tokenAmountToGet] = useState(0)
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [canBurn, setCanBurn] = useState(false)
 	const [totalTokenCanBurn, setTotalTokenCanBurn] = useState(BigNumber.from(0))
@@ -99,9 +99,10 @@ export const Redeem = () => {
 				})
 			}
 			else{
+				const description = result && result.msg ? result.msg : 'An error occurred, please try again later'
 				toast({
 					title: 'Error',
-					description: 'An error occurred, please try again later',
+					description,
 					status: 'error',
 					duration: 9000,
 					isClosable: true,
@@ -110,10 +111,7 @@ export const Redeem = () => {
 			}
 		}
 		catch (e) {
-			let description = 'An error occurred, please try again later'
-			if(e && e.code === 4001) {
-				description = 'Seems you rejected the transaction'
-			}
+			const description = e && e.code === 4001 ? 'Seems you rejected the transaction' : 'An error occurred, please try again later'
 			toast({
 				title: 'Error',
 				description,
