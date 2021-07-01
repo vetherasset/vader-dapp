@@ -1,9 +1,8 @@
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import defaults from './defaults'
 import vetherTokenAbi from '../abi/Vether.sol/Vether.json'
 import vaderTokenAbi from '../abi/Vader.sol/Vader.json'
 import USDVTokenAbi from '../abi/USDV.sol/USDV.json'
-import humanStandardTokenAbi from '../abi/humanStandardTokenAbi.json'
 import VaultAbi from '../abi/Vault.sol/Vault.json'
 import { VADER, USDV, VETHER, VAULT } from './consts'
 
@@ -38,16 +37,6 @@ const getTokenConfig = (tokenName) => {
 	default:
 		return null
 	}
-}
-
-// get general erc20 token balance
-const getERC20BalanceOf = async (tokenAddress, address, provider) => {
-	const contract = new ethers.Contract(
-		tokenAddress,
-		humanStandardTokenAbi.abi,
-		provider,
-	)
-	return await contract.balanceOf(address)
 }
 
 const getTokenBalance = async (tokenName) => {

@@ -1,0 +1,141 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "iLENDER",
+  "sourceName": "contracts/interfaces/iLENDER.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemInterestPaid",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

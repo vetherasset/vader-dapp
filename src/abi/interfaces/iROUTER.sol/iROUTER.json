@@ -1,0 +1,666 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "iROUTER",
+  "sourceName": "contracts/interfaces/iROUTER.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "base",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "inputBase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "inputToken",
+          "type": "uint256"
+        }
+      ],
+      "name": "addLiquidity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "curatePool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAnchorPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "anchorPrice",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "base",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "basisPoints",
+          "type": "uint256"
+        }
+      ],
+      "name": "getILProtection",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "protection",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberBaseDeposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberLastDeposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "member",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "getMemberTokenDeposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "collateralAsset",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "debtAsset",
+          "type": "address"
+        }
+      ],
+      "name": "getSystemInterestPaid",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaderAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getUSDVAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "USDVAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "USDVAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getVADERAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaderAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "isBase",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "base",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "isCurated",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "curated",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "listAnchor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "base",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "basisPoints",
+          "type": "uint256"
+        }
+      ],
+      "name": "removeLiquidity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "units",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountBase",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountToken",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "oldToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "newToken",
+          "type": "address"
+        }
+      ],
+      "name": "replacePool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reserveUSDV",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reserveVADER",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "newFactor",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newLimit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newInterval",
+          "type": "uint256"
+        }
+      ],
+      "name": "setParams",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "inputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "outputToken",
+          "type": "address"
+        }
+      ],
+      "name": "swap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "outputAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "inputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "outputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "slipLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapWithLimit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "outputAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "inputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "inSynth",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "outputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "outSynth",
+          "type": "bool"
+        }
+      ],
+      "name": "swapWithSynths",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "outputAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "inputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "inSynth",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "outputToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "outSynth",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "slipLimit",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapWithSynthsWithLimit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "outputAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "updateAnchorPrice",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
