@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { depositToken } from '../common/ethereum'
-import { USDV, VETHER } from '../common/consts'
+import { USDV } from '../common/consts'
 
 const Deposit = ()=>{
 
