@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import defaults from './defaults'
 import vetherTokenAbi from '../abi/Vether.sol/Vether.json'
 import vaderTokenAbi from '../abi/Vader.sol/Vader.json'
@@ -75,14 +75,31 @@ const convertToken = async ({ name, amount }) => {
 	// WIP, this only works for Vader -> USDV now
 	switch (name) {
 	case VETHER:
-	case USDV:
-		 config = getTokenConfig(VAULT)
-		 contract = new ethers.Contract(
+	case USDV: {
+		config = getTokenConfig(VAULT)
+		contract = new ethers.Contract(
 			config.address,
 			VaultAbi.abi,
 			defaults.network.provider.getSigner(0),
 		)
-		return await contract.withdrawToVader(defaults.contract.usdv, ethers.utils.parseUnits(amount), { from: defaults.user.account })
+		try{
+			const share = await getDeposit()
+			// no deposit, ask user to deposit fist, lte function converts the value, so just use number here
+			if(share.lte(0)) {
+				return {
+					msg: 'User does not have deposit',
+				}
+			}
+			const dp = amount / share * 100
+			return await contract.withdrawToVader(defaults.contract.usdv, dp, { from: defaults.user.account })
+		}
+		catch (e) {
+			console.log(e)
+			return {
+				msg: 'error when redeem',
+			}
+		}
+	}
 	case VADER: {
 		 config = getTokenConfig(VADER)
 		 contract = new ethers.Contract(
@@ -92,14 +109,45 @@ const convertToken = async ({ name, amount }) => {
 		)
 		return await contract.convertToUSDV(ethers.utils.parseUnits(amount), { from: defaults.user.account })
 	}
-
 	}
-
 }
 
+/**
+ * get user's deposit balance
+ * @returns {Promise<*>}
+ */
+const getDeposit = async ()=>{
+	const { abi, address } = getTokenConfig(VAULT)
+	const contract = new ethers.Contract(
+		address,
+		abi,
+		defaults.network.provider.getSigner(0),
+	)
+	return await contract.getMemberDeposit(defaults.user.account, defaults.contract.usdv)
+}
+
+
+/**
+ * deposit token
+ * @param token {string} the token name, one of [vader, vether, usdv]
+ * @param amount {string} the deposit amount
+ * @returns {Promise<*>}
+ */
+const depositToken = async ({ token, amount })=>{
+	const { abi, address } = getTokenConfig(VAULT)
+	const tokenConfig = getTokenConfig(token)
+	const contract = new ethers.Contract(
+		address,
+		abi,
+		defaults.network.provider.getSigner(0),
+	)
+	return await contract.deposit(tokenConfig.address, ethers.utils.parseUnits(amount), { from: defaults.user.account })
+}
 
 export {
 	convertToken,
 	getTokenBalance,
+	getDeposit,
+	depositToken,
 }
 
