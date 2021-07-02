@@ -93,7 +93,12 @@ const searchFor = (array, string, callBack, regEx = new RegExp(`(${string.replac
 	}
 }
 
+const isEthereumAddress = (string) => {
+	const regEx = new RegExp('^0x[a-fA-F0-9]{40}$')
+	return regEx.test(string)
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
-	promiseAllProgress, searchFor,
+	promiseAllProgress, searchFor, isEthereumAddress,
 }

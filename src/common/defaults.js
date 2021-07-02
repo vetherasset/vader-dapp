@@ -32,11 +32,11 @@ defaults.toast.position = 'top'
 
 defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenDefault = {
-	'chainId':1,
-	'address':'0x4ba6ddd7b89ed838fed25d208d4f644106e34279',
-	'name':'Vether',
-	'symbol':'VETH',
-	'decimals':18,
+	'chainId':3,
+	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+	'name':'USDC',
+	'symbol':'USDC',
+	'decimals':6,
 	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 }
 

@@ -6,7 +6,10 @@ import { Box, Flex, NumberInput, NumberInputField, Input, Button, Image, useDisc
 import { FixedSizeList as List } from 'react-window'
 import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
-import { searchFor } from '../common/utils'
+import { useWallet } from 'use-wallet'
+import { ethers } from 'ethers'
+import { getERC20BalanceOf, resolveUnknownERC20 } from '../common/ethereum'
+import { isEthereumAddress, searchFor } from '../common/utils'
 import getTokenList from 'get-token-list'
 
 const flex = {
@@ -68,25 +71,59 @@ export const Swap = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const initialRef = useRef()
 
+	const wallet = useWallet()
+
 	const [isSelect, setIsSelect] = useState(-1)
 	const [tokenListDefault, setTokenListDefault] = useState(false)
 	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
 	const [tokenListModified, setTokenListModified] = useState(false)
 	const [token0, setToken0] = useState(defaults.tokenDefault)
 	const [token1, setToken1] = useState(false)
+	const [balance0, setBalance0] = useState(false)
+	const [balance1, setBalance1] = useState(false)
 
 	useEffect(() => {
 		getTokenList(defaults.tokenList)
 			.then(data => {
 				setTokenListDefault(data)
 			})
-			.catch(err => console.log(err))
-		return () => setTokenListDefault(false)
+			.catch(err => {
+				setTokenListDefault(false)
+				console.log(err)
+			})
 	}, [])
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
 	}, [isOpen])
+
+	useEffect(() => {
+		if (wallet.account && token0) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(token0.address, wallet.account, provider)
+				.then(b => {
+					setBalance0(b)
+				})
+				.catch(err => {
+					setBalance0(false)
+					console.log(err)
+				})
+		}
+	}, [wallet.account, token0])
+
+	useEffect(() => {
+		if (wallet.account && token1) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(token1.address, wallet.account, provider)
+				.then(b => {
+					setBalance1(b)
+				})
+				.catch(err => {
+					setBalance1(false)
+					console.log(err)
+				})
+		}
+	}, [wallet.account, token1])
 
 	return (
 		<>
@@ -119,9 +156,16 @@ export const Swap = () => {
 						</Box>
 					</Flex>
 
-					<Flex layerStyle='inputLike'>
+					<Flex layerStyle='inputLike' minH='83.2px'>
 						<Box flex='1' pr='0.5rem'>
-							<Box as='span' textStyle='uppercase' {...span}>Balance: 333.33 VADER</Box>
+							{balance0 &&
+								<Box as='span' textStyle='uppercase' {...span}>
+									Balance: {ethers.utils.formatUnits(balance0, token0.decimals)}&nbsp;{token0.symbol}
+								</Box>
+							}
+							{!balance0 &&
+								<br/>
+							}
 							<NumberInput {...flex} {...input}>
 								<NumberInputField placeholder='0.0' {...field}/>
 							</NumberInput>
@@ -152,7 +196,9 @@ export const Swap = () => {
 						onClick={() => {
 							if (token1) {
 								setToken0(token1)
+								setBalance0(balance1)
 								setToken1(token0)
+								setBalance1(balance0)
 							}
 						}}
 					>
@@ -161,7 +207,14 @@ export const Swap = () => {
 
 					<Flex layerStyle='inputLike'>
 						<Box flex='1' pr='0.5rem'>
-							<Box as='span' textStyle='uppercase' {...span}>Balance: 333.33 VADER</Box>
+							{balance1 &&
+								<Box as='span' textStyle='uppercase' {...span}>
+									Balance: {ethers.utils.formatUnits(balance1, token1.decimals)}&nbsp;{token1.symbol}
+								</Box>
+							}
+							{!balance1 &&
+								<br/>
+							}
 							<NumberInput {...flex} {...input}>
 								<NumberInputField placeholder='0.0' {...field}/>
 							</NumberInput>
@@ -217,7 +270,13 @@ export const Swap = () => {
 							<Input
 								size='lg'
 								placeholder='Search name or paste address'
-								onChange={e => searchFor(tokenList, e.target.value, setTokenListModified)}
+								onChange={e => {
+									const result = searchFor(tokenList, e.target.value)
+									if (result) setTokenListModified(result)
+									if (result.length === 0 &&
+										isEthereumAddress(e.target.value)
+									) console.log(resolveUnknownERC20(e.target.value, defaults.network.provider))
+								}}
 							/>
 						</Box>
 						{tokenList &&

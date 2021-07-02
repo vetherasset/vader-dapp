@@ -10,7 +10,6 @@ import {
 	List,
 	ListItem,
 } from '@chakra-ui/react'
-import vaderIcon from '../static/icons/vader.svg'
 
 import {
 	FormControl,
@@ -116,7 +115,6 @@ export const Redeem = () => {
 									<Image
 										width='42px'
 										mr='10px'
-										src={vaderIcon}
 									/>
 									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenToBurn}</Box>
 									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
@@ -128,7 +126,6 @@ export const Redeem = () => {
 												<Image
 													width='42px'
 													mr='10px'
-													src={vaderIcon}
 												/>
 												{token.name}
 											</ListItem>,
@@ -143,7 +140,6 @@ export const Redeem = () => {
 							<Image
 								width='42px'
 								mr='10px'
-								src={vaderIcon}
 							/>
 							<Box fontSize='1.5rem' fontWeight='bolder'>{tokenToGet}</Box>
 						</Box>
