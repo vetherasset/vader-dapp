@@ -15,7 +15,9 @@ import {
 	FormLabel,
 	FormErrorMessage,
 } from '@chakra-ui/react'
-import vaderIcon from '../static/icons/vader.svg'
+import vaderIcon from '../assets/svg/vader.svg'
+import vetherIcon from '../assets/svg/vether.svg'
+import usdvIcon from '../assets/svg/usdv.svg'
 import { BigNumber, utils } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
@@ -48,14 +50,17 @@ export const Redeem = () => {
 		{
 			name: 'Vader',
 			value: 'vader',
+			icon: vaderIcon,
 		},
 		{
 			name: 'Vether',
 			value: 'vether',
+			icon: vetherIcon,
 		},
 		{
 			name: 'USDV',
 			value: 'usdv',
+			icon: usdvIcon,
 		},
 	]
 
@@ -68,7 +73,7 @@ export const Redeem = () => {
 	const toast = useToast()
 
 	const [tokens] = useState(defaultTokens)
-	const [tokenToBurn, setTokenToBurn] = useState('vader')
+	const [tokenToBurn, setTokenToBurn] = useState(defaultTokens[0])
 	const [burnAmount, setBurnAmount] = useState(0)
 	const [tokenToGet, setTokenToGet] = useState('usdv')
 	const [tokenAmountToGet] = useState(0)
@@ -87,7 +92,7 @@ export const Redeem = () => {
 		setSubmitting(true)
 		setCanBurn(false)
 		try{
-			const result = await convertToken({ name: tokenToBurn, amount: String(burnAmount) })
+			const result = await convertToken({ name: tokenToBurn.value, amount: String(burnAmount) })
 			if(result && result.hash) {
 				toast({
 					title: 'Transaction submitted',
@@ -142,8 +147,9 @@ export const Redeem = () => {
 		setTotalTokenCanBurn(value)
 	}
 
+
 	useEffect(() => {
-		setTokenToGet(burnPair[tokenToBurn])
+		setTokenToGet(burnPair[tokenToBurn.value])
 	}, [tokenToBurn])
 
 	useEffect(()=>{
@@ -185,9 +191,10 @@ export const Redeem = () => {
 									<Image
 										width='42px'
 										mr='10px'
+										src={tokenToBurn.icon}
 									/>
 									<Box as='h3' m='0' fontSize='xl' fontWeight='bold'
-										textTransform='capitalize'>{getTokenNameByValue(tokenToBurn)}</Box>
+										textTransform='capitalize'>{getTokenNameByValue(tokenToBurn.value)}</Box>
 									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 								</Box>
 								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle='colorful' padding='1rem' mt='.7rem'
@@ -196,11 +203,12 @@ export const Redeem = () => {
 										{tokens.map(token =>
 											<ListItem key={token.name} mb='0.5rem' d='flex' alignItems='center'
 												onClick={() => {
-													setTokenToBurn(token.value)
+													setTokenToBurn(token)
 												}}>
 												<Image
 													width='42px'
 													mr='10px'
+													src={token.icon}
 												/>
 												{token.name}
 											</ListItem>,
@@ -210,7 +218,7 @@ export const Redeem = () => {
 							</Box>
 						</Flex>
 						<Box textAlign='left' margin='15px'>
-							<Balance tokenName={tokenToBurn} setBurnTokenTotalValue={setBurnTokenTotalValue}/>
+							<Balance tokenName={tokenToBurn.value} setBurnTokenTotalValue={setBurnTokenTotalValue}/>
 						</Box>
 						<Box textAlign='center' marginY='15px'>Mint:</Box>
 						<Box d='flex' justifyContent='center' alignItems='center'>
