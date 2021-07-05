@@ -42,6 +42,18 @@ const resolveUnknownERC20 = async (tokenAddress, provider) => {
 	return token
 }
 
+const estimateGasCost = async (contractAddress, abi, callName, data, provider) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		abi,
+		provider.getSigner(0),
+	)
+	const execute = (name, context, args) => {
+		return context[name](args)
+	}
+	return await execute(callName, contract.estimateGas, data)
+}
+
 export {
-	getERC20BalanceOf, resolveUnknownERC20,
+	getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
 }
