@@ -2,10 +2,6 @@ import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/humanStandardTokenAbi'
 import defaults from './defaults'
 
-const getBalanceOf = async (address, provider) => {
-	return await provider.getBalance(address)
-}
-
 const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 	const contract = new ethers.Contract(
 		tokenAddress,
@@ -47,5 +43,5 @@ const resolveUnknownERC20 = async (tokenAddress, provider) => {
 }
 
 export {
-	getBalanceOf, getERC20BalanceOf, resolveUnknownERC20,
+	getERC20BalanceOf, resolveUnknownERC20,
 }
