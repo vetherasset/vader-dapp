@@ -21,7 +21,7 @@ export const Header = (props) => {
 			>
 				<Link to='/'>Swap</Link>
 				<Link to='/'>Liquidity</Link>
-				<Link to='/'>Synths</Link>
+				<Link to='/syths'>Synths</Link>
 				<Link to='/redeem'>Redeem</Link>
 			</Flex>
 			<Flex w='33%'

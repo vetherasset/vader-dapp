@@ -6,6 +6,7 @@ import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Swap from './locations/swap'
 import Redeem from './locations/redeem'
+import Syths from './locations/syths'
 import defaults from './common/defaults'
 
 const App = () => {
@@ -26,6 +27,9 @@ const App = () => {
 						}/>
 						<Route path='/redeem' exact render={() =>
 							<Redeem />
+						}/>
+						<Route path='/syths' exact render={() =>
+							<Syths />
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
