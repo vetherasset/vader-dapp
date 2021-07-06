@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/humanStandardTokenAbi'
+import vaderAbi from '../artifacts/VaderAbi'
 import defaults from './defaults'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
@@ -9,6 +10,15 @@ const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provide
 		provider.getSigner(0),
 	)
 	return await contract.approve(spenderAddress, amount)
+}
+
+const getVaderConversionFactor = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.vader,
+		vaderAbi,
+		provider,
+	)
+	return await contract.conversionFactor()
 }
 
 const getERC20BalanceOf = async (tokenAddress, address, provider) => {
@@ -65,4 +75,5 @@ const estimateGasCost = async (contractAddress, abi, callName, data, provider) =
 
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
+	getVaderConversionFactor,
 }

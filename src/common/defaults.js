@@ -30,6 +30,12 @@ defaults.toast.duration = 5000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
 
+defaults.address = {}
+defaults.address.vader = defaults.network.chainId === 1 ? ''
+	: defaults.network.chainId === 3 ? '0xA5c7332D70615160C54D2e09CB128583eD08D81b' : undefined
+defaults.address.vether = defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279'
+	: defaults.network.chainId === 3 ? '0xCa4861B3ee3F9792Ae7ED953b85711C2ef806A08' : undefined
+
 defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenDefault = {
 	'chainId':3,
