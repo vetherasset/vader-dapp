@@ -32,9 +32,14 @@ defaults.toast.position = 'top'
 
 defaults.address = {}
 defaults.address.vader = defaults.network.chainId === 1 ? ''
-	: defaults.network.chainId === 3 ? '0xA5c7332D70615160C54D2e09CB128583eD08D81b' : undefined
+	: defaults.network.chainId === 3 ? '0xA5c7332D70615160C54D2e09CB128583eD08D81b'
+		: undefined
+defaults.address.usdv = defaults.network.chainId === 1 ? ''
+	: defaults.network.chainId === 3 ? '0x6077a249ADfc542a87C0F18a29deEfA1e85A7aab'
+	 : undefined
 defaults.address.vether = defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279'
-	: defaults.network.chainId === 3 ? '0xCa4861B3ee3F9792Ae7ED953b85711C2ef806A08' : undefined
+	: defaults.network.chainId === 3 ? '0xCa4861B3ee3F9792Ae7ED953b85711C2ef806A08'
+	 : undefined
 
 defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenDefault = {

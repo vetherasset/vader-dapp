@@ -12,6 +12,15 @@ const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provide
 	return await contract.approve(spenderAddress, amount)
 }
 
+const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, provider) => {
+	const contract = new ethers.Contract(
+		tokenAddress,
+		humanStandardTokenAbi,
+		provider,
+	)
+	return await contract.allowance(ownerAddress, spenderAddress)
+}
+
 const getVaderConversionFactor = async (provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.vader,
@@ -75,5 +84,5 @@ const estimateGasCost = async (contractAddress, abi, callName, data, provider) =
 
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
-	getVaderConversionFactor,
+	getVaderConversionFactor, getERC20Allowance,
 }

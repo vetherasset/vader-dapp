@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Box,
 	Flex,
@@ -10,76 +10,87 @@ import {
 	List,
 	ListItem,
 } from '@chakra-ui/react'
-
-import {
-	FormControl,
-	FormLabel,
-	FormErrorMessage,
-} from '@chakra-ui/react'
+import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-
-const HiddenList = {
-	visibility: 'hidden',
-	opacity: 0,
-	display: 'none',
-}
-
-const ShowList = {
-	position: 'absolute',
-	transition: 'all 0.5s ease',
-	marginTop: '1rem',
-	left: 0,
-}
-
-const ToggleList = {
-	visibility: 'visible',
-	opacity: 1,
-	display: 'block',
-}
-
+import { getERC20Allowance, getVaderConversionFactor } from '../common/ethereum'
+import { useWallet } from 'use-wallet'
 
 export const Redeem = () => {
-	const fakeTokens = [{
-		name: 'Vader',
-		value: 'vader',
-		icon: 'blue',
-	},
-	{
-		name: 'Vether',
-		value: 'vether',
-		color: 'pink',
-	},
+	const tokens = [
+		{
+			'chainId':defaults.network.chainId,
+			'address': defaults.address.vader,
+			'name':'VADER PROTOCOL TOKEN',
+			'symbol':'VADER',
+			'decimals':18,
+			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		},
+		{
+			'chainId':defaults.network.chainId,
+			'address':defaults.address.vether,
+			'name':'VETHER',
+			'symbol':'VETH',
+			'decimals':18,
+			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		},
 	]
-	const [tokens, setTokens] = useState(fakeTokens)
-	const [tokenToBurn, setTokenToBurn] = useState('Vader')
-	const [burnAmount, setBurnAmount] = useState(0)
-	const [tokenToGet, setTokenToGet] = useState('USDV')
-	const [tokenAmountToGet, setTokenAmountToGet] = useState(10000)
+	const wallet = useWallet()
 	const [showTokenList, setShowTokenList] = useState(false)
+	const [tokenSelect, setTokenSelect] = useState(tokens[1])
+	const [amount] = useState('0')
+	const [spendAllowed, setSpendAllowed] = useState(true)
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('1000'))
 
-
-	const burnToken = () => {
-		console.log(tokenToBurn)
-		console.log(burnAmount)
+	const HiddenList = {
+		visibility: 'hidden',
+		opacity: 0,
+		display: 'none',
 	}
 
-	const calculateBurn = (e) => {
-	  const amount = Number(e.target.value)
-		if(!amount || amount <= 0) {
-			return
-		}
-		setBurnAmount(amount)
-		// TODO change it
-		setTokenToGet('USDV')
-		// TODO get the real rate
-		setTokenAmountToGet(amount * 100)
+	const ShowList = {
+		position: 'absolute',
+		transition: 'all 0.5s ease',
+		marginTop: '1rem',
+		left: 0,
+	}
+
+	const ToggleList = {
+		visibility: 'visible',
+		opacity: 1,
+		display: 'block',
 	}
 
 	useEffect(() => {
-		// placeholder
-		setTokens(fakeTokens)
-	}, [])
+		if (tokenSelect.symbol === 'VETH') {
+			getVaderConversionFactor(defaults.network.provider)
+				.then((f) => {
+					setConversionFactor(f)
+				})
+				.catch(console.log)
+		}
+	}, [tokenSelect])
+
+	useEffect(() => {
+		if(wallet.account) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			if (tokenSelect.symbol === 'VETH') {
+				getERC20Allowance(tokenSelect.address,
+					wallet.account,
+					defaults.address.vader,
+					provider)
+					.then(n => {
+						if(
+							n.gt(ethers.BigNumber.from('0'))
+							&& n.gte(ethers.BigNumber.from(String(amount)))
+						) setSpendAllowed(true)
+					})
+					.catch(console.log)
+			}
+		}
+	}, [wallet.account, tokenSelect, amount])
+
+	console.log(spendAllowed)
 
 	return (
 		<Box
@@ -92,70 +103,63 @@ export const Redeem = () => {
 				layerStyle='colorful'
 				maxW='49ch'
 				m='0 auto'
-				p='1.8rem'
+				p='2.5rem 2.5rem 1.8rem'
+				flexDir='column'
 			>
-				<Box>
-					<Text align='center' fontSize='1.5rem' fontWeight='bolder'>
+				<Text align='center' fontSize='1.55rem' fontWeight='bolder'>
             Asset redemption
-					</Text>
-					<Text align='center' fontSize='1.2rem' display='block' mb='2rem'>
-            Redeem assets by burning your tokens
-					</Text>
-					<FormControl id='assetToBurn'>
-						<FormLabel fontSize='1.2rem' fontWeight='bolder'> Asset amount to burn</FormLabel>
-						<FormErrorMessage />
-						<Flex layerStyle='inputLike'>
-							<Box flex='1' pr='0.5rem'>
-								<NumberInput>
-									<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' onChange={calculateBurn} />
-								</NumberInput>
-							</Box>
-							<Box position='relative' cursor='pointer' onClick={() => setShowTokenList(!showTokenList)}>
-								<Box d='flex' alignItems='center'>
-									<Image
-										width='42px'
-										mr='10px'
-									/>
-									<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenToBurn}</Box>
-									{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
-								</Box>
-								<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle="colorful" padding="1rem" mt=".7rem">
-									<List {...ToggleList}>
-										{tokens.map(token =>
-											<ListItem key={token.name} mb="0.5rem" d="flex" alignItems="center" onClick={()=> setTokenToBurn(token.value)}>
-												<Image
-													width='42px'
-													mr='10px'
-												/>
-												{token.name}
-											</ListItem>,
-										)}
-									</List>
-								</Box>
-							</Box>
-						</Flex>
-						<Box textAlign='center' marginY='15px'>Mint:</Box>
-						<Box d='flex' justifyContent='center' alignItems='center'>
-							<Box fontSize='1.5rem' fontWeight='bolder' mr="1rem">{tokenAmountToGet}</Box>
+				</Text>
+				<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
+            Redeem assets by burning your tokens.
+				</Text>
+				<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Asset amount to burn</Text>
+				<Flex layerStyle='inputLike'>
+					<Box flex='1' pr='0.5rem'>
+						<NumberInput variant='transparent'>
+							<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' />
+						</NumberInput>
+					</Box>
+					<Box position='relative' cursor='pointer' onClick={() => setShowTokenList(!showTokenList)}>
+						<Box d='flex' alignItems='center'>
 							<Image
 								width='42px'
 								mr='10px'
+								src={tokenSelect.logoURI}
 							/>
-							<Box fontSize='1.5rem' fontWeight='bolder'>{tokenToGet}</Box>
+							<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenSelect.symbol}</Box>
+							{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 						</Box>
-						<Box d='flex' justifyContent='center' marginY='1.5rem'>
-							<Button variant='solidRadial'
-								m='0 auto'
-								size='lg'
-								minWidth='230px'
-								textTransform='uppercase'
-								color="white"
-								onClick={burnToken}>
-                    Burn
-							</Button>
+						<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle='colorful' padding='1rem' mt='.7rem'>
+							<List {...ToggleList}>
+								{tokens.map(token =>
+									<ListItem key={token.name} mb='0.5rem' d='flex' alignItems='center'
+										onClick={() => setTokenSelect(token)}
+									>
+										<Image
+											width='42px'
+											mr='10px'
+											src={token.logoURI}
+										/>
+										{token.symbol}
+									</ListItem>,
+								)}
+							</List>
 						</Box>
-					</FormControl>
-				</Box>
+					</Box>
+				</Flex>
+				<Flex mt='2rem' fontSize='1.5rem' fontWeight='bolder'
+					justifyContent='center' alignItems='center'>
+					{conversionFactor.toString()}
+				</Flex>
+				<Button
+					variant='solidRadial'
+					m='2rem auto'
+					size='lg'
+					minWidth='230px'
+					textTransform='uppercase'
+				>
+						Burn
+				</Button>
 			</Flex>
 		</Box>
 	)
