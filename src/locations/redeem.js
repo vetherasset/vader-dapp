@@ -13,7 +13,7 @@ import {
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, getVaderConversionFactor } from '../common/ethereum'
+import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance, getVaderConversionFactor, upgradeVetherToVader } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
 
 export const Redeem = () => {
@@ -25,6 +25,7 @@ export const Redeem = () => {
 			'symbol':'VADER',
 			'decimals':18,
 			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			'convertsTo':'USDV',
 		},
 		{
 			'chainId':defaults.network.chainId,
@@ -33,14 +34,17 @@ export const Redeem = () => {
 			'symbol':'VETH',
 			'decimals':18,
 			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			'convertsTo':'VADER',
 		},
 	]
 	const wallet = useWallet()
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[1])
-	const [amount] = useState('0')
+	const [amount, setAmount] = useState(0)
+	// eslint-disable-next-line no-unused-vars
 	const [spendAllowed, setSpendAllowed] = useState(true)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('1000'))
+	const [working, setWorking] = useState(false)
 
 	const HiddenList = {
 		visibility: 'hidden',
@@ -67,30 +71,26 @@ export const Redeem = () => {
 				.then((f) => {
 					setConversionFactor(f)
 				})
-				.catch(console.log)
+				.catch((err) =>console.log(err))
 		}
 	}, [tokenSelect])
 
 	useEffect(() => {
 		if(wallet.account) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			if (tokenSelect.symbol === 'VETH') {
-				getERC20Allowance(tokenSelect.address,
-					wallet.account,
-					defaults.address.vader,
-					provider)
-					.then(n => {
-						if(
-							n.gt(ethers.BigNumber.from('0'))
+			getERC20Allowance(tokenSelect.address,
+				wallet.account,
+				defaults.address.vader,
+				provider)
+				.then(n => {
+					if(
+						n.gt(ethers.BigNumber.from('0'))
 							&& n.gte(ethers.BigNumber.from(String(amount)))
-						) setSpendAllowed(true)
-					})
-					.catch(console.log)
-			}
+					) setSpendAllowed(true)
+				})
+				.catch(console.log)
 		}
 	}, [wallet.account, tokenSelect, amount])
-
-	console.log(spendAllowed)
 
 	return (
 		<Box
@@ -115,7 +115,11 @@ export const Redeem = () => {
 				<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Asset amount to burn</Text>
 				<Flex layerStyle='inputLike'>
 					<Box flex='1' pr='0.5rem'>
-						<NumberInput variant='transparent'>
+						<NumberInput
+							variant='transparent'
+							onChange={(n) => {
+								setAmount(n)
+							}}>
 							<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' />
 						</NumberInput>
 					</Box>
@@ -147,18 +151,77 @@ export const Redeem = () => {
 						</Box>
 					</Box>
 				</Flex>
-				<Flex mt='2rem' fontSize='1.5rem' fontWeight='bolder'
+				<Flex m='3rem 0' fontSize='1.5rem' fontWeight='bolder'
 					justifyContent='center' alignItems='center'>
-					{conversionFactor.toString()}
+					{amount * conversionFactor.toNumber()}
+					&nbsp;
+					{tokenSelect.convertsTo}
 				</Flex>
 				<Button
 					variant='solidRadial'
-					m='2rem auto'
+					m='0 auto 2rem'
 					size='lg'
 					minWidth='230px'
 					textTransform='uppercase'
+					loadingText='Submitting'
+					isLoading={working}
+					onClick={() => {
+						if(wallet.account) {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+							if(spendAllowed) {
+								if (tokenSelect.symbol === 'VETH') {
+									setWorking(true)
+									upgradeVetherToVader(
+										ethers.utils.parseUnits(String(amount)).toString(),
+										provider,
+									)
+										.then(() => {
+											setWorking(false)
+										})
+										.catch(err => {
+											setWorking(false)
+											console.log(err)
+										})
+								}
+								if (tokenSelect.symbol === 'VADER') {
+									setWorking(true)
+									convertVaderToUsdv(
+										ethers.utils.parseUnits(String(amount)).toString(),
+										provider,
+									)
+										.then(() => {
+											setWorking(false)
+										})
+										.catch(err => {
+											setWorking(false)
+											console.log(err)
+										})
+								}
+							}
+ 							else {
+								setWorking(true)
+								approveERC20ToSpend(
+									tokenSelect.address,
+									defaults.address.vader,
+									'302503999000000000299700000',
+								)
+									.then(() => {
+										setWorking(false)
+									})
+									.catch(err => {
+										setWorking(false)
+										console.log(err)
+									})
+							}
+						}
+					}}
 				>
-						Burn
+					{spendAllowed &&
+						'Burn'
+					}
+					{!spendAllowed &&
+						'Approve for spending'
+					}
 				</Button>
 			</Flex>
 		</Box>
