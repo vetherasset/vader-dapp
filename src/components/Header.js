@@ -61,9 +61,9 @@ export const Header = (props) => {
 					icon={<HamburgerIcon />}
 					variant='outline'
 				/>
-				<MenuList>
-					{pages.map(p => <MenuItem key={p.name}><Link to={p.link}>{p.text}</Link></MenuItem>)}
-					<WalletConnectionToggle />
+				<MenuList p='1rem'>
+					{pages.map(p => <MenuItem key={p.name} pb="1rem"><Link to={p.link}>{p.text}</Link></MenuItem>)}
+					<WalletConnectionToggle w='100%'/>
 				</MenuList>
 			</Menu>
 		</Flex>
