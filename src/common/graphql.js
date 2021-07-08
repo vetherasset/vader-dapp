@@ -1,28 +1,71 @@
 const { request, gql } = require('graphql-request')
 import defaults from './defaults'
 
-const getAllAssetPools = async (skip, first) => {
-	const assetsQuery = gql`
-		query assets ($skip: Int, $first: Int) {
-			assets {
-				id
-				address
-				deposit
-				balance
-				lastHarvestedTime
+const getData = async (options) => {
+	const dataQuery = gql`
+		query data (${options.params}) {
+			${options.schema} ${options.conditions} {
+				${options.entities}
 			}
 		}
 	`
+
 	return request(
 		defaults.graphUrl,
-		assetsQuery,
-		{
+		dataQuery,
+		options.variables,
+	).then(data=> data[options.schema])
+}
+
+const getAllTokens = async (options) => {
+	return await getData({
+		...options,
+		schema: 'tokens',
+		entities: `
+			id
+			address
+			totalSupply
+			synth {
+				id
+				address
+			}
+			isSynth
+			isAsset
+			isAnchor
+			liquidityUnits
+			baseToken {
+				id
+				address
+			}
+			baseAmount
+			tokenAmount
+		`,
+	})
+}
+
+const getAllAssetPools = async (skip, first) => {
+	return await getAllTokens({
+		params: '$skip: Int, $first: Int',
+		conditions: '(skip: $skip, first: $first, where: {isAsset: true})',
+		variables: {
 			skip,
 			first,
 		},
-	).then(data=> data.assets)
+	})
+}
+
+const getAllAnchorPools = async (skip, first) => {
+	return await getAllTokens({
+		params: '$skip: Int, $first: Int',
+		conditions: '(skip: $skip, first: $first, where: {isAnchor: false})',
+		variables: {
+			skip,
+			first,
+		},
+	})
 }
 
 export {
 	getAllAssetPools,
+	getAllAnchorPools,
 }
