@@ -83,10 +83,15 @@ export const Redeem = () => {
 				defaults.address.vader,
 				provider)
 				.then(n => {
-					if(
+					if (
 						n.gt(ethers.BigNumber.from('0'))
 							&& n.gte(ethers.BigNumber.from(String(amount)))
-					) setSpendAllowed(true)
+					) {
+						setSpendAllowed(true)
+					}
+					else {
+						setSpendAllowed(false)
+					}
 				})
 				.catch(console.log)
 		}
@@ -169,8 +174,8 @@ export const Redeem = () => {
 						if(wallet.account) {
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							if(spendAllowed) {
+								setWorking(true)
 								if (tokenSelect.symbol === 'VETH') {
-									setWorking(true)
 									upgradeVetherToVader(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
@@ -184,7 +189,6 @@ export const Redeem = () => {
 										})
 								}
 								if (tokenSelect.symbol === 'VADER') {
-									setWorking(true)
 									convertVaderToUsdv(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
@@ -204,6 +208,7 @@ export const Redeem = () => {
 									tokenSelect.address,
 									defaults.address.vader,
 									'302503999000000000299700000',
+									provider,
 								)
 									.then(() => {
 										setWorking(false)
@@ -220,7 +225,7 @@ export const Redeem = () => {
 						'Burn'
 					}
 					{!spendAllowed &&
-						'Approve for spending'
+						'Approve Token'
 					}
 				</Button>
 			</Flex>
