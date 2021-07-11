@@ -9,12 +9,16 @@ import {
 	Image,
 	List,
 	ListItem,
+	useToast,
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance, getVaderConversionFactor, upgradeVetherToVader } from '../common/ethereum'
+import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
+	getVaderConversionFactor, upgradeVetherToVader } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
+import { approved, insufficientBalance, rejected, failed,
+	vaderconverted, vethupgraded } from '../messages'
 
 export const Redeem = () => {
 	const tokens = [
@@ -38,6 +42,7 @@ export const Redeem = () => {
 		},
 	]
 	const wallet = useWallet()
+	const toast = useToast()
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[1])
 	const [amount, setAmount] = useState(0)
@@ -182,10 +187,23 @@ export const Redeem = () => {
 									)
 										.then(() => {
 											setWorking(false)
+											toast(vethupgraded)
 										})
 										.catch(err => {
 											setWorking(false)
-											console.log(err)
+											if(err.code === 'INSUFFICIENT_FUNDS') {
+												console.log('Insufficient balance: Your account balance is insufficient.')
+												toast(insufficientBalance)
+											}
+											else if(err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else {
+												console.log('Error code is:' + err.code)
+												console.log('Error:' + err)
+												toast(failed)
+											}
 										})
 								}
 								if (tokenSelect.symbol === 'VADER') {
@@ -195,10 +213,23 @@ export const Redeem = () => {
 									)
 										.then(() => {
 											setWorking(false)
+											toast(vaderconverted)
 										})
 										.catch(err => {
 											setWorking(false)
-											console.log(err)
+											if(err.code === 'INSUFFICIENT_FUNDS') {
+												console.log('Insufficient balance: Your account balance is insufficient.')
+												toast(insufficientBalance)
+											}
+											else if(err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else {
+												console.log('Error code is:' + err.code)
+												console.log('Error:' + err)
+												toast(failed)
+											}
 										})
 								}
 							}
@@ -212,10 +243,23 @@ export const Redeem = () => {
 								)
 									.then(() => {
 										setWorking(false)
+										toast(approved)
 									})
 									.catch(err => {
 										setWorking(false)
-										console.log(err)
+										if(err.code === 'INSUFFICIENT_FUNDS') {
+											console.log('Insufficient balance: Your account balance is insufficient.')
+											toast(insufficientBalance)
+										}
+										else if(err.code === 4001) {
+											console.log('Transaction rejected: Your have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else {
+											console.log('Error code is:' + err.code)
+											console.log('Error:' + err)
+											toast(failed)
+										}
 									})
 							}
 						}
