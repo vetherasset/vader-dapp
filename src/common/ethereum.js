@@ -1,6 +1,8 @@
 import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/humanStandardTokenAbi'
 import vaderAbi from '../artifacts/VaderAbi'
+import routerAbi from '../artifacts/RouterAbi'
+import poolsAbi from '../artifacts/PoolsAbi'
 import defaults from './defaults'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
@@ -100,7 +102,33 @@ const upgradeVetherToVader = async (amount, provider) => {
 	return await contract.upgrade(amount)
 }
 
+const getSwapRate = async (from, to, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.router,
+		routerAbi,
+		provider.getSigner(0),
+	)
+
+	return ethers.BigNumber.from(await contract.callStatic.swap(1, from, to))
+}
+
+const getSwapFee = async (inputAmount, from, to, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.pools,
+		poolsAbi,
+		provider.getSigner(0),
+	)
+
+	const baseAmount = ethers.BigNumber.from(await contract.getBaseAmount(to))
+	const tokenAmount = ethers.BigNumber.from(await contract.getTokenAmount(to))
+	const numerator = tokenAmount.mul(ethers.BigNumber.from(inputAmount).pow(2))
+	const denominator = baseAmount.add(1).pow(2)
+
+	return numerator.div(denominator)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
 	getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv, upgradeVetherToVader,
+	getSwapRate, getSwapFee,
 }
