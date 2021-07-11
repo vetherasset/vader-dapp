@@ -116,7 +116,7 @@ const getSwapFee = async (inputAmount, from, to, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.pools,
 		poolsAbi,
-		provider.getSigner(0),
+		provider,
 	)
 
 	const baseAmount = ethers.BigNumber.from(await contract.getBaseAmount(to))
@@ -127,8 +127,19 @@ const getSwapFee = async (inputAmount, from, to, provider) => {
 	return numerator.div(denominator)
 }
 
+const getUSDVburnRate = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.router,
+		routerAbi,
+		provider,
+	)
+
+	return ethers.BigNumber.from(await contract.getVADERAmount(1))
+}
+
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
 	getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv, upgradeVetherToVader,
-	getSwapRate, getSwapFee,
+	getSwapRate, getSwapFee, getUSDVburnRate,
 }
