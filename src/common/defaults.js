@@ -40,6 +40,12 @@ defaults.address.usdv = defaults.network.chainId === 1 ? ''
 defaults.address.vether = defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279'
 	: defaults.network.chainId === 3 ? '0xA7764B95123D8c7680eBbA3F2dd7DB459E6EcdC6'
 	 : undefined
+defaults.address.pools = defaults.network.chainId === 1 ? ''
+	: defaults.network.chainId === 3 ? '0x2a7665D63d157373573b3EaBebEc1a7a9431fA5F'
+		: undefined
+defaults.address.router = defaults.network.chainId === 1 ? ''
+	: defaults.network.chainId === 3 ? '0x2880F198f6C380F34381200f2969BB4280da8634'
+		: undefined
 
 defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenDefault = {
