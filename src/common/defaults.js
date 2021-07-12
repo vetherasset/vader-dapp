@@ -35,18 +35,17 @@ defaults.address.vader = defaults.network.chainId === 1 ? ''
 	: defaults.network.chainId === 3 ? '0x9bee02113c21ad204c6a08Dd22a921aC86CA69e5'
 		: undefined
 defaults.address.usdv = defaults.network.chainId === 1 ? ''
-	: defaults.network.chainId === 3 ? '0x6077a249ADfc542a87C0F18a29deEfA1e85A7aab'
+	: defaults.network.chainId === 3 ? '0xD3EEE43466FA03d220c1D9d31d9c169171d6860C'
 	 : undefined
 defaults.address.vether = defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279'
 	: defaults.network.chainId === 3 ? '0xA7764B95123D8c7680eBbA3F2dd7DB459E6EcdC6'
 	 : undefined
-defaults.address.usdv = defaults.network.chainId === 1 ? ''
-	: defaults.network.chainId === 3 ? '0xD3EEE43466FA03d220c1D9d31d9c169171d6860C'
-	 : undefined
+defaults.address.pools = defaults.network.chainId === 1 ? ''
+	: defaults.network.chainId === 3 ? '0x2a7665D63d157373573b3EaBebEc1a7a9431fA5F'
+		: undefined
 defaults.address.router = defaults.network.chainId === 1 ? ''
 	: defaults.network.chainId === 3 ? '0x2880F198f6C380F34381200f2969BB4280da8634'
 		: undefined
-
 
 defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenDefault = {
