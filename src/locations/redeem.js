@@ -274,6 +274,32 @@ export const Redeem = () => {
 											}
 										})
 								}
+								if (tokenSelect.symbol === 'USDV') {
+									convertVaderToUsdv(
+										ethers.utils.parseUnits(String(amount)).toString(),
+										provider,
+									)
+										.then(() => {
+											setWorking(false)
+											toast(vaderconverted)
+										})
+										.catch(err => {
+											setWorking(false)
+											if(err.code === 'INSUFFICIENT_FUNDS') {
+												console.log('Insufficient balance: Your account balance is insufficient.')
+												toast(insufficientBalance)
+											}
+											else if(err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else {
+												console.log('Error code is:' + err.code)
+												console.log('Error:' + err)
+												toast(failed)
+											}
+										})
+								}
 							}
  							else {
 								setWorking(true)

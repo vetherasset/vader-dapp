@@ -68,6 +68,15 @@ const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 	return await contract.balanceOf(address)
 }
 
+const redeemToVADER = async (amountUsdv, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.vader,
+		vaderAbi,
+		provider.getSigner(0),
+	)
+	return await contract.redeemToVADER(amountUsdv)
+}
+
 const resolveUnknownERC20 = async (tokenAddress, provider) => {
 	let token
 	const contract = new ethers.Contract(
@@ -167,8 +176,8 @@ const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
 
 
 export {
-	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
-	getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv, upgradeVetherToVader,
-	getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
+	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
+	estimateGasCost, getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv,
+	upgradeVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
 	getVaderAmount, getUsdvAmount,
 }
