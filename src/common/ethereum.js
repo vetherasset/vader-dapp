@@ -137,9 +137,19 @@ const getUSDVburnRate = async (provider) => {
 	return ethers.BigNumber.from(await contract.getVADERAmount(1))
 }
 
+const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.pools,
+		poolsAbi,
+		provider,
+	)
+
+	return ethers.BigNumber.from(await contract.getMemberUnits(poolAddress, address)).gt(0)
+}
+
 
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20, estimateGasCost,
 	getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv, upgradeVetherToVader,
-	getSwapRate, getSwapFee, getUSDVburnRate,
+	getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
 }
