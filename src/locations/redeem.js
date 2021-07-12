@@ -15,7 +15,7 @@ import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
-	getVaderConversionFactor, upgradeVetherToVader } from '../common/ethereum'
+	getVaderConversionFactor, upgradeVetherToVader, getVaderAmount, getUsdvAmount } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded } from '../messages'
@@ -40,6 +40,15 @@ export const Redeem = () => {
 			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 			'convertsTo':'VADER',
 		},
+		{
+			'chainId':defaults.network.chainId,
+			'address':defaults.address.usdv,
+			'name':'VADER STABLE DOLLAR',
+			'symbol':'USDV',
+			'decimals':18,
+			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			'convertsTo':'VADER',
+		},
 	]
 	const wallet = useWallet()
 	const toast = useToast()
@@ -48,7 +57,7 @@ export const Redeem = () => {
 	const [amount, setAmount] = useState(0)
 	// eslint-disable-next-line no-unused-vars
 	const [spendAllowed, setSpendAllowed] = useState(true)
-	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('1000'))
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
 	const [working, setWorking] = useState(false)
 
 	const HiddenList = {
@@ -77,6 +86,39 @@ export const Redeem = () => {
 					setConversionFactor(f)
 				})
 				.catch((err) =>console.log(err))
+		}
+		if (tokenSelect.symbol === 'USDV') {
+			if(amount > Number(0)) {
+				getVaderAmount(
+					ethers.BigNumber.from(String(amount),
+					),
+					defaults.network.provider)
+					.then((f) => {
+						setConversionFactor(
+							f.div(ethers.BigNumber.from(String(amount))),
+						)
+					})
+					.catch((err) =>console.log(err))
+			}
+		}
+		if (tokenSelect.symbol === 'VADER') {
+			if(amount > Number(0)) {
+				getUsdvAmount(
+					ethers.BigNumber.from(String(amount),
+					),
+					defaults.network.provider)
+					.then((f) => {
+						setConversionFactor(
+							f.div(ethers.BigNumber.from(String(amount))),
+						)
+					})
+					.catch((err) =>console.log(err))
+			}
+		}
+		if (amount <= 0) {
+			setConversionFactor(
+				ethers.BigNumber.from('0'),
+			)
 		}
 	}, [tokenSelect])
 
