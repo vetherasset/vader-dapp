@@ -9,12 +9,16 @@ import {
 	Image,
 	List,
 	ListItem,
+	useToast,
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance, getVaderConversionFactor, upgradeVetherToVader } from '../common/ethereum'
+import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
+	getVaderConversionFactor, upgradeVetherToVader, getVaderAmount, getUsdvAmount } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
+import { approved, insufficientBalance, rejected, failed,
+	vaderconverted, vethupgraded } from '../messages'
 
 export const Redeem = () => {
 	const tokens = [
@@ -36,14 +40,24 @@ export const Redeem = () => {
 			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 			'convertsTo':'VADER',
 		},
+		{
+			'chainId':defaults.network.chainId,
+			'address':defaults.address.usdv,
+			'name':'VADER STABLE DOLLAR',
+			'symbol':'USDV',
+			'decimals':18,
+			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			'convertsTo':'VADER',
+		},
 	]
 	const wallet = useWallet()
+	const toast = useToast()
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[1])
 	const [amount, setAmount] = useState(0)
 	// eslint-disable-next-line no-unused-vars
 	const [spendAllowed, setSpendAllowed] = useState(true)
-	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('1000'))
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
 	const [working, setWorking] = useState(false)
 
 	const HiddenList = {
@@ -73,6 +87,39 @@ export const Redeem = () => {
 				})
 				.catch((err) =>console.log(err))
 		}
+		if (tokenSelect.symbol === 'USDV') {
+			if(amount > Number(0)) {
+				getVaderAmount(
+					ethers.BigNumber.from(String(amount),
+					),
+					defaults.network.provider)
+					.then((f) => {
+						setConversionFactor(
+							f.div(ethers.BigNumber.from(String(amount))),
+						)
+					})
+					.catch((err) =>console.log(err))
+			}
+		}
+		if (tokenSelect.symbol === 'VADER') {
+			if(amount > Number(0)) {
+				getUsdvAmount(
+					ethers.BigNumber.from(String(amount),
+					),
+					defaults.network.provider)
+					.then((f) => {
+						setConversionFactor(
+							f.div(ethers.BigNumber.from(String(amount))),
+						)
+					})
+					.catch((err) =>console.log(err))
+			}
+		}
+		if (amount <= 0) {
+			setConversionFactor(
+				ethers.BigNumber.from('0'),
+			)
+		}
 	}, [tokenSelect])
 
 	useEffect(() => {
@@ -83,10 +130,15 @@ export const Redeem = () => {
 				defaults.address.vader,
 				provider)
 				.then(n => {
-					if(
+					if (
 						n.gt(ethers.BigNumber.from('0'))
 							&& n.gte(ethers.BigNumber.from(String(amount)))
-					) setSpendAllowed(true)
+					) {
+						setSpendAllowed(true)
+					}
+					else {
+						setSpendAllowed(false)
+					}
 				})
 				.catch(console.log)
 		}
@@ -169,32 +221,57 @@ export const Redeem = () => {
 						if(wallet.account) {
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							if(spendAllowed) {
+								setWorking(true)
 								if (tokenSelect.symbol === 'VETH') {
-									setWorking(true)
 									upgradeVetherToVader(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
 									)
 										.then(() => {
 											setWorking(false)
+											toast(vethupgraded)
 										})
 										.catch(err => {
 											setWorking(false)
-											console.log(err)
+											if(err.code === 'INSUFFICIENT_FUNDS') {
+												console.log('Insufficient balance: Your account balance is insufficient.')
+												toast(insufficientBalance)
+											}
+											else if(err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else {
+												console.log('Error code is:' + err.code)
+												console.log('Error:' + err)
+												toast(failed)
+											}
 										})
 								}
 								if (tokenSelect.symbol === 'VADER') {
-									setWorking(true)
 									convertVaderToUsdv(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
 									)
 										.then(() => {
 											setWorking(false)
+											toast(vaderconverted)
 										})
 										.catch(err => {
 											setWorking(false)
-											console.log(err)
+											if(err.code === 'INSUFFICIENT_FUNDS') {
+												console.log('Insufficient balance: Your account balance is insufficient.')
+												toast(insufficientBalance)
+											}
+											else if(err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else {
+												console.log('Error code is:' + err.code)
+												console.log('Error:' + err)
+												toast(failed)
+											}
 										})
 								}
 							}
@@ -204,13 +281,27 @@ export const Redeem = () => {
 									tokenSelect.address,
 									defaults.address.vader,
 									'302503999000000000299700000',
+									provider,
 								)
 									.then(() => {
 										setWorking(false)
+										toast(approved)
 									})
 									.catch(err => {
 										setWorking(false)
-										console.log(err)
+										if(err.code === 'INSUFFICIENT_FUNDS') {
+											console.log('Insufficient balance: Your account balance is insufficient.')
+											toast(insufficientBalance)
+										}
+										else if(err.code === 4001) {
+											console.log('Transaction rejected: Your have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else {
+											console.log('Error code is:' + err.code)
+											console.log('Error:' + err)
+											toast(failed)
+										}
 									})
 							}
 						}
@@ -220,7 +311,7 @@ export const Redeem = () => {
 						'Burn'
 					}
 					{!spendAllowed &&
-						'Approve for spending'
+						'Approve Token'
 					}
 				</Button>
 			</Flex>

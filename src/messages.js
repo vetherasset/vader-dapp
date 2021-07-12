@@ -1,5 +1,14 @@
 import defaults from './common/defaults'
 
+const approved = {
+	title: 'Token succesfully approved',
+	description: 'You have approved the token for spending.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const connected = {
 	title: 'Wallet connected',
 	description: 'Your wallet account has been connected.',
@@ -45,7 +54,25 @@ const walletNotConnected = {
 	position: defaults.toast.position,
 }
 
+const vaderconverted = {
+	title: 'Vader Token burnt for USDV',
+	description: 'Amount of Vader was burnt for USDV succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const vethupgraded = {
+	title: 'Veth burnt for Vader Token',
+	description: 'Amount of Veth was burnt for Vader succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
-	connected, failed, rejected, insufficientBalance,
-	walletNotConnected,
+	approved, connected, failed, rejected, insufficientBalance,
+	walletNotConnected, vaderconverted, vethupgraded,
 }
