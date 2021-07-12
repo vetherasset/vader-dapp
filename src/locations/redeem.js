@@ -15,10 +15,10 @@ import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
-	getVaderConversionFactor, upgradeVetherToVader, getVaderAmount, getUsdvAmount } from '../common/ethereum'
+	getVaderConversionFactor, upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
-	vaderconverted, vethupgraded } from '../messages'
+	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
 
 export const Redeem = () => {
 	const tokens = [
@@ -275,13 +275,13 @@ export const Redeem = () => {
 										})
 								}
 								if (tokenSelect.symbol === 'USDV') {
-									convertVaderToUsdv(
+									redeemToVADER(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
 									)
 										.then(() => {
 											setWorking(false)
-											toast(vaderconverted)
+											toast(usdvredeemed)
 										})
 										.catch(err => {
 											setWorking(false)
