@@ -1,0 +1,50 @@
+const pools = [
+	{
+		name: 'DAI',
+		symbol: 'dai',
+		icon: 'data:image/png;base64,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',
+		type: 'anchor',
+		price: '0.41',
+		liquidity: '30.45',
+		dayVolume: '1.52',
+		apy: '24',
+		actions: ['sawp', 'liquidity'],
+	},
+	{
+		name: 'USDT',
+		symbol: 'usdt',
+		icon: 'data:image/png;base64,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',
+		type: 'anchor',
+		price: '0.42',
+		liquidity: '31.45',
+		dayVolume: '1.1',
+		apy: '24',
+		actions: ['sawp', 'liquidity'],
+	},
+	{
+		name: 'USDC',
+		symbol: 'usdc',
+		icon: 'data:image/png;base64,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',
+		type: 'anchor',
+		price: '0.42',
+		liquidity: '20.45',
+		dayVolume: '0.52',
+		apy: '12',
+		actions: ['sawp', 'synth', 'liquidity'],
+	},
+	{
+		name: 'UST',
+		symbol: 'ust',
+		icon: 'data:image/png;base64,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',
+		type: 'anchor',
+		price: '0.21',
+		liquidity: '10.45',
+		dayVolume: '2.52',
+		apy: '27',
+		actions: ['sawp', 'liquidity'],
+	},
+]
+
+export {
+	pools,
+}

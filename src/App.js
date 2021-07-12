@@ -7,6 +7,7 @@ import { Header } from './components/Header'
 import Swap from './locations/swap'
 import Redeem from './locations/redeem'
 import Syths from './locations/syths'
+import Pool from './locations/pool'
 import defaults from './common/defaults'
 
 const App = () => {
@@ -30,6 +31,9 @@ const App = () => {
 						}/>
 						<Route path='/syths' exact render={() =>
 							<Syths />
+						}/>
+						<Route path='/pool' exact render={() =>
+							<Pool />
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
