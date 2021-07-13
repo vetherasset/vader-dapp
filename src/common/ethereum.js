@@ -186,12 +186,12 @@ const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
 
 const tokenHasPool = async (address, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.pools,
-		poolsAbi,
+		defaults.address.router,
+		routerAbi,
 		provider,
 	)
 
-	return ethers.BigNumber.from(await contract.getUnits(address)).gt(0)
+	return await contract.isPool(address)
 }
 
 export {
