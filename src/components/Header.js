@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Flex, Menu, MenuItem, IconButton, MenuButton, MenuList } from '@chakra-ui/react'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
@@ -28,9 +28,6 @@ export const Header = (props) => {
 			link: '/redeem',
 		},
 	]
-
-	const [currentPath, setCurrentPath] = useState('/')
-
 	return (
 		<Flex
 			style={{ justifyContent: 'space-between', alignItems: 'center' }}
@@ -49,11 +46,7 @@ export const Header = (props) => {
 				display={{ base: 'none', md: 'flex' }}
 			>
 				{pages.map(p =>
-					<Link
-						onClick={() => {
-							setCurrentPath(p.link)
-						}}
-						key={p.name} to={p.link}>{p.text}</Link>)}
+					<Link key={p.name} to={p.link}>{p.text}</Link>)}
 			</Flex>
 			<Flex w='20%' 	justifyContent='flex-end'>
 				<Flex
@@ -70,10 +63,7 @@ export const Header = (props) => {
 					/>
 					<MenuList p='1rem'>
 						{pages.map(p => <MenuItem key={p.name} pb='1rem'>
-							<Link
-								onClick={() => {
-									setCurrentPath(p.link)
-								}} to={p.link}>{p.text}</Link>
+							<Link to={p.link}>{p.text}</Link>
 						</MenuItem>)}
 						<WalletConnectionToggle w='100%' />
 					</MenuList>
