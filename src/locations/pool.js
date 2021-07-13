@@ -7,12 +7,79 @@ import SortableHeader from '../components/SortableHeader'
 import CenteredText from '../components/CenteredText'
 
 const Pools = () => {
+	const headers = [
+		{
+			name: 'name',
+			text: 'pool',
+		},
+		{
+			name: 'type',
+			text: 'pooltype',
+		},
+		{
+			name: 'price',
+			text: 'price',
+		},
+		{
+			name: 'liquidity',
+			text: 'liquidity',
+		},
+		{
+			name: 'dayVolume',
+			text: '24H volume',
+		},
+		{
+			name: 'apy',
+			text: 'apy',
+		},
+		{
+			name: 'refresh',
+			text: 'refresh',
+		},
+	]
 	const [tokens, setTokens] = useState([])
-	const headers = ['pool', 'pooltype', 'price', 'liguidity', '24H volume', 'apy', 'refresh']
+	const [filteredToken, setFilteredToken] = useState([])
+	const [currentOrderKey, setCurrentOrderKey] = useState('')
+	const [currentOrder, setCurrentOrder] = useState('')
+	const [currentQuery, setCurrentQuery] = useState('')
 
 	useEffect(() => {
 		setTokens(pools)
+		setFilteredToken(pools)
 	}, [])
+
+	const sortPool = (headerKey, desc)=>{
+		if(currentOrderKey === headerKey && currentOrder === desc) {
+			return
+		}
+		setCurrentOrderKey(headerKey)
+		setCurrentOrder(desc)
+		const isDesc = desc === 'desc'
+		const sortedTokens = tokens.sort((tokenA, tokenB)=>{
+			if(isNaN(tokenA[headerKey])) {
+				return (tokenA[headerKey] > tokenB[headerKey]) ? (isDesc ? 1 : -1) : (isDesc ? -1 : 1)
+			}
+			return (Number(tokenA[headerKey]) > Number(tokenB[headerKey])) ? (isDesc ? 1 : -1) : (isDesc ? -1 : 1)
+		})
+		setFilteredToken(sortedTokens)
+	}
+
+	const searchToken = query=>{
+		const trimmedQuery = query.trim()
+		if(currentQuery === trimmedQuery) {
+			return
+		}
+		setCurrentQuery(trimmedQuery)
+		if(!trimmedQuery) {
+			setFilteredToken(tokens)
+			return
+		}
+		setFilteredToken(tokens.filter(t=> t.name.toLowerCase().includes(query.trim().toLowerCase())))
+	}
+
+	const handleActionButton = (action, token) =>{
+		console.log(action, token)
+	}
 
 	return (
 		<Box
@@ -26,33 +93,33 @@ const Pools = () => {
 					>
 						<SearchIcon color="gray.300"/>
 					</InputLeftElement>
-					<Input borderRadius='none' borderColor='#141414' type="text" placeholder="Search all pools"/>
+					<Input borderRadius='none' borderColor='#141414' type="text" placeholder="Search all pools" onChange={(e)=>{searchToken(e.target.value)}}/>
 				</InputGroup>
 				<Box>
 					<Flex id="header" justify='space-between'
 						border='1px solid #141414' p='.5rem' fontSize='.8rem'
 						borderTop='none'
 					>
-						{headers.map(h => <SortableHeader key={h} name={h}/>)}
+						{headers.map((h, i) => <SortableHeader key={h.name} name={h.name} text={h.text} index={i} sortHandler={e=>{sortPool(h.name, e)}}/>)}
 					</Flex>
-					{tokens.map(t => {
+					{filteredToken.map(t => {
 						return (
 							<Flex border="1px solid #141414" key={t.name} justify='space-between' padding=".5rem"
 								justifyContent='center'>
-								<CenteredText width="10%">
+								<CenteredText width="10%" display={{ base: 'flex' }}>
 									<Image width='40px' height='auto' src={t.icon}/>
 									<Flex flexDir='column' width="60px" ml="5px">
 										<Text>{t.name}</Text>
 										<Text>{t.symbol}</Text>
 									</Flex>
 								</CenteredText>
-								<CenteredText casing="uppercase" width="10%">{t.type}</CenteredText>
-								<CenteredText width="10%">${t.price}</CenteredText>
-								<CenteredText width="10%">${t.liquidity}M</CenteredText>
-								<CenteredText width="10%">${t.dayVolume}M</CenteredText>
-								<CenteredText width="10%">{t.apy}%</CenteredText>
+								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>{t.type}</CenteredText>
+								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>${t.price}</CenteredText>
+								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</CenteredText>
+								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</CenteredText>
+								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>{t.apy}%</CenteredText>
 								<Flex width="40%" justifyContent="flex-end">
-									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a}>{a}</Button>)}
+									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a} onClick={()=>{handleActionButton(a, t)}}>{a}</Button>)}
 								</Flex>
 							</Flex>)
 					})}
