@@ -1,4 +1,5 @@
-const { request, gql } = require('graphql-request')
+import { request, gql } from 'graphql-request'
+import { BigNumber } from 'ethers/lib'
 import defaults from './defaults'
 
 const getData = async (options) => {
@@ -65,7 +66,20 @@ const getAllAnchorPools = async (skip, first) => {
 	})
 }
 
+const tokenHasPool = async (address) => {
+	const tokens = await getAllTokens({
+		params: '$address: String',
+		conditions: '(where: {address: $address})',
+		variables: {
+			address,
+		},
+	})
+
+	return tokens.length > 0 && BigNumber.from(tokens[0].liquidityUnits).gt(0)
+}
+
 export {
 	getAllAssetPools,
 	getAllAnchorPools,
+	tokenHasPool,
 }
