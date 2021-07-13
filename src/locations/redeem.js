@@ -175,7 +175,11 @@ export const Redeem = () => {
 							<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' />
 						</NumberInput>
 					</Box>
-					<Box position='relative' cursor='pointer' onClick={() => setShowTokenList(!showTokenList)}>
+					<Box
+						position='relative'
+						cursor='pointer'
+						zIndex='1'
+						onClick={() => setShowTokenList(!showTokenList)}>
 						<Box d='flex' alignItems='center'>
 							<Image
 								width='42px'
@@ -185,18 +189,27 @@ export const Redeem = () => {
 							<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenSelect.symbol}</Box>
 							{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 						</Box>
-						<Box {...(showTokenList ? ShowList : HiddenList)} layerStyle='colorful' padding='1rem' mt='.7rem'>
+						<Box {...(showTokenList ? ShowList : HiddenList)}
+							layerStyle='colorful'
+							padding='1rem'
+							mt='.7rem'>
 							<List {...ToggleList}>
 								{tokens.map(token =>
-									<ListItem key={token.name} mb='0.5rem' d='flex' alignItems='center'
+									<ListItem
+										key={token.name}
+										mb='0.5rem'
+										d='flex'
+										alignItems='center'
+										minWidth='108px'
 										onClick={() => setTokenSelect(token)}
 									>
 										<Image
-											width='42px'
+											width='26px'
+											height='26px'
 											mr='10px'
 											src={token.logoURI}
 										/>
-										{token.symbol}
+										<Box as='span'>{token.symbol}</Box>
 									</ListItem>,
 								)}
 							</List>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { Box, Flex, NumberInput, NumberInputField, Input, Button, Image, useDisclosure,
-	Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
+	Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
 } from '@chakra-ui/react'
 import { FixedSizeList as List } from 'react-window'
 import { TriangleDownIcon } from '@chakra-ui/icons'
@@ -42,6 +42,8 @@ const TokenSelectButton = ({ data, index, style }) => {
 			fontWeight='600'
 			fontSize='1.2rem'
 			justifyContent='left'
+			flexWrap='wrap'
+			alignContent='center'
 			p='2rem 1.5rem'
 			onClick={() => {
 				if (data.tokenList) {
@@ -54,12 +56,28 @@ const TokenSelectButton = ({ data, index, style }) => {
 			key={index}>
 			{data.tokenList &&
 				<>
-					<Image
-						width='42px'
-						mr='10px'
-						src={data.tokenList[index].logoURI}
-					/>
-					{data.tokenList[index].name}
+					<Box
+						width='100%'
+						display='inline-flex'>
+						<Image
+							width='24px'
+							height='24px'
+							borderRadius='50%'
+							background='white'
+							objectFit='none'
+							mr='10px'
+							src={data.tokenList[index].logoURI}
+						/>
+						{data.tokenList[index].symbol}
+					</Box>
+					<Box
+						paddingLeft='34px'
+						fontSize='1rem'
+						fontWeight='100'
+						color='#666'
+					>
+						{data.tokenList[index].name}
+					</Box>
 				</>
 			}
 		</Button>
@@ -263,13 +281,15 @@ export const Swap = () => {
 					<ModalCloseButton />
 					<ModalBody
 						display='flex'
-						flexDir='column'
-						p='0'>
+						flexDir='column'>
 						<Box
-							p='0 1.5rem 1rem'>
+							p='0 1.5rem 1.5rem'
+							borderBottom='1px solid #00000017'
+						>
 							<Input
 								size='lg'
 								placeholder='Search name or paste address'
+								variant='blank'
 								onChange={e => {
 									const result = searchFor(tokenList, e.target.value)
 									if (result) setTokenListModified(result)
@@ -286,6 +306,9 @@ export const Swap = () => {
 									height={600}
 									itemCount={tokenListModified ? tokenListModified.length : tokenList.length}
 									itemSize={64}
+									style={{
+										scrollbarColor: 'rgb(134, 134, 134) transparent',
+									}}
 									itemData={{
 										tokenList: tokenListModified ? tokenListModified : tokenList,
 										isSelect: isSelect,
@@ -298,7 +321,7 @@ export const Swap = () => {
 							</>
 						}
 					</ModalBody>
-					<ModalFooter/>
+					{/* <ModalFooter/> */}
 				</ModalContent>
 			</Modal>
 		</>
