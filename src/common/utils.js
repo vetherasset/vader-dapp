@@ -98,7 +98,29 @@ const isEthereumAddress = (string) => {
 	return regEx.test(string)
 }
 
+const addUnknownTokenToList = (tokenList, newToken) => {
+	if (!newToken) {
+		return tokenList
+	}
+	const newList = tokenList
+	const index = newList.findIndex(token => token.chainId == newToken.chainId && token.address.toLowerCase() == newToken.address.toLowerCase())
+	if (index >= 0) {
+		newList[index] = {
+			'chainId': newToken.chainId || newList[index].chainId,
+			'address': newToken.address || newList[index].address,
+			'name': newToken.name || newList[index].name,
+			'symbol': newToken.symbol || newList[index].symbol,
+			'decimals': newToken.decimals || newList[index].decimals,
+			'logoURI': newToken.logoURI || newList[index].logoURI,
+		}
+	}
+	else {
+		newList.push(newToken)
+	}
+	return newList
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
-	promiseAllProgress, searchFor, isEthereumAddress,
+	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList,
 }
