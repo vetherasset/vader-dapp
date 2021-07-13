@@ -5,7 +5,6 @@ import defaults from '../common/defaults'
 import { Link } from 'react-router-dom'
 import { Logotype } from './Logotype'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
-import '../scss/header.scss'
 export const Header = (props) => {
 	const pages = [
 		{
@@ -54,7 +53,6 @@ export const Header = (props) => {
 						onClick={() => {
 							setCurrentPath(p.link)
 						}}
-						className={p.link === currentPath ? 'active' : ''}
 						key={p.name} to={p.link}>{p.text}</Link>)}
 			</Flex>
 			<Flex w='20%' 	justifyContent='flex-end'>
@@ -72,7 +70,7 @@ export const Header = (props) => {
 					/>
 					<MenuList p='1rem'>
 						{pages.map(p => <MenuItem key={p.name} pb='1rem'>
-							<Link className={p.link === currentPath ? 'active' : ''}
+							<Link
 								onClick={() => {
 									setCurrentPath(p.link)
 								}} to={p.link}>{p.text}</Link>
