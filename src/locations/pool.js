@@ -11,30 +11,64 @@ const Pools = () => {
 		{
 			name: 'name',
 			text: 'pool',
+			style: {
+				display: { base: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
 		},
 		{
 			name: 'type',
 			text: 'pooltype',
+			style: {
+				display: { base: 'none', lg: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
+
 		},
 		{
 			name: 'price',
 			text: 'price',
+			style: {
+				display: { base: 'none', lg: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
+
 		},
 		{
 			name: 'liquidity',
 			text: 'liquidity',
+			style: {
+				display: { base: 'none', md: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
+
 		},
 		{
 			name: 'dayVolume',
 			text: '24H volume',
+			style: {
+				display: { base: 'none', md: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
+
 		},
 		{
 			name: 'apy',
 			text: 'apy',
+			style: {
+				display: { base: 'none', md: 'flex' },
+				width: { base: '30%', md: '10%' },
+			},
+
 		},
 		{
 			name: 'refresh',
 			text: 'refresh',
+			style: {
+				display: { base: 'flex' },
+				width: { base: '70%', md: '40%' },
+			},
+
 		},
 	]
 	const [tokens, setTokens] = useState([])
@@ -48,15 +82,15 @@ const Pools = () => {
 		setFilteredToken(pools)
 	}, [])
 
-	const sortPool = (headerKey, desc)=>{
-		if(currentOrderKey === headerKey && currentOrder === desc) {
+	const sortPool = (headerKey, desc) => {
+		if (currentOrderKey === headerKey && currentOrder === desc) {
 			return
 		}
 		setCurrentOrderKey(headerKey)
 		setCurrentOrder(desc)
 		const isDesc = desc === 'desc'
-		const sortedTokens = tokens.sort((tokenA, tokenB)=>{
-			if(isNaN(tokenA[headerKey])) {
+		const sortedTokens = tokens.sort((tokenA, tokenB) => {
+			if (isNaN(tokenA[headerKey])) {
 				return (tokenA[headerKey] > tokenB[headerKey]) ? (isDesc ? 1 : -1) : (isDesc ? -1 : 1)
 			}
 			return (Number(tokenA[headerKey]) > Number(tokenB[headerKey])) ? (isDesc ? 1 : -1) : (isDesc ? -1 : 1)
@@ -64,20 +98,20 @@ const Pools = () => {
 		setFilteredToken(sortedTokens)
 	}
 
-	const searchToken = query=>{
+	const searchToken = query => {
 		const trimmedQuery = query.trim()
-		if(currentQuery === trimmedQuery) {
+		if (currentQuery === trimmedQuery) {
 			return
 		}
 		setCurrentQuery(trimmedQuery)
-		if(!trimmedQuery) {
+		if (!trimmedQuery) {
 			setFilteredToken(tokens)
 			return
 		}
-		setFilteredToken(tokens.filter(t=> t.name.toLowerCase().includes(query.trim().toLowerCase())))
+		setFilteredToken(tokens.filter(t => t.name.toLowerCase().includes(query.trim().toLowerCase())))
 	}
 
-	const handleActionButton = (action, token) =>{
+	const handleActionButton = (action, token) => {
 		console.log(action, token)
 	}
 
@@ -93,20 +127,25 @@ const Pools = () => {
 					>
 						<SearchIcon color="gray.300"/>
 					</InputLeftElement>
-					<Input borderRadius='none' borderColor='#141414' type="text" placeholder="Search all pools" onChange={(e)=>{searchToken(e.target.value)}}/>
+					<Input borderRadius='none' borderColor='#141414' type="text" placeholder="Search all pools"
+						onChange={(e) => {
+							searchToken(e.target.value)
+						}}/>
 				</InputGroup>
 				<Box>
 					<Flex id="header" justify='space-between'
 						border='1px solid #141414' p='.5rem' fontSize='.8rem'
 						borderTop='none'
 					>
-						{headers.map((h, i) => <SortableHeader key={h.name} name={h.name} text={h.text} index={i} sortHandler={e=>{sortPool(h.name, e)}}/>)}
+						{headers.map(h => <SortableHeader key={h.name} name={h.name} text={h.text} display={h.style}
+							sortHandler={e => {
+								sortPool(h.name, e)
+							}}/>)}
 					</Flex>
 					{filteredToken.map(t => {
 						return (
-							<Flex border="1px solid #141414" key={t.name} justify='space-between' padding=".5rem"
-								justifyContent='center'>
-								<CenteredText width="10%" display={{ base: 'flex' }}>
+							<Flex border="1px solid #141414" key={t.name} justify='space-between' padding=".5rem">
+								<CenteredText width={{ base: '30%', md: '10%' }} display={{ base: 'flex' }}>
 									<Image width='40px' height='auto' src={t.icon}/>
 									<Flex flexDir='column' width="60px" ml="5px">
 										<Text>{t.name}</Text>
@@ -115,11 +154,15 @@ const Pools = () => {
 								</CenteredText>
 								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>{t.type}</CenteredText>
 								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>${t.price}</CenteredText>
-								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</CenteredText>
-								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</CenteredText>
+								<CenteredText width="10%"
+									display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</CenteredText>
+								<CenteredText width="10%"
+									display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</CenteredText>
 								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>{t.apy}%</CenteredText>
-								<Flex width="40%" justifyContent="flex-end">
-									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a} onClick={()=>{handleActionButton(a, t)}}>{a}</Button>)}
+								<Flex width={{ base: '70%', md: '40%' }} justifyContent="flex-end">
+									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a} onClick={() => {
+										handleActionButton(a, t)
+									}}>{a}</Button>)}
 								</Flex>
 							</Flex>)
 					})}

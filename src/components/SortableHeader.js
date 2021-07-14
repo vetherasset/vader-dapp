@@ -3,25 +3,13 @@ import PropTypes from 'prop-types'
 import { Flex, Text } from '@chakra-ui/react'
 import { TriangleUpIcon, TriangleDownIcon } from '@chakra-ui/icons'
 
-const SortableHeader = ({ name, text, index,
-	sortHandler }) =>{
+const SortableHeader = ({ name, text, display, sortHandler }) =>{
 	const ascColor = '#ff9ddb'
 	const descColor = '#26a4fe'
 	const [order, setOrder] = useState('asc')
-	const display = [
-	    { base: 'flex' },
-		{ base: 'none', md: 'flex' },
-		{ base: 'none', md: 'flex' },
-		{ base: 'none', md: 'flex' },
-		{ base: 'none', md: 'flex' },
-		{ base: 'none', lg: 'flex' },
-		{ base: 'none', lg: 'flex' },
-	]
-
 	return (
 	    <Flex
-			display={display[index]}
-			width={name === 'refresh' ? '40%' : '10%'}
+			{...display}
 			  justifyContent='center'
 			  cursor='pointer'
 			  onClick={()=>{
@@ -43,7 +31,7 @@ SortableHeader.propTypes = {
 	name: PropTypes.string,
 	text: PropTypes.string,
 	sortHandler: PropTypes.func,
-	index: PropTypes.number,
+	display: PropTypes.object,
 }
 
 export default SortableHeader
