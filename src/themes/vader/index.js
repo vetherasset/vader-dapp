@@ -8,7 +8,7 @@ import tooltip from './tooltip'
 import input from './input'
 import numberInput from './numberinput'
 import select from './select'
-import menuitem from './menuitem'
+import menu from './menu'
 import link from './link'
 import { extendTheme } from '@chakra-ui/react'
 import spinner from './spinner'
@@ -67,12 +67,18 @@ const overrides = {
 		Badge: badge,
 		Tooltip: tooltip,
 		Select: select,
-		MenuItem: menuitem,
+		Menu: menu,
 		Link: link,
 		Spinner: spinner,
 		Modal: modal,
 	},
 	layerStyles: {
+		opaque: {
+			background: 'white.100',
+			color: '#4F4F4F',
+			fontWeight: 'bold',
+			borderRadius: '12px',
+		},
 		colorful: {
 			borderRadius: '12px',
 			background: 'linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)',

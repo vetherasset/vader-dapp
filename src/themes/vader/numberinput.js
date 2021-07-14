@@ -2,6 +2,11 @@ export default {
 	variants: {
 		transparent: () => ({
 			field: {
+				color: '#fff',
+				_placeholder: {
+					color: '#fff',
+					fontWeight: '400',
+				},
 				paddingInlineStart: '0',
 				paddingInlineEnd: '0',
 				background: 'transparent',
