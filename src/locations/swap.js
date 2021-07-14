@@ -21,7 +21,7 @@ const input = {
 }
 
 const field = {
-	fontSize: '1.8rem',
+	fontSize: '1.3rem',
 	fontWeight: 'bold',
 }
 
@@ -153,6 +153,7 @@ export const Swap = () => {
 			>
 				<Flex
 					maxW='49ch'
+					minH='478.65px'
 					m='0 auto'
 					p='1.8rem'
 					layerStyle='colorful'
@@ -160,12 +161,12 @@ export const Swap = () => {
 				>
 					<Flex
 						{...flex}
-						mb='1.1rem'
-						p='0 0.3rem'
+						p='0.3rem 0.3rem'
 						flexDir='row'
 						justifyContent='space-between'
+						alignItems='first baseline'
 					>
-						<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>Swap</Box>
+						<Box as='h3' m='0' fontSize='1.3rem' fontWeight='bold' textTransform='capitalize'>Swap</Box>
 						<Box
 							as='button'
 							width='22px'
@@ -174,15 +175,12 @@ export const Swap = () => {
 						</Box>
 					</Flex>
 
-					<Flex layerStyle='inputLike' minH='83.2px'>
+					<Flex layerStyle='inputLike'>
 						<Box flex='1' pr='0.5rem'>
 							{balance0 &&
 								<Box as='span' textStyle='uppercase' {...span}>
 									Balance: {ethers.utils.formatUnits(balance0, token0.decimals)}&nbsp;{token0.symbol}
 								</Box>
-							}
-							{!balance0 &&
-								<br/>
 							}
 							<NumberInput {...flex} {...input}>
 								<NumberInputField placeholder='0.0' {...field}/>
@@ -191,14 +189,19 @@ export const Swap = () => {
 						<Box
 							as='button'
 							display='inline-flex'
-							minWidth='42px'
+							minWidth='23px'
+							alignItems='center'
 							onClick={() => {
 								onOpen()
 								setIsSelect(0)
 							}}
 						>
 							<Image
-								width='42px'
+								width='23px'
+								height='23px'
+								borderRadius='50%'
+								objectFit='none'
+								background='#fff'
 								mr='10px'
 								src={token0.logoURI}
 							/>
@@ -230,9 +233,6 @@ export const Swap = () => {
 									Balance: {ethers.utils.formatUnits(balance1, token1.decimals)}&nbsp;{token1.symbol}
 								</Box>
 							}
-							{!balance1 &&
-								<br/>
-							}
 							<NumberInput {...flex} {...input}>
 								<NumberInputField placeholder='0.0' {...field}/>
 							</NumberInput>
@@ -241,30 +241,42 @@ export const Swap = () => {
 							as='button'
 							display='inline-flex'
 							minWidth='42px'
+							alignItems='center'
 							onClick={() => {
 								onOpen()
 								setIsSelect(1)
 							}}
 						>
 							<Image
-								width='42px'
+								width='23px'
+								height='23px'
+								borderRadius='50%'
+								objectFit='none'
+								background='#fff'
 								mr='10px'
 								src={token1.logoURI}
 							/>
 							<Box as='span' fontWeight='bold' alignSelf='center' mr='5px'>
 								{token1 ? token1.symbol : 'Select a token'}
 							</Box>
-							<TriangleDownIcon alignSelf='center'/>
+							<TriangleDownIcon
+								alignSelf='center'
+								height='0.7rem'
+								marginTop='1px'/>
 						</Box>
 					</Flex>
 					<Flex {...flex}></Flex>
 					<Button
 						minWidth='230px'
-						m='2rem auto 1.7rem'
+						m='2rem auto'
 						size='lg'
 						variant='solidRadial'
 					>
-						<Box>SWAP</Box>
+						<Box
+							fontWeight='1000'
+						>
+							SWAP
+						</Box>
 					</Button>
 				</Flex>
 			</Box>

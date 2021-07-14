@@ -55,7 +55,6 @@ export const Redeem = () => {
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[1])
 	const [amount, setAmount] = useState(0)
-	// eslint-disable-next-line no-unused-vars
 	const [spendAllowed, setSpendAllowed] = useState(true)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
 	const [working, setWorking] = useState(false)
@@ -70,7 +69,7 @@ export const Redeem = () => {
 		position: 'absolute',
 		transition: 'all 0.5s ease',
 		marginTop: '1rem',
-		left: 0,
+		left: '-18px',
 	}
 
 	const ToggleList = {
@@ -154,6 +153,7 @@ export const Redeem = () => {
 				justifyContent='center'
 				layerStyle='colorful'
 				maxW='49ch'
+				minH='474px'
 				m='0 auto'
 				p='2.5rem 2.5rem 1.8rem'
 				flexDir='column'
@@ -172,27 +172,33 @@ export const Redeem = () => {
 							onChange={(n) => {
 								setAmount(n)
 							}}>
-							<NumberInputField placeholder='0.0' border='none' fontSize='1.5rem' />
+							<NumberInputField placeholder='0.0' border='none' fontSize='1.3rem' />
 						</NumberInput>
 					</Box>
-					<Box
+					<Flex
 						position='relative'
 						cursor='pointer'
 						zIndex='1'
 						onClick={() => setShowTokenList(!showTokenList)}>
 						<Box d='flex' alignItems='center'>
 							<Image
-								width='42px'
+								width='24px'
+								height='24px'
 								mr='10px'
 								src={tokenSelect.logoURI}
 							/>
-							<Box as='h3' m='0' fontSize='xl' fontWeight='bold' textTransform='capitalize'>{tokenSelect.symbol}</Box>
+							<Box
+								as='h3'
+								m='0'
+								fontSize='1.02rem'
+								fontWeight='bold'
+								textTransform='capitalize'>{tokenSelect.symbol}</Box>
 							{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
 						</Box>
 						<Box {...(showTokenList ? ShowList : HiddenList)}
-							layerStyle='colorful'
+							layerStyle='opaque'
 							padding='1rem'
-							mt='.7rem'>
+							mt='2.5rem'>
 							<List {...ToggleList}>
 								{tokens.map(token =>
 									<ListItem
@@ -201,6 +207,9 @@ export const Redeem = () => {
 										d='flex'
 										alignItems='center'
 										minWidth='108px'
+										_hover={{
+											opacity: '0.74',
+										}}
 										onClick={() => setTokenSelect(token)}
 									>
 										<Image
@@ -209,14 +218,18 @@ export const Redeem = () => {
 											mr='10px'
 											src={token.logoURI}
 										/>
-										<Box as='span'>{token.symbol}</Box>
+										<Box
+											as='span'
+										>
+											{token.symbol}
+										</Box>
 									</ListItem>,
 								)}
 							</List>
 						</Box>
-					</Box>
+					</Flex>
 				</Flex>
-				<Flex m='3rem 0' fontSize='1.5rem' fontWeight='bolder'
+				<Flex m='3.15rem 0' fontSize='1.5rem' fontWeight='bolder'
 					justifyContent='center' alignItems='center'>
 					{amount * conversionFactor.toNumber()}
 					&nbsp;
