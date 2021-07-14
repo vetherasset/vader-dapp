@@ -2,16 +2,16 @@ import React from 'react'
 import { Box, Flex } from '@chakra-ui/react'
 import ModalStyleContainer from '../components/ModalStyleContainer'
 
-const Syths = ()=>{
+const Synths = ()=>{
 	return(
 		<ModalStyleContainer>
 			<Box>
 				<Flex>
-					This is Syths
+					This is Synths
 				</Flex>
 			</Box>
 		</ModalStyleContainer>
 	)
 }
 
-export default Syths
+export default Synths
