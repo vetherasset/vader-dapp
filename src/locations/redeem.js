@@ -20,7 +20,7 @@ import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
 
-export const Redeem = () => {
+export const Redeem = (props) => {
 	const tokens = [
 		{
 			'chainId':defaults.network.chainId,
@@ -145,9 +145,11 @@ export const Redeem = () => {
 
 	return (
 		<Box
+			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
 			pt='5rem'
+			{...props}
 		>
 			<Flex
 				justifyContent='center'

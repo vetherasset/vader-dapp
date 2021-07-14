@@ -7,6 +7,7 @@ import { Header } from './components/Header'
 import Swap from './locations/swap'
 import Redeem from './locations/redeem'
 import defaults from './common/defaults'
+import { Wave } from './assets/svg/effects/Wave'
 
 const App = () => {
 
@@ -19,18 +20,30 @@ const App = () => {
 				>
 					<Header width={defaults.layout.header.width}
 						      p={defaults.layout.header.padding}
-							    justifyContent='center'/>
+							    justifyContent='center'
+						position='relative'
+						zIndex='1'/>
 					<Switch>
 						<Route path='/' exact render={() =>
-							<Swap />
+							<>
+								<Swap position='relative' zIndex='1'/>
+							</>
 						}/>
 						<Route path='/redeem' exact render={() =>
-							<Redeem />
+							<Redeem position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
 						} />
 					</Switch>
+					<Wave
+						width='100%'
+						height='777.65665px'
+						position='absolute'
+						left='50%'
+						top='65%'
+						transform='translate(-50%, -65%)'
+						m='0 auto'/>
       	</UseWalletProvider>
 			</ChakraProvider>
 		</Router>

@@ -84,7 +84,7 @@ const TokenSelectButton = ({ data, index, style }) => {
 	)
 }
 
-export const Swap = () => {
+export const Swap = (props) => {
 
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const initialRef = useRef()
@@ -150,6 +150,7 @@ export const Swap = () => {
 				maxWidth={defaults.layout.container.sm.width}
 				m='0 auto'
 				pt='5rem'
+				{...props}
 			>
 				<Flex
 					maxW='49ch'
