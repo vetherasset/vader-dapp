@@ -6,7 +6,7 @@ import { pools } from '../assets/dumpdata'
 import SortableHeader from '../components/SortableHeader'
 import CenteredText from '../components/CenteredText'
 
-const Pools = () => {
+const Liquidity = () => {
 	const headers = [
 		{
 			name: 'name',
@@ -172,4 +172,4 @@ const Pools = () => {
 	)
 }
 
-export default Pools
+export default Liquidity

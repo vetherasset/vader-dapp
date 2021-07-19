@@ -7,7 +7,7 @@ import { Header } from './components/Header'
 import Swap from './locations/swap'
 import Redeem from './locations/redeem'
 import Synths from './locations/synths'
-import Pool from './locations/pool'
+import Liquidity from './locations/liquidity'
 import defaults from './common/defaults'
 import { Wave } from './assets/svg/effects/Wave'
 
@@ -37,8 +37,8 @@ const App = () => {
 						<Route path='/synths' exact render={() =>
 							<Synths />
 						}/>
-						<Route path='/pool' exact render={() =>
-							<Pool />
+						<Route path='/liquidity' exact render={() =>
+							<Liquidity />
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
