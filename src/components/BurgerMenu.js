@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link, Menu, MenuButton, IconButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Menu, MenuButton, IconButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Link } from 'react-router-dom'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 
@@ -17,9 +18,14 @@ export const BurgerMenu = (props) => {
 				variant='solid'
 			/>
 			<MenuList>
-				{props.pages.map(p => <MenuItem key={p.name} pb='1rem'>
-					<Link to={p.link}>{p.text}</Link>
-				</MenuItem>)}
+				{props.pages.map(p => <Link
+					key={p.name}
+					to={p.link}
+				>
+					<MenuItem key={p.name} pb='1rem'>
+						{p.text}
+					</MenuItem>
+				</Link>)}
 				<WalletConnectionToggle w='100%' />
 			</MenuList>
 		</Menu>

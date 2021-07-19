@@ -20,11 +20,12 @@ const App = () => {
 					chainId={defaults.network.chainId}
 					connectors={defaults.network.connectors}
 				>
-					<Header width={defaults.layout.header.width}
-						      p={defaults.layout.header.padding}
-							    justifyContent='center'
+					<Header
+						width={defaults.layout.header.width}
+						p={defaults.layout.header.padding}
+						justifyContent='center'
 						position='relative'
-						zIndex='1'/>
+						zIndex='2'/>
 					<Switch>
 						<Route path='/' exact render={() =>
 							<>
