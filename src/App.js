@@ -35,10 +35,10 @@ const App = () => {
 							<Redeem position='relative' zIndex='1'/>
 						}/>
 						<Route path='/synths' exact render={() =>
-							<Synths />
+							<Synths position='relative' zIndex='1'/>
 						}/>
 						<Route path='/liquidity' exact render={() =>
-							<Liquidity />
+							<Liquidity position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
