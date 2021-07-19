@@ -6,6 +6,8 @@ import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Swap from './locations/swap'
 import Redeem from './locations/redeem'
+import Synths from './locations/synths'
+import Pool from './locations/pool'
 import defaults from './common/defaults'
 import { Wave } from './assets/svg/effects/Wave'
 
@@ -31,6 +33,12 @@ const App = () => {
 						}/>
 						<Route path='/redeem' exact render={() =>
 							<Redeem position='relative' zIndex='1'/>
+						}/>
+						<Route path='/synths' exact render={() =>
+							<Synths />
+						}/>
+						<Route path='/pool' exact render={() =>
+							<Pool />
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
