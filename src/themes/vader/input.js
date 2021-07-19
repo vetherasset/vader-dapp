@@ -1,12 +1,21 @@
 export default {
 	variants: {
-		filled: (props) => ({
+		filled: () => ({
 			field: {
+				borderRadius: '0.8rem',
+				background: '#000',
+				borderStyle: 'solid',
+				borderWidth: '2px',
+				borderColor: 'accent',
+				_placeholder: {
+					color: '#fff',
+				},
 				_hover: {
-					bg: props.colorMode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgb(168 168 168)',
+					background: '#000',
 				},
 				_focus: {
-					bg: props.colorMode === 'dark' ? 'rgba(21, 21, 21, 0.23)' : 'rgb(255, 255, 255)',
+					borderColor: '#ff8ac0',
+					background: '#000',
 				},
 			},
 		}),

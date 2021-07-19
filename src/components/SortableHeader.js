@@ -10,12 +10,13 @@ const SortableHeader = ({ name, text, display, sortHandler }) =>{
 	return (
 	    <Flex
 			{...display}
-			  justifyContent='center'
-			  cursor='pointer'
-			  onClick={()=>{
-			  	const newOrder = order === 'asc' ? 'desc' : 'asc'
-				  setOrder(newOrder)
-			    sortHandler(newOrder)
+			cursor='pointer'
+			mb='1.5rem'
+			fontWeight='bold'
+			onClick={()=>{
+				const newOrder = order === 'asc' ? 'desc' : 'asc'
+				setOrder(newOrder)
+				sortHandler(newOrder)
 			  }
 			}>
 			<Text casing='uppercase'>{text}</Text>

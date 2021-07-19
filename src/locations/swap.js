@@ -153,6 +153,7 @@ export const Swap = (props) => {
 				{...props}
 			>
 				<Flex
+					w='100%'
 					maxW='49ch'
 					minH='478.65px'
 					m='0 auto'

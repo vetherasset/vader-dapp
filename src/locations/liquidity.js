@@ -4,9 +4,8 @@ import { SearchIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { pools } from '../assets/dumpdata'
 import SortableHeader from '../components/SortableHeader'
-import CenteredText from '../components/CenteredText'
 
-const Liquidity = () => {
+const Liquidity = (props) => {
 	const headers = [
 		{
 			name: 'name',
@@ -18,7 +17,7 @@ const Liquidity = () => {
 		},
 		{
 			name: 'type',
-			text: 'pooltype',
+			text: 'type',
 			style: {
 				display: { base: 'none', lg: 'flex' },
 				width: { base: '30%', md: '10%' },
@@ -45,7 +44,7 @@ const Liquidity = () => {
 		},
 		{
 			name: 'dayVolume',
-			text: '24H volume',
+			text: '24H VOL',
 			style: {
 				display: { base: 'none', md: 'flex' },
 				width: { base: '30%', md: '10%' },
@@ -65,6 +64,7 @@ const Liquidity = () => {
 			name: 'refresh',
 			text: 'refresh',
 			style: {
+				justifyContent: 'right',
 				display: { base: 'flex' },
 				width: { base: '70%', md: '40%' },
 			},
@@ -117,49 +117,104 @@ const Liquidity = () => {
 
 	return (
 		<Box
+			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
-			pt='5rem'>
-			<Box>
-				<InputGroup border='none'>
-					<InputLeftElement
-						pointerEvents="none"
+			pt='5rem'
+			{...props}
+		>
+			<Flex
+				minH='478.65px'
+				m='0 auto'
+				p='1.8rem'
+				flexDir='column'
+			>
+
+				<Box
+					w='100%'
+					maxWidth='49ch'
+					m='0 auto'
+				>
+					<Box as='h3' fontSize='1.3rem' fontWeight='bold' textTransform='capitalize'>Liquidity</Box>
+					<InputGroup
+						mb='5rem'>
+						<InputLeftElement
+							w='2.9rem'
+							pointerEvents='none'
+						>
+							<SearchIcon/>
+						</InputLeftElement>
+						<Input
+							variant='filled'
+							type='text'
+							placeholder='Search all pools'
+							onChange={(e) => {
+								searchToken(e.target.value)
+							}}/>
+					</InputGroup>
+				</Box>
+
+				<Box
+					mb='5rem'
+					p='1.8rem'
+				>
+					<Flex
+						id='header'
+						justify='space-between'
+						fontSize='.8rem'
+						p='.5rem'
 					>
-						<SearchIcon color="gray.300"/>
-					</InputLeftElement>
-					<Input borderRadius='none' borderColor='#141414' type="text" placeholder="Search all pools"
-						onChange={(e) => {
-							searchToken(e.target.value)
-						}}/>
-				</InputGroup>
-				<Box>
-					<Flex id="header" justify='space-between'
-						border='1px solid #141414' p='.5rem' fontSize='.8rem'
-						borderTop='none'
-					>
-						{headers.map(h => <SortableHeader key={h.name} name={h.name} text={h.text} display={h.style}
+						{headers.map(h => <SortableHeader
+							key={h.name}
+							name={h.name}
+							text={h.text}
+							display={h.style}
 							sortHandler={e => {
 								sortPool(h.name, e)
 							}}/>)}
 					</Flex>
 					{filteredToken.map(t => {
 						return (
-							<Flex border="1px solid #141414" key={t.name} justify='space-between' padding=".5rem">
-								<CenteredText width={{ base: '30%', md: '10%' }} display={{ base: 'flex' }}>
-									<Image width='40px' height='auto' src={t.icon}/>
-									<Flex flexDir='column' width="60px" ml="5px">
-										<Text>{t.name}</Text>
-										<Text>{t.symbol}</Text>
+							<Flex
+								key={t.name}
+								justify='space-between'
+								padding='.5rem'
+							>
+								<Flex alignItems='center' width={{ base: '30%', md: '10%' }}
+									flexWrap='wrap'>
+									<Flex d='flex' flexDir='row'>
+										<Image
+											bg='white'
+											borderRadius='50%'
+											objectFit='none'
+											width='23px'
+											height='23px'
+											src={t.icon}/>
+										<Flex flexDir='column' width='60px' ml='5px'>
+											<Text>{t.symbol}</Text>
+										</Flex>
 									</Flex>
-								</CenteredText>
-								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>{t.type}</CenteredText>
-								<CenteredText width="10%" display={{ base: 'none', lg: 'flex' }}>${t.price}</CenteredText>
-								<CenteredText width="10%"
-									display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</CenteredText>
-								<CenteredText width="10%"
-									display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</CenteredText>
-								<CenteredText width="10%" display={{ base: 'none', md: 'flex' }}>{t.apy}%</CenteredText>
-								<Flex width={{ base: '70%', md: '40%' }} justifyContent="flex-end">
+									<Flex d='flex' flexDir='row'>
+										<Image
+											bg='white'
+											borderRadius='50%'
+											objectFit='none'
+											width='23px'
+											height='23px'
+											src={t.icon}/>
+										<Flex flexDir='column' width='60px' ml='5px'>
+											<Text>{t.symbol}</Text>
+										</Flex>
+									</Flex>
+								</Flex>
+								<Flex alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>{t.type}</Flex>
+								<Flex alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>${t.price}</Flex>
+								<Flex alignItems='center' width='10%'
+									display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</Flex>
+								<Flex alignItems='center' width='10%'
+									display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</Flex>
+								<Flex alignItems='center' width='10%' display={{ base: 'none', md: 'flex' }}>{t.apy}%</Flex>
+								<Flex alignItems='center' width={{ base: '70%', md: '40%' }} justifyContent='flex-end'>
 									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a} onClick={() => {
 										handleActionButton(a, t)
 									}}>{a}</Button>)}
@@ -167,7 +222,7 @@ const Liquidity = () => {
 							</Flex>)
 					})}
 				</Box>
-			</Box>
+			</Flex>
 		</Box>
 	)
 }
