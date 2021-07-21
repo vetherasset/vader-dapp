@@ -5,6 +5,13 @@ import defaults from '../common/defaults'
 import SynthsMint from '../components/SynthsMint'
 import SynthsStake from '../components/SynthsStake'
 import SynthsUnStake from '../components/SynthsUnStake'
+
+const selectedTab = {
+	backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
+	borderRadius: '10px',
+	padding: '0 30px',
+}
+
 const Synths = ()=>{
 	const [token ] = useState({
 		name: 'apr',
@@ -45,14 +52,14 @@ const Synths = ()=>{
 				m='1rem auto'
 				p='1.8rem'
 			>
-				<Tabs layerStyle="colorful">
-					<TabList>
-						<Tab>Mint</Tab>
-						<Tab>Stake</Tab>
-						<Tab>Unstake</Tab>
+				<Tabs w="100%">
+					<TabList layerStyle='inputLike' display='flex' flexDir="row" borderBottom='none' justifyContent='space-around'>
+						<Tab _selected={selectedTab}>Mint</Tab>
+						<Tab _selected={selectedTab}>Stake</Tab>
+						<Tab _selected={selectedTab}>Unstake</Tab>
 					</TabList>
-					<TabPanels>
-						<TabPanel>
+					<TabPanels mt="1rem">
+						<TabPanel padding='0' >
 							<SynthsMint/>
 						</TabPanel>
 						<TabPanel>
