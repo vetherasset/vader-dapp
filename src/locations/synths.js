@@ -56,7 +56,7 @@ const Synths = ()=>{
 					<TabList layerStyle='inputLike' display='flex' flexDir="row" borderBottom='none' justifyContent='space-around'>
 						<Tab _selected={selectedTab}>Mint</Tab>
 						<Tab _selected={selectedTab}>Stake</Tab>
-						<Tab _selected={selectedTab}>Unstake</Tab>
+						<Tab _selected={selectedTab} isDisabled>Unstake</Tab>
 					</TabList>
 					<TabPanels mt="1rem">
 						<TabPanel padding='0' >
