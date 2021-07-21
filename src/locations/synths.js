@@ -64,8 +64,8 @@ const Synths = ()=>{
 						</TabPanel>
 						<TabPanel padding='0'>
 							<SynthsStake/>
-						</TabPanel padding='0'>
-						<TabPanel>
+						</TabPanel>
+						<TabPanel padding='0'>
 							<SynthsUnStake/>
 						</TabPanel>
 					</TabPanels>
