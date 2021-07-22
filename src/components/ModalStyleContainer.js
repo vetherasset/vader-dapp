@@ -4,12 +4,14 @@ import defaults from '../common/defaults'
 import PropTypes from 'prop-types'
 
 
-const ModalStyleContainer = ({ children })=>{
+const ModalStyleContainer = ({ children, ...props })=>{
+	console.log(props)
 	return(
 		<Box
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
 			pt='5rem'
+			{	...props}
 		>
 			<Flex
 				justifyContent='center'
