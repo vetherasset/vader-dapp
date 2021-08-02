@@ -22,11 +22,6 @@ export const Header = (props) => {
 			link: '/liquidity',
 		},
 		{
-			name: 'synths',
-			text: 'Synths',
-			link: '/synths',
-		},
-		{
 			name: 'redeem',
 			text: 'Redeem',
 			link: '/redeem',
@@ -48,13 +43,12 @@ export const Header = (props) => {
 			<Flex w={{ md: '20%', sm: '30%' }}>
 				<Logotype margin='0 8px 0' />
 			</Flex>
-			<Flex w='100%'
+			<Flex w='auto'
 				alignItems='center'
 				justifyContent='space-around'
 				textTransform='capitalize'
 				layerStyle='colorful'
 				p='0.3rem 0.2rem'
-				maxW='400px'
 				display={{ base: 'none', md: 'flex' }}
 			>
 				{pages.map(p =>
