@@ -5,10 +5,28 @@ const defaults = {}
 defaults.network = {}
 defaults.network.connector = undefined
 defaults.network.chainId = Number(process.env.REACT_APP_CHAIN_ID)
-
-defaults.network.provider = new ethers.providers.WebSocketProvider(
-	process.env.REACT_APP_WS_URL,
-	defaults.network.chainId,
+defaults.network.provider = new ethers.providers.FallbackProvider(
+	[
+		{
+			provider: new ethers.providers.AlchemyProvider(
+				defaults.network.chainId,
+				process.env.REACT_APP_ALCHEMY_KEY,
+			),
+			weight: 1,
+			priority: 1,
+			stallTimeout: 2000,
+		},
+		{
+			provider: new ethers.providers.InfuraProvider(
+				defaults.network.chainId,
+				process.env.REACT_APP_INFURA_KEY,
+			),
+			weight: 1,
+			priority: 2,
+			stallTimeout: 2000,
+		},
+	],
+	1,
 )
 
 defaults.layout = {}
