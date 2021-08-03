@@ -80,7 +80,7 @@ const overrides = {
 			borderRadius: '12px',
 		},
 		colorful: {
-			borderRadius: '12px',
+			borderRadius: '24px',
 			background: 'linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)',
 			maxHeight: '660px',
 		},

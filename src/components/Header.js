@@ -48,6 +48,7 @@ export const Header = (props) => {
 				justifyContent='space-around'
 				textTransform='capitalize'
 				layerStyle='colorful'
+				borderRadius='12px'
 				p='0.3rem 0.2rem'
 				display={{ base: 'none', md: 'flex' }}
 			>

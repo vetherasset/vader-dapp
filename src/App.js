@@ -1,6 +1,6 @@
 import React, {} from 'react'
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Box } from '@chakra-ui/react'
 import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
@@ -27,9 +27,7 @@ const App = () => {
 						zIndex='2'/>
 					<Switch>
 						<Route path='/' exact render={() =>
-							<>
-								<Swap position='relative' zIndex='1'/>
-							</>
+							<Swap position='relative' zIndex='1'/>
 						}/>
 						<Route path='/redeem' exact render={() =>
 							<Redeem position='relative' zIndex='1'/>
@@ -48,7 +46,13 @@ const App = () => {
 						left='50%'
 						top='65%'
 						transform='translate(-50%, -65%)'
-						m='0 auto'/>
+						m='0 auto'>
+						<Box
+							id='radialMask'
+							width='100%'
+							height='100%'
+						/>
+					</Wave>
       	</UseWalletProvider>
 			</ChakraProvider>
 		</Router>

@@ -149,7 +149,7 @@ export const Swap = (props) => {
 				height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 				maxWidth={defaults.layout.container.sm.width}
 				m='0 auto'
-				pt='5rem'
+				p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 				{...props}
 			>
 				<Flex
