@@ -68,7 +68,7 @@ export default {
 			},
 		}),
 		outline: () => ({
-			color: 'accent',
+			color: 'accent.100',
 			border: 'none',
 			backgroundSize: '150% auto',
 			backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
@@ -86,12 +86,15 @@ export default {
 			},
 		}),
 		link: () => ({
-			color: '#fff',
+			color: 'accent.200',
 			height: 'auto',
     	padding: '0',
 			_active: {
-				color: '#fff',
-				opacity: '0.6',
+				color: 'accent.200',
+				opacity: '0.8',
+			},
+			_hover: {
+				textDecoration: 'none',
 			},
 		}),
 		ghost: () => ({
@@ -116,14 +119,14 @@ export default {
 			},
 		}),
 		linkAccent: () => ({
-			color: 'accent',
+			color: 'accent.100',
 			height: 'auto',
     	padding: '0',
 			_hover: {
 				textDecoration: 'underline',
 			},
 			_active: {
-				color: 'accent',
+				color: 'accent.100',
 				opacity: '0.6',
 			},
 		}),

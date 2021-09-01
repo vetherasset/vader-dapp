@@ -26,7 +26,7 @@ export default {
 					background: '#665a81',
 				},
 				_focus: {
-					borderColor: 'accent',
+					borderColor: 'accent.100',
 					background: '#665a81',
 				},
 			},

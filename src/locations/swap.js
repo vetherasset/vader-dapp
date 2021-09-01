@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { Box, Flex, NumberInput, NumberInputField, Input, Button, Image, useDisclosure,
-	Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody,
+import React, { useEffect, useState } from 'react'
+import { Box, Flex, NumberInput, NumberInputField, Button, Image, useDisclosure,
 } from '@chakra-ui/react'
-import { FixedSizeList as List } from 'react-window'
 import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { getERC20BalanceOf, resolveUnknownERC20 } from '../common/ethereum'
-import { isEthereumAddress, searchFor } from '../common/utils'
-import getTokenList from 'get-token-list'
+import { getERC20BalanceOf } from '../common/ethereum'
+import { TokenSelector } from '../components/TokenSelector'
 
 const flex = {
 	flex: '1',
@@ -30,86 +26,17 @@ const span = {
 	opacity: '0.9',
 }
 
-const TokenSelectButton = ({ data, index, style }) => {
-	TokenSelectButton.propTypes = {
-		index: PropTypes.number.isRequired,
-		style: PropTypes.object.isRequired,
-		data: PropTypes.any.isRequired,
-	}
-	return (
-		<Button
-			variant='ghostSelectable'
-			fontWeight='600'
-			fontSize='1.2rem'
-			justifyContent='left'
-			flexWrap='wrap'
-			alignContent='center'
-			p='2rem 1.5rem'
-			onClick={() => {
-				if (data.tokenList) {
-					if (data.isSelect === 0) data.setToken0(data.tokenList[index])
-					if (data.isSelect === 1) data.setToken1(data.tokenList[index])
-				}
-				data.onClose()
-			}}
-			style={style}
-			key={index}>
-			{data.tokenList &&
-				<>
-					<Box
-						width='100%'
-						display='inline-flex'>
-						<Image
-							width='24px'
-							height='24px'
-							borderRadius='50%'
-							background='white'
-							objectFit='none'
-							mr='10px'
-							src={data.tokenList[index].logoURI}
-						/>
-						{data.tokenList[index].symbol}
-					</Box>
-					<Box
-						paddingLeft='34px'
-						fontSize='1rem'
-						fontWeight='100'
-						color='#666'
-					>
-						{data.tokenList[index].name}
-					</Box>
-				</>
-			}
-		</Button>
-	)
-}
-
 export const Swap = (props) => {
 
 	const { isOpen, onOpen, onClose } = useDisclosure()
-	const initialRef = useRef()
 
 	const wallet = useWallet()
 
 	const [isSelect, setIsSelect] = useState(-1)
-	const [tokenListDefault, setTokenListDefault] = useState(false)
-	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
-	const [tokenListModified, setTokenListModified] = useState(false)
 	const [token0, setToken0] = useState(defaults.tokenDefault)
 	const [token1, setToken1] = useState(false)
 	const [balance0, setBalance0] = useState(false)
 	const [balance1, setBalance1] = useState(false)
-
-	useEffect(() => {
-		getTokenList(defaults.tokenList)
-			.then(data => {
-				setTokenListDefault(data)
-			})
-			.catch(err => {
-				setTokenListDefault(false)
-				console.log(err)
-			})
-	}, [])
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
@@ -283,61 +210,14 @@ export const Swap = (props) => {
 				</Flex>
 			</Box>
 
-			<Modal
-				onClose={onClose}
+			<TokenSelector
+				isSelect={isSelect}
+				setToken0={setToken0}
+				setToken1={setToken1}
 				isOpen={isOpen}
-				scrollBehavior='inside'
-				isCentered
-				initialFocusRef={initialRef}>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Select a token</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody
-						display='flex'
-						flexDir='column'>
-						<Box
-							p='0 1.5rem 1.5rem'
-							borderBottom='1px solid #00000017'
-						>
-							<Input
-								size='lg'
-								placeholder='Search name or paste address'
-								variant='blank'
-								onChange={e => {
-									const result = searchFor(tokenList, e.target.value)
-									if (result) setTokenListModified(result)
-									if (result.length === 0 &&
-										isEthereumAddress(e.target.value)
-									) console.log(resolveUnknownERC20(e.target.value, defaults.network.provider))
-								}}
-							/>
-						</Box>
-						{tokenList &&
-							<>
-								<List
-									width={448}
-									height={600}
-									itemCount={tokenListModified ? tokenListModified.length : tokenList.length}
-									itemSize={64}
-									style={{
-										scrollbarColor: 'rgb(134, 134, 134) transparent',
-									}}
-									itemData={{
-										tokenList: tokenListModified ? tokenListModified : tokenList,
-										isSelect: isSelect,
-										setToken0,
-										setToken1,
-										onClose,
-									}}>
-									{TokenSelectButton}
-								</List>
-							</>
-						}
-					</ModalBody>
-					{/* <ModalFooter/> */}
-				</ModalContent>
-			</Modal>
+				onOpen={onOpen}
+				onClose={onClose}
+			/>
 		</>
 	)
 }

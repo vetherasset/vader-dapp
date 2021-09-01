@@ -6,7 +6,7 @@ export default {
 				background: '#000',
 				borderStyle: 'solid',
 				borderWidth: '2px',
-				borderColor: 'accent',
+				borderColor: 'accent.100',
 				_placeholder: {
 					color: '#fff',
 				},
@@ -25,7 +25,7 @@ export default {
 				background: 'white',
 				borderStyle: 'solid',
 				borderWidth: '2px',
-				borderColor: 'accent',
+				borderColor: 'accent.100',
 				_hover: {
 					background: 'white',
 				},

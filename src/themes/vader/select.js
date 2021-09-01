@@ -3,7 +3,7 @@ export default {
 		filled: () => ({
 			field: {
 				background: 'white',
-				borderColor: 'accent',
+				borderColor: 'accent.100',
 				_hover: {
 					background: 'white',
 				},
