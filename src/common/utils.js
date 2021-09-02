@@ -1,3 +1,5 @@
+import getTokenList from 'get-token-list'
+
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
 }
@@ -120,7 +122,18 @@ const addUnknownTokenToList = (tokenList, newToken) => {
 	return newList
 }
 
+const getCombinedTokenListFromSources = (sources) => {
+	return Promise.all(
+		sources.filter((source) => source.enabled === true)
+			.map((source) => {
+				const p = getTokenList(source.url).then(d => d.tokens)
+				return p
+			})).then(data => {
+		return data.flat()
+	})
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
-	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList,
+	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 }

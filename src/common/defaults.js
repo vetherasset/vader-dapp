@@ -65,7 +65,23 @@ defaults.address.router = defaults.network.chainId === 1 ? ''
 	: defaults.network.chainId === 3 ? '0x2880F198f6C380F34381200f2969BB4280da8634'
 		: undefined
 
-defaults.tokenList = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
+defaults.tokenList = {}
+defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
+defaults.tokenList.sources = [
+	{
+		'name':'Vader Token List',
+		'url':'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-coingecko.png',
+		'enabled':true,
+	},
+	{
+		'name':'1inch Token List',
+		'url':'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link',
+		'logoURI':'https://raw.githubusercontent.com/SetProtocol/uniswap-tokenlist/main/assets/set-logo.svg',
+		'enabled':false,
+	},
+]
+
 defaults.tokenDefault = {
 	'chainId':3,
 	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',

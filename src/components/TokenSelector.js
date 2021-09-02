@@ -6,9 +6,8 @@ import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay,
 } from '@chakra-ui/react'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon } from '@chakra-ui/icons'
-import getTokenList from 'get-token-list'
 import { resolveUnknownERC20 } from '../common/ethereum'
-import { isEthereumAddress, searchFor } from '../common/utils'
+import { getCombinedTokenListFromSources, isEthereumAddress, searchFor } from '../common/utils'
 
 const TokenSelectButton = ({ data, index, style }) => {
 	TokenSelectButton.propTypes = {
@@ -157,20 +156,23 @@ export const TokenSelector = (props) => {
 	const initialRef = useRef()
 	const [dialog, setDialog] = useState(0)
 
-	const [tokenListDefault, setTokenListDefault] = useState(false)
-	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
+	const [tokenListCombined, setTokenListCombined] = useState(false)
+	const tokenList = useMemo(() => tokenListCombined, [tokenListCombined])
 
 	useEffect(() => {
 		if (!props.isOpen) setDialog(0)
 	}, [props.isOpen])
 
 	useEffect(() => {
-		getTokenList(defaults.tokenList)
+		getCombinedTokenListFromSources(
+			defaults.tokenList.sources,
+		)
 			.then(data => {
-				setTokenListDefault(data)
+				setTokenListCombined(data)
+				console.log(data)
 			})
 			.catch(err => {
-				setTokenListDefault(false)
+				setTokenListCombined(false)
 				console.log(err)
 			})
 	}, [])
