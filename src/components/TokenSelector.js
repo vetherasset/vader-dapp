@@ -138,6 +138,22 @@ const TokenSelectDialog = (props) => {
 	)
 }
 
+const TokenListSelectDialog = () => {
+
+	return (
+		<>
+			<ModalHeader
+				borderBottom='1px solid #00000017'
+			>Manage</ModalHeader>
+			<ModalCloseButton />
+			<ModalBody
+				display='flex'
+				flexDir='column'>
+					Toggles
+			</ModalBody>
+		</>
+	)
+}
 
 export const TokenSelector = (props) => {
 
@@ -145,40 +161,56 @@ export const TokenSelector = (props) => {
 		isSelect: PropTypes.number.isRequired,
 		setToken0: PropTypes.func.isRequired,
 		setToken1: PropTypes.func.isRequired,
-		isOpen: PropTypes.any.isRequired,
+		isOpen: PropTypes.bool.isRequired,
 		onOpen: PropTypes.func.isRequired,
 		onClose: PropTypes.func.isRequired,
 	}
 
 	const initialRef = useRef()
+	const [dialog, setDialog] = useState(0)
+
+	useEffect(() => {
+		if (!props.isOpen) setDialog(0)
+	}, [props.isOpen])
 
 	return (
-		<Modal
-			onClose={props.onClose}
-			isOpen={props.isOpen}
-			scrollBehavior='inside'
-			isCentered
-			initialFocusRef={initialRef}>
-			<ModalOverlay />
-			<ModalContent>
-				<TokenSelectDialog
-					isSelect={props.isSelect}
-					setToken0={props.setToken0}
-					setToken1={props.setToken1}
-					onClose={props.onClose}
-				/>
-				<ModalFooter
-					borderTop='1px solid #00000017'
-					justifyContent='center'>
-					<Button
-						variant='link'
-						fontWeight='bold'
-						fontSize='1.1rem'
-					>
-						<EditIcon mr='6px'/> Manage Token Lists
-					</Button>
-				</ModalFooter>
-			</ModalContent>
-		</Modal>
+		<>
+			<Modal
+				onClose={props.onClose}
+				isOpen={props.isOpen}
+				scrollBehavior='inside'
+				isCentered
+				initialFocusRef={initialRef}>
+				<ModalOverlay />
+				<ModalContent>
+					<Box height='736px'>
+						{dialog === 0 &&
+							<TokenSelectDialog
+								height='736px'
+								isSelect={props.isSelect}
+								setToken0={props.setToken0}
+								setToken1={props.setToken1}
+								onClose={props.onClose}
+							/>
+						}
+						{dialog === 1 &&
+							<TokenListSelectDialog/>
+						}
+					</Box>
+					<ModalFooter
+						borderTop='1px solid #00000017'
+						justifyContent='center'>
+						<Button
+							variant='link'
+							fontWeight='bold'
+							fontSize='1.1rem'
+							onClick={() => setDialog(1)}
+						>
+							<EditIcon mr='6px'/> Manage Token Lists
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+		</>
 	)
 }
