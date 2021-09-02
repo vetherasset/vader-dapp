@@ -67,26 +67,14 @@ const TokenSelectButton = ({ data, index, style }) => {
 const TokenSelectDialog = (props) => {
 
 	TokenSelectDialog.propTypes = {
+		tokenList: PropTypes.any.isRequired,
 		isSelect: PropTypes.number.isRequired,
 		setToken0: PropTypes.func.isRequired,
 		setToken1: PropTypes.func.isRequired,
 		onClose: PropTypes.func.isRequired,
 	}
 
-	const [tokenListDefault, setTokenListDefault] = useState(false)
-	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
 	const [tokenListModified, setTokenListModified] = useState(false)
-
-	useEffect(() => {
-		getTokenList(defaults.tokenList)
-			.then(data => {
-				setTokenListDefault(data)
-			})
-			.catch(err => {
-				setTokenListDefault(false)
-				console.log(err)
-			})
-	}, [])
 
 	return (
 		<>
@@ -104,7 +92,7 @@ const TokenSelectDialog = (props) => {
 						placeholder='Search name or paste address'
 						variant='blank'
 						onChange={e => {
-							const result = searchFor(tokenList, e.target.value)
+							const result = searchFor(props.tokenList, e.target.value)
 							if (result) setTokenListModified(result)
 							if (result.length === 0 &&
 										isEthereumAddress(e.target.value)
@@ -112,18 +100,18 @@ const TokenSelectDialog = (props) => {
 						}}
 					/>
 				</Box>
-				{tokenList &&
+				{props.tokenList &&
 							<>
 								<List
 									width={448}
 									height={600}
-									itemCount={tokenListModified ? tokenListModified.length : tokenList.length}
+									itemCount={tokenListModified ? tokenListModified.length : props.tokenList.length}
 									itemSize={64}
 									style={{
 										scrollbarColor: 'rgb(134, 134, 134) transparent',
 									}}
 									itemData={{
-										tokenList: tokenListModified ? tokenListModified : tokenList,
+										tokenList: tokenListModified ? tokenListModified : props.tokenList,
 										isSelect: props.isSelect,
 										setToken0: props.setToken0,
 										setToken1: props.setToken1,
@@ -169,9 +157,23 @@ export const TokenSelector = (props) => {
 	const initialRef = useRef()
 	const [dialog, setDialog] = useState(0)
 
+	const [tokenListDefault, setTokenListDefault] = useState(false)
+	const tokenList = useMemo(() => tokenListDefault.tokens, [tokenListDefault])
+
 	useEffect(() => {
 		if (!props.isOpen) setDialog(0)
 	}, [props.isOpen])
+
+	useEffect(() => {
+		getTokenList(defaults.tokenList)
+			.then(data => {
+				setTokenListDefault(data)
+			})
+			.catch(err => {
+				setTokenListDefault(false)
+				console.log(err)
+			})
+	}, [])
 
 	return (
 		<>
@@ -187,6 +189,7 @@ export const TokenSelector = (props) => {
 						{dialog === 0 &&
 							<TokenSelectDialog
 								height='736px'
+								tokenList={tokenList}
 								isSelect={props.isSelect}
 								setToken0={props.setToken0}
 								setToken1={props.setToken1}
