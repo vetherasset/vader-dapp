@@ -84,7 +84,7 @@ export const Swap = (props) => {
 					maxW='49ch'
 					minH='478.65px'
 					m='0 auto'
-					p='1.8rem'
+					p='1.8rem 3.3rem'
 					layerStyle='colorful'
 					flexDir='column'
 				>
