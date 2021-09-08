@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import tokenListSources from '../tokenListSources.json'
 
 const defaults = {}
 
@@ -67,20 +68,7 @@ defaults.address.router = defaults.network.chainId === 1 ? ''
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
-defaults.tokenList.sources = [
-	{
-		'name':'Vader Token List',
-		'url':'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json',
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-coingecko.png',
-		'enabled':true,
-	},
-	{
-		'name':'1inch Token List',
-		'url':'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link',
-		'logoURI':'https://app.1inch.io/assets/images/logo_small.svg#logo_small',
-		'enabled':false,
-	},
-]
+defaults.tokenList.sources = tokenListSources
 
 defaults.tokenDefault = {
 	'chainId':3,
