@@ -5,7 +5,7 @@ import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay,
 	ModalFooter, Input,
 } from '@chakra-ui/react'
 import { FixedSizeList as List } from 'react-window'
-import { EditIcon } from '@chakra-ui/icons'
+import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
 import { resolveUnknownERC20 } from '../common/ethereum'
 import { getCombinedTokenListFromSources, isEthereumAddress, searchFor } from '../common/utils'
 
@@ -78,7 +78,9 @@ const TokenSelectDialog = (props) => {
 	return (
 		<>
 			<ModalHeader>Select a token</ModalHeader>
-			<ModalCloseButton />
+			<ModalCloseButton
+				top='1.29rem'
+			/>
 			<ModalBody
 				display='flex'
 				flexDir='column'>
@@ -125,14 +127,39 @@ const TokenSelectDialog = (props) => {
 	)
 }
 
-const TokenListSelectDialog = () => {
+const TokenListSelectDialog = (props) => {
+
+	TokenListSelectDialog.propTypes = {
+		setDialog: PropTypes.func.isRequired,
+	}
 
 	return (
 		<>
 			<ModalHeader
+				textAlign='center'
 				borderBottom='1px solid #00000017'
-			>Manage</ModalHeader>
-			<ModalCloseButton />
+			>
+				<Button
+					variant='ghostDark'
+					minW='auto'
+					width='32px'
+					height='32px'
+					position='absolute'
+					top='1.29rem'
+					left='0.75rem'
+					p='0'
+					onClick={() => props.setDialog(0)}
+				>
+					<ArrowBackIcon
+						width='18px'
+						height='18px'
+					/>
+				</Button>
+				Manage
+				<ModalCloseButton
+					top='1.29rem'
+				/>
+			</ModalHeader>
 			<ModalBody
 				display='flex'
 				flexDir='column'>
@@ -186,7 +213,7 @@ export const TokenSelector = (props) => {
 				isCentered
 				initialFocusRef={initialRef}>
 				<ModalOverlay />
-				<ModalContent>
+				<ModalContent minHeight='801px'>
 					<Box height='736px'>
 						{dialog === 0 &&
 							<TokenSelectDialog
@@ -199,21 +226,26 @@ export const TokenSelector = (props) => {
 							/>
 						}
 						{dialog === 1 &&
-							<TokenListSelectDialog/>
+							<TokenListSelectDialog
+								setDialog={setDialog}
+							/>
 						}
 					</Box>
-					<ModalFooter
-						borderTop='1px solid #00000017'
-						justifyContent='center'>
-						<Button
-							variant='link'
-							fontWeight='bold'
-							fontSize='1.1rem'
-							onClick={() => setDialog(1)}
-						>
-							<EditIcon mr='6px'/> Manage Token Lists
-						</Button>
-					</ModalFooter>
+					{dialog === 0 &&
+						<ModalFooter
+							borderTop='1px solid #00000017'
+							justifyContent='center'>
+							<Button
+								variant='link'
+								fontWeight='bold'
+								fontSize='1.1rem'
+								onClick={() => setDialog(1)}
+							>
+
+								<EditIcon mr='6px'/> Manage Token Lists
+							</Button>
+						</ModalFooter>
+					}
 				</ModalContent>
 			</Modal>
 		</>

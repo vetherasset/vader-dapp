@@ -105,6 +105,15 @@ export default {
 				background: 'transparent',
 			},
 		}),
+		ghostDark: () => ({
+			color: '#4F4F4F',
+			_hover: {
+				background: 'transparent',
+			},
+			_active: {
+				background: 'transparent',
+			},
+		}),
 		ghostSelectable: () => ({
 			p: '0',
 			borderRadius: '0',
