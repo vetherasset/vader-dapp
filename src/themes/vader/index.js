@@ -9,6 +9,7 @@ import input from './input'
 import numberInput from './numberinput'
 import select from './select'
 import menu from './menu'
+import switchComp from './switch'
 import link from './link'
 import { extendTheme } from '@chakra-ui/react'
 import spinner from './spinner'
@@ -71,6 +72,7 @@ const overrides = {
 		Link: link,
 		Spinner: spinner,
 		Modal: modal,
+		Switch: switchComp,
 	},
 	layerStyles: {
 		opaque: {

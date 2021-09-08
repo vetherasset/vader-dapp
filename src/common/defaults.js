@@ -77,7 +77,7 @@ defaults.tokenList.sources = [
 	{
 		'name':'1inch Token List',
 		'url':'https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link',
-		'logoURI':'https://raw.githubusercontent.com/SetProtocol/uniswap-tokenlist/main/assets/set-logo.svg',
+		'logoURI':'https://app.1inch.io/assets/images/logo_small.svg#logo_small',
 		'enabled':false,
 	},
 ]

@@ -3,6 +3,7 @@ export default {
 	accent: {
 		100: '#f472b6',
 		200: '#f44ca2',
+		300: '#d95d9c',
 	},
 	white: {
 		100: '#FFD8FE',

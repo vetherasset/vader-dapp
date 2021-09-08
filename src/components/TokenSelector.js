@@ -2,8 +2,9 @@ import React, { useRef, useMemo, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import defaults from '../common/defaults'
 import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay, ModalContent, ModalBody,
-	ModalFooter, Input,
+	ModalFooter, Input, Switch, Flex,
 } from '@chakra-ui/react'
+import useLocalStorageState from 'use-local-storage-state'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
 import { resolveUnknownERC20 } from '../common/ethereum'
@@ -130,6 +131,8 @@ const TokenSelectDialog = (props) => {
 const TokenListSelectDialog = (props) => {
 
 	TokenListSelectDialog.propTypes = {
+		tokenListSources: PropTypes.array.isRequired,
+		setTokenListSources: PropTypes.func.isRequired,
 		setDialog: PropTypes.func.isRequired,
 	}
 
@@ -162,8 +165,45 @@ const TokenListSelectDialog = (props) => {
 			</ModalHeader>
 			<ModalBody
 				display='flex'
-				flexDir='column'>
-					Toggles
+				flexDir='column'
+				p='1.8rem 0 0'>
+				{props.tokenListSources.map((source, index) => {
+					return (
+						<Flex
+							background={source.enabled ? '#e693dd' : '#d4b4d1' }
+							m='0 1.3rem 0.8rem'
+							p='1.6rem'
+							borderRadius='1.4rem'
+							minH='5rem'
+							justifyContent='space-between'
+							alignItems='center'
+							key={index}
+						>
+							<Image
+								width='33px'
+								height='33px'
+								objectFit='contain'
+								src={source.logoURI}/>
+							<Box
+								as='h3'
+								m='0'
+								fontSize='1.1rem'
+								fontWeight='bold'
+								textTransform='capitalize'>
+								{source.name}
+							</Box>
+							<Switch
+								size='lg'
+								isDisabled={index === 0 ? true : false}
+								isChecked={index === 0 ? true : source.enabled}
+								onChange={() => {
+									source.enabled = !source.enabled
+									props.setTokenListSources([ ...props.tokenListSources ])
+								}}
+							/>
+						</Flex>
+					)
+				})}
 			</ModalBody>
 		</>
 	)
@@ -183,6 +223,7 @@ export const TokenSelector = (props) => {
 	const initialRef = useRef()
 	const [dialog, setDialog] = useState(0)
 
+	const [tokenListSources, setTokenListSources] = useLocalStorageState('tokenListSources', defaults.tokenList.sources)
 	const [tokenListCombined, setTokenListCombined] = useState(false)
 	const tokenList = useMemo(() => tokenListCombined, [tokenListCombined])
 
@@ -192,7 +233,7 @@ export const TokenSelector = (props) => {
 
 	useEffect(() => {
 		getCombinedTokenListFromSources(
-			defaults.tokenList.sources,
+			tokenListSources,
 		)
 			.then(data => {
 				setTokenListCombined(data)
@@ -202,7 +243,7 @@ export const TokenSelector = (props) => {
 				setTokenListCombined(false)
 				console.log(err)
 			})
-	}, [])
+	}, [tokenListSources])
 
 	return (
 		<>
@@ -227,6 +268,8 @@ export const TokenSelector = (props) => {
 						}
 						{dialog === 1 &&
 							<TokenListSelectDialog
+								tokenListSources={tokenListSources}
+								setTokenListSources={setTokenListSources}
 								setDialog={setDialog}
 							/>
 						}
