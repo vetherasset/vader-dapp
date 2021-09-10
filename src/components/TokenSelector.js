@@ -170,7 +170,7 @@ const TokenListSelectDialog = (props) => {
 				{props.tokenListSources.map((source, index) => {
 					return (
 						<Flex
-							background={source.enabled ? '#e693dd' : '#d4b4d1' }
+							background={source.enabled ? '#e5b1e0' : '#e7c2e4' }
 							m='0 1.3rem 0.8rem'
 							p='1.6rem'
 							borderRadius='1.4rem'
