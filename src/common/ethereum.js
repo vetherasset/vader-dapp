@@ -1,8 +1,6 @@
 import { ethers } from 'ethers'
-import humanStandardTokenAbi from '../artifacts/humanStandardTokenAbi'
-import vaderAbi from '../artifacts/VaderAbi'
-import routerAbi from '../artifacts/RouterAbi'
-import poolsAbi from '../artifacts/PoolsAbi'
+import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
+import vaderAbi from '../artifacts/abi/vader'
 import defaults from './defaults'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
