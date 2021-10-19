@@ -14,8 +14,7 @@ import {
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
-	getVaderConversionFactor, upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
+import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance, upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
@@ -80,11 +79,7 @@ export const Redeem = (props) => {
 
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
-			getVaderConversionFactor(defaults.network.provider)
-				.then((f) => {
-					setConversionFactor(f)
-				})
-				.catch((err) =>console.log(err))
+			setConversionFactor(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
 		}
 		if (tokenSelect.symbol === 'USDV') {
 			if(amount > Number(0)) {

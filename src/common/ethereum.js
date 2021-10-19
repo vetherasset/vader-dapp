@@ -30,19 +30,9 @@ const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, pro
 	return await contract.allowance(ownerAddress, spenderAddress)
 }
 
-const getVaderConversionFactor = async (provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.vader,
-		vaderAbi,
-		provider,
-	)
-	return await contract.conversionFactor()
-}
-
 const getVaderAmount = async (amountUsdv, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider,
 	)
 	return await contract.getVADERAmount(amountUsdv)
@@ -51,7 +41,6 @@ const getVaderAmount = async (amountUsdv, provider) => {
 const getUsdvAmount = async (amountVader, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider,
 	)
 	return await contract.getUSDVAmount(amountVader)
@@ -130,7 +119,6 @@ const upgradeVetherToVader = async (amount, provider) => {
 const getSwapRate = async (from, to, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider.getSigner(0),
 	)
 
@@ -140,7 +128,6 @@ const getSwapRate = async (from, to, provider) => {
 const getSwapFee = async (inputAmount, from, to, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.pools,
-		poolsAbi,
 		provider,
 	)
 
@@ -155,7 +142,6 @@ const getSwapFee = async (inputAmount, from, to, provider) => {
 const swapForAsset = async (amount, from, to, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider.getSigner(0),
 	)
 
@@ -165,7 +151,6 @@ const swapForAsset = async (amount, from, to, provider) => {
 const getUSDVburnRate = async (provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider,
 	)
 
@@ -175,7 +160,6 @@ const getUSDVburnRate = async (provider) => {
 const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.pools,
-		poolsAbi,
 		provider,
 	)
 
@@ -185,7 +169,6 @@ const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
 const tokenHasPool = async (address, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
-		routerAbi,
 		provider,
 	)
 
@@ -194,7 +177,7 @@ const tokenHasPool = async (address, provider) => {
 
 export {
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
-	estimateGasCost, getVaderConversionFactor, getERC20Allowance, convertVaderToUsdv,
+	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
 	upgradeVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
 	getVaderAmount, getUsdvAmount, tokenHasPool, swapForAsset,
 }
