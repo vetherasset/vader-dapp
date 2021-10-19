@@ -14,7 +14,8 @@ import {
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance, upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
+import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
+	 upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
@@ -55,7 +56,7 @@ export const Redeem = (props) => {
 	const [tokenSelect, setTokenSelect] = useState(tokens[1])
 	const [amount, setAmount] = useState(0)
 	const [spendAllowed, setSpendAllowed] = useState(true)
-	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
 	const [working, setWorking] = useState(false)
 
 	const HiddenList = {
@@ -82,7 +83,7 @@ export const Redeem = (props) => {
 			setConversionFactor(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
 		}
 		if (tokenSelect.symbol === 'USDV') {
-			if(amount > Number(0)) {
+			if(amount > 0) {
 				getVaderAmount(
 					ethers.BigNumber.from(String(amount),
 					),
@@ -96,7 +97,7 @@ export const Redeem = (props) => {
 			}
 		}
 		if (tokenSelect.symbol === 'VADER') {
-			if(amount > Number(0)) {
+			if(amount > 0) {
 				getUsdvAmount(
 					ethers.BigNumber.from(String(amount),
 					),
@@ -109,11 +110,7 @@ export const Redeem = (props) => {
 					.catch((err) =>console.log(err))
 			}
 		}
-		if (amount <= 0) {
-			setConversionFactor(
-				ethers.BigNumber.from('0'),
-			)
-		}
+		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect])
 
 	useEffect(() => {
@@ -167,7 +164,12 @@ export const Redeem = (props) => {
 						<NumberInput
 							variant='transparent'
 							onChange={(n) => {
-								setAmount(n)
+								if(Number(n) >= 0) {
+									setAmount(n)
+								}
+								else {
+									setAmount(0)
+								}
 							}}>
 							<NumberInputField placeholder='0.0' border='none' fontSize='1.3rem' />
 						</NumberInput>
