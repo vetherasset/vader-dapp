@@ -80,6 +80,15 @@ export const Redeem = (props) => {
 		display: 'block',
 	}
 
+	const DrawAmount = () => {
+		if (tokenSelect.symbol === 'VETH' && amount >= 1000001) {
+			return <>👻👻👻</>
+	 	}
+		else {
+			return <>{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}</>
+		}
+	}
+
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
 			setConversionFactor(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
@@ -237,7 +246,7 @@ export const Redeem = (props) => {
 				<Flex
 					m='1.66rem 0' fontSize='1.5rem' fontWeight='bolder'
 					justifyContent='center' alignItems='center' flexDir='column'>
-					{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}
+					{DrawAmount()}
 					<Box as='h3' fontWeight='bold' textAlign='center'>
 						<Badge as='div' background='rgb(214, 188, 250)' color='rgb(128, 41, 251)'>What You Get</Badge>
 					</Box>
