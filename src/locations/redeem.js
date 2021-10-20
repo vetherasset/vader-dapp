@@ -141,16 +141,16 @@ export const Redeem = (props) => {
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
-			pt='5rem'
+			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Flex
-				justifyContent='center'
-				layerStyle='colorful'
+				w='100%'
 				maxW='49ch'
-				minH='474px'
+				minH='478.65px'
 				m='0 auto'
-				p='2.5rem 2.5rem 1.8rem'
+				p='2rem 2.6rem'
+				layerStyle='colorful'
 				flexDir='column'
 			>
 				<Text align='center' fontSize='1.55rem' fontWeight='bolder'>
