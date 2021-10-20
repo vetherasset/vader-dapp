@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
 	Box,
+	Badge,
 	Flex,
 	Text,
 	Button,
@@ -229,10 +230,15 @@ export const Redeem = (props) => {
 						</Box>
 					</Flex>
 				</Flex>
-				<Flex m='3.15rem 0' fontSize='1.5rem' fontWeight='bolder'
-					justifyContent='center' alignItems='center'>
+
+				<Flex m='1.66rem 0' fontSize='1.5rem' fontWeight='bolder'
+					justifyContent='center' alignItems='center' flexDir='column'>
 					{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}
+					<Box as='h3' fontWeight='bold' textAlign='center'>
+						<Badge as='div' background='rgb(214, 188, 250)' color='rgb(128, 41, 251)'>What You Get</Badge>
+					</Box>
 				</Flex>
+
 				<Button
 					variant='solidRadial'
 					m='0 auto 2rem'
