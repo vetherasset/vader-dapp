@@ -164,7 +164,10 @@ export const Redeem = (props) => {
 				<Flex layerStyle='inputLike'>
 					<Box flex='1' pr='0.5rem'>
 						<NumberInput
+						  min={0}
 							variant='transparent'
+							value={amount}
+							clampValueOnBlur={false}
 							onChange={(n) => {
 								if(Number(n) >= 0) {
 									setAmount(n)
@@ -231,7 +234,8 @@ export const Redeem = (props) => {
 					</Flex>
 				</Flex>
 
-				<Flex m='1.66rem 0' fontSize='1.5rem' fontWeight='bolder'
+				<Flex
+					m='1.66rem 0' fontSize='1.5rem' fontWeight='bolder'
 					justifyContent='center' alignItems='center' flexDir='column'>
 					{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}
 					<Box as='h3' fontWeight='bold' textAlign='center'>
