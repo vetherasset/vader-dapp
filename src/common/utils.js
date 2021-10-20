@@ -37,6 +37,17 @@ const prettifyCurrency = (amount, minFractionDigits = 0, maxFractionDigits = 2, 
 		cryptocurrency = true
 	}
 
+	if (currency === 'VADER') {
+		options = {
+			style: 'decimal',
+			minimumFractionDigits: minFractionDigits,
+			maximumFractionDigits: maxFractionDigits,
+		}
+		symbol = 'VADER'
+		symbolPrepended = false
+		cryptocurrency = true
+	}
+
 	const currencyValue = new Intl.NumberFormat(locales, options)
 
 	return (

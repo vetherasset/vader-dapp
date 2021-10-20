@@ -16,6 +16,7 @@ import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
 	 upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
+import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
@@ -230,9 +231,7 @@ export const Redeem = (props) => {
 				</Flex>
 				<Flex m='3.15rem 0' fontSize='1.5rem' fontWeight='bolder'
 					justifyContent='center' alignItems='center'>
-					{amount * conversionFactor.toNumber()}
-					&nbsp;
-					{tokenSelect.convertsTo}
+					{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}
 				</Flex>
 				<Button
 					variant='solidRadial'
