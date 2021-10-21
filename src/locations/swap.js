@@ -135,7 +135,11 @@ const Swap = (props) => {
 								src={token0.logoURI}
 							/>
 							<Box as='span' fontWeight='bold' alignSelf='center' mr='5px'>{token0.symbol}</Box>
-							<TriangleDownIcon alignSelf='center'/>
+							<TriangleDownIcon
+								alignSelf='center'
+								height='0.7rem'
+								marginTop='1px'
+							/>
 						</Box>
 					</Flex>
 

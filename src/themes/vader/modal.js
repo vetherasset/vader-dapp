@@ -15,6 +15,9 @@ export default {
 		},
 		closeButton: {
 			top: '1rem',
+			_focus: {
+				boxShadow: '0 0 0 3px #7b7ce0',
+			},
 		},
 	},
 }

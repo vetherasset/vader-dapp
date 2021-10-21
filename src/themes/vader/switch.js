@@ -4,6 +4,7 @@ export default {
 			bg: '#4F4F4F',
 		},
 		track: {
+			bg: '#ffffffd6',
 			_checked: {
 				bg: 'accent.300',
 			},
