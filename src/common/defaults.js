@@ -50,12 +50,21 @@ defaults.toast.closable = true
 defaults.toast.position = 'top'
 
 defaults.address = {}
-defaults.address.vader = defaults.network.chainId === 1 ? ''
-	: defaults.network.chainId === 3 ? '0x9bee02113c21ad204c6a08Dd22a921aC86CA69e5'
-		: undefined
-defaults.address.vether = defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279'
-	: defaults.network.chainId === 3 ? '0xA7764B95123D8c7680eBbA3F2dd7DB459E6EcdC6'
-	 : undefined
+defaults.address.vader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742' :
+			undefined
+)
+defaults.address.vether = (
+	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
+		defaults.network.chainId === 42 ? '0x438f70ab08ab3f74833c439643c3fc1939ce2929' :
+			undefined
+)
+defaults.address.converter = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x8e7A48fC00cF9541392FB820628Ca730b6badf3e' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
@@ -69,6 +78,18 @@ defaults.tokenDefault = {
 	'decimals':6,
 	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 }
+
+defaults.redeemables = [
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.vether,
+		'name':'VETHER',
+		'symbol':'VETH',
+		'decimals':18,
+		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		'convertsTo':'VADER',
+	},
+]
 
 defaults.vader = {}
 defaults.vader.conversionRate = 1000

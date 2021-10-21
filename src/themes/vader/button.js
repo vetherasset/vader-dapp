@@ -55,7 +55,7 @@ export default {
 			_hover: {
 				backgroundImage: 'linear-gradient(90deg, rgb(254, 201, 254) 0%, rgb(56, 233, 253) 100%)',
 				_disabled: {
-					backgroundImage: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
+					backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 				},
 			},
 			_active: {
@@ -64,7 +64,6 @@ export default {
 			},
 			_disabled: {
 				color: '#fff',
-				background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
 			},
 		}),
 		outline: () => ({

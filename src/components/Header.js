@@ -67,14 +67,9 @@ export const Header = (props) => {
 				}
 			</Flex>
 			<Flex w='20%' justifyContent='flex-end'>
-				<Flex
-					display={{ base: 'none', md: 'flex' }}
-				>
-					<WalletConnectionToggle />
-				</Flex>
 				{useBreakpointValue({
 					base: <BurgerMenu pages={pages}/>,
-					md: '',
+					md: <WalletConnectionToggle />,
 				})}
 			</Flex>
 		</Flex>

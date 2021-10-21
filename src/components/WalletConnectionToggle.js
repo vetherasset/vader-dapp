@@ -7,7 +7,6 @@ import Jazzicon from '@metamask/jazzicon'
 import { connected } from '../messages'
 
 export const WalletConnectionToggle = (props) => {
-
 	const initialText = 'Connect'
 	const wallet = useWallet()
 	const ref = useRef()

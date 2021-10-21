@@ -56,7 +56,7 @@ const walletNotConnected = {
 
 const vaderconverted = {
 	title: 'Vader Token burnt for USDV',
-	description: 'Amount of Vader was burnt for USDV succesfully.',
+	description: 'Your tokens were burnt succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -65,7 +65,7 @@ const vaderconverted = {
 
 const usdvredeemed = {
 	title: 'USDV burnt for Vader Token',
-	description: 'Amount of USDV was burnt for VADER succesfully.',
+	description: 'Your tokens were burnt succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -74,7 +74,16 @@ const usdvredeemed = {
 
 const vethupgraded = {
 	title: 'Veth burnt for Vader Token',
-	description: 'Amount of Veth was burnt for VADER succesfully.',
+	description: 'Your tokens were burnt succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const noAmount = {
+	title: 'No amount specified',
+	description: 'You didn\'t specify any amount.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -84,4 +93,5 @@ const vethupgraded = {
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
+	noAmount,
 }

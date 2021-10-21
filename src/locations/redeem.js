@@ -15,31 +15,19 @@ import {
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
-	 upgradeVetherToVader, redeemToVADER } from '../common/ethereum'
+import { convertVaderToUsdv, convertVetherToVader, redeemToVADER } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
-import { approved, insufficientBalance, rejected, failed,
-	vaderconverted, vethupgraded, usdvredeemed } from '../messages'
+import { insufficientBalance, rejected, failed,
+	vaderconverted, vethupgraded, usdvredeemed, walletNotConnected, noAmount } from '../messages'
 
 export const Redeem = (props) => {
-	const tokens = [
-		{
-			'chainId':defaults.network.chainId,
-			'address':defaults.address.vether,
-			'name':'VETHER',
-			'symbol':'VETH',
-			'decimals':18,
-			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
-			'convertsTo':'VADER',
-		},
-	]
+	const tokens = defaults.redeemables
 	const wallet = useWallet()
 	const toast = useToast()
 	const [showTokenList, setShowTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[0])
 	const [amount, setAmount] = useState(0)
-	const [spendAllowed, setSpendAllowed] = useState(true)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
 	const [working, setWorking] = useState(false)
 
@@ -66,9 +54,7 @@ export const Redeem = (props) => {
 		if (tokenSelect.symbol === 'VETH' && amount >= 1000001) {
 			return <>👻👻👻</>
 	 	}
-		else {
-			return <>{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}</>
-		}
+		return <>{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}</>
 	}
 
 	useEffect(() => {
@@ -79,28 +65,6 @@ export const Redeem = (props) => {
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect])
-
-	useEffect(() => {
-		if(wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20Allowance(tokenSelect.address,
-				wallet.account,
-				defaults.address.vader,
-				provider)
-				.then(n => {
-					if (
-						n.gt(ethers.BigNumber.from('0'))
-							&& n.gte(ethers.BigNumber.from(String(amount)))
-					) {
-						setSpendAllowed(true)
-					}
-					else {
-						setSpendAllowed(false)
-					}
-				})
-				.catch(console.log)
-		}
-	}, [wallet.account, tokenSelect, amount])
 
 	return (
 		<Box
@@ -219,10 +183,10 @@ export const Redeem = (props) => {
 					onClick={() => {
 						if(wallet.account) {
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-							if(spendAllowed) {
-								setWorking(true)
+							setWorking(true)
+							if (amount > 0) {
 								if (tokenSelect.symbol === 'VETH') {
-									upgradeVetherToVader(
+									convertVetherToVader(
 										ethers.utils.parseUnits(String(amount)).toString(),
 										provider,
 									)
@@ -232,7 +196,7 @@ export const Redeem = (props) => {
 										})
 										.catch(err => {
 											setWorking(false)
-											if(err.code === 'INSUFFICIENT_FUNDS') {
+											if(err.code === -32016) {
 												console.log('Insufficient balance: Your account balance is insufficient.')
 												toast(insufficientBalance)
 											}
@@ -258,7 +222,7 @@ export const Redeem = (props) => {
 										})
 										.catch(err => {
 											setWorking(false)
-											if(err.code === 'INSUFFICIENT_FUNDS') {
+											if(err.code === -32016) {
 												console.log('Insufficient balance: Your account balance is insufficient.')
 												toast(insufficientBalance)
 											}
@@ -284,7 +248,7 @@ export const Redeem = (props) => {
 										})
 										.catch(err => {
 											setWorking(false)
-											if(err.code === 'INSUFFICIENT_FUNDS') {
+											if(err.code === -32016) {
 												console.log('Insufficient balance: Your account balance is insufficient.')
 												toast(insufficientBalance)
 											}
@@ -300,44 +264,17 @@ export const Redeem = (props) => {
 										})
 								}
 							}
- 							else {
-								setWorking(true)
-								approveERC20ToSpend(
-									tokenSelect.address,
-									defaults.address.vader,
-									'302503999000000000299700000',
-									provider,
-								)
-									.then(() => {
-										setWorking(false)
-										toast(approved)
-									})
-									.catch(err => {
-										setWorking(false)
-										if(err.code === 'INSUFFICIENT_FUNDS') {
-											console.log('Insufficient balance: Your account balance is insufficient.')
-											toast(insufficientBalance)
-										}
-										else if(err.code === 4001) {
-											console.log('Transaction rejected: Your have decided to reject the transaction..')
-											toast(rejected)
-										}
-										else {
-											console.log('Error code is:' + err.code)
-											console.log('Error:' + err)
-											toast(failed)
-										}
-									})
+							else {
+								setWorking(false)
+								toast(noAmount)
 							}
+						}
+						else {
+							toast(walletNotConnected)
 						}
 					}}
 				>
-					{spendAllowed &&
-						'Burn'
-					}
-					{!spendAllowed &&
-						'Approve Token'
-					}
+					Burn
 				</Button>
 			</Flex>
 		</Box>
