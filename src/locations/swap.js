@@ -26,7 +26,7 @@ const span = {
 	opacity: '0.9',
 }
 
-export const Swap = (props) => {
+const Swap = (props) => {
 
 	const { isOpen, onOpen, onClose } = useDisclosure()
 

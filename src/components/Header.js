@@ -22,9 +22,9 @@ export const Header = (props) => {
 			link: '/liquidity',
 		},
 		{
-			name: 'redeem',
-			text: 'Redeem',
-			link: '/redeem',
+			name: 'Burn',
+			text: 'Burn',
+			link: '/burn',
 		},
 	]
 

@@ -21,7 +21,7 @@ import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed,
 	vaderconverted, vethupgraded, usdvredeemed, walletNotConnected, noAmount } from '../messages'
 
-export const Redeem = (props) => {
+const Burn = (props) => {
 	const tokens = defaults.redeemables
 	const wallet = useWallet()
 	const toast = useToast()
@@ -281,4 +281,4 @@ export const Redeem = (props) => {
 	)
 }
 
-export default Redeem
+export default Burn

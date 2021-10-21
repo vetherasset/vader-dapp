@@ -5,7 +5,7 @@ import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Swap from './locations/swap'
-import Redeem from './locations/redeem'
+import Burn from './locations/burn'
 import Liquidity from './locations/liquidity'
 import defaults from './common/defaults'
 import { Wave } from './assets/svg/effects/Wave'
@@ -29,8 +29,8 @@ const App = () => {
 						<Route path='/' exact render={() =>
 							<Swap position='relative' zIndex='1'/>
 						}/>
-						<Route path='/redeem' exact render={() =>
-							<Redeem position='relative' zIndex='1'/>
+						<Route path='/burn' exact render={() =>
+							<Burn position='relative' zIndex='1'/>
 						}/>
 						<Route path='/liquidity' exact render={() =>
 							<Liquidity position='relative' zIndex='1'/>
