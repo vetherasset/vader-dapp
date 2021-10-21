@@ -16,7 +16,7 @@ import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { approveERC20ToSpend, convertVaderToUsdv, getERC20Allowance,
-	 upgradeVetherToVader, getVaderAmount, getUsdvAmount, redeemToVADER } from '../common/ethereum'
+	 upgradeVetherToVader, redeemToVADER } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { approved, insufficientBalance, rejected, failed,
@@ -26,27 +26,9 @@ export const Redeem = (props) => {
 	const tokens = [
 		{
 			'chainId':defaults.network.chainId,
-			'address': defaults.address.vader,
-			'name':'VADER PROTOCOL TOKEN',
-			'symbol':'VADER',
-			'decimals':18,
-			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
-			'convertsTo':'USDV',
-		},
-		{
-			'chainId':defaults.network.chainId,
 			'address':defaults.address.vether,
 			'name':'VETHER',
 			'symbol':'VETH',
-			'decimals':18,
-			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
-			'convertsTo':'VADER',
-		},
-		{
-			'chainId':defaults.network.chainId,
-			'address':defaults.address.usdv,
-			'name':'VADER STABLE DOLLAR',
-			'symbol':'USDV',
 			'decimals':18,
 			'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 			'convertsTo':'VADER',
@@ -55,7 +37,7 @@ export const Redeem = (props) => {
 	const wallet = useWallet()
 	const toast = useToast()
 	const [showTokenList, setShowTokenList] = useState(false)
-	const [tokenSelect, setTokenSelect] = useState(tokens[1])
+	const [tokenSelect, setTokenSelect] = useState(tokens[0])
 	const [amount, setAmount] = useState(0)
 	const [spendAllowed, setSpendAllowed] = useState(true)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
@@ -91,35 +73,9 @@ export const Redeem = (props) => {
 
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
-			setConversionFactor(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
-		}
-		if (tokenSelect.symbol === 'USDV') {
-			if(amount > 0) {
-				getVaderAmount(
-					ethers.BigNumber.from(String(amount),
-					),
-					defaults.network.provider)
-					.then((f) => {
-						setConversionFactor(
-							f.div(ethers.BigNumber.from(String(amount))),
-						)
-					})
-					.catch((err) =>console.log(err))
-			}
-		}
-		if (tokenSelect.symbol === 'VADER') {
-			if(amount > 0) {
-				getUsdvAmount(
-					ethers.BigNumber.from(String(amount),
-					),
-					defaults.network.provider)
-					.then((f) => {
-						setConversionFactor(
-							f.div(ethers.BigNumber.from(String(amount))),
-						)
-					})
-					.catch((err) =>console.log(err))
-			}
+			setConversionFactor(
+				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
+			)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect])

@@ -30,22 +30,6 @@ const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, pro
 	return await contract.allowance(ownerAddress, spenderAddress)
 }
 
-const getVaderAmount = async (amountUsdv, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-	return await contract.getVADERAmount(amountUsdv)
-}
-
-const getUsdvAmount = async (amountVader, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-	return await contract.getUSDVAmount(amountVader)
-}
-
 const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 	const contract = new ethers.Contract(
 		tokenAddress,
@@ -179,5 +163,5 @@ export {
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
 	upgradeVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
-	getVaderAmount, getUsdvAmount, tokenHasPool, swapForAsset,
+	tokenHasPool, swapForAsset,
 }
