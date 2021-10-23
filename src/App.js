@@ -1,12 +1,13 @@
 import React, {} from 'react'
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect, useLocation } from 'react-router-dom'
 import { ChakraProvider, Box } from '@chakra-ui/react'
 import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Swap from './locations/swap'
+import Pool from './locations/pool'
 import Burn from './locations/burn'
-import Liquidity from './locations/liquidity'
+import PoolDetail from './locations/poolDetail'
 import defaults from './common/defaults'
 import { Wave } from './assets/svg/effects/Wave'
 
@@ -32,8 +33,11 @@ const App = () => {
 						<Route path='/burn' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
 						}/>
-						<Route path='/liquidity' exact render={() =>
-							<Liquidity position='relative' zIndex='1'/>
+						<Route path='/pool' exact render={() =>
+							<Pool position='relative' zIndex='1'/>
+						}/>
+						<Route path='/pool/:poolAddress' exact render={() =>
+							<PoolDetail position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
@@ -46,17 +50,30 @@ const App = () => {
 						left='50%'
 						top='65%'
 						transform='translate(-50%, -65%)'
-						m='0 auto'>
+						m='0 auto'
+						overflowX='hidden'>
 						<Box
 							id='radialMask'
 							width='100%'
 							height='100%'
+							transform={maskTransform}
 						/>
 					</Wave>
       	</UseWalletProvider>
 			</ChakraProvider>
 		</Router>
 	)
+}
+
+const maskTransform = () => {
+	const location = useLocation()
+	if(location.pathname.includes('pool')) {
+		return {
+			base: 'scaleX(1.5)',
+			md: 'scaleX(1.4)',
+			xl: 'scaleX(1.2)',
+		}
+	}
 }
 
 export default App

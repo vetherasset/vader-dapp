@@ -41,6 +41,8 @@ defaults.layout.container = {}
 defaults.layout.container.lg = {}
 defaults.layout.container.lg.width = '75rem'
 defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
+defaults.layout.container.md = {}
+defaults.layout.container.md.width = '840px'
 defaults.layout.container.sm = {}
 defaults.layout.container.sm.width = '768px'
 

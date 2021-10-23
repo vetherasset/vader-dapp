@@ -17,9 +17,9 @@ export const Header = (props) => {
 			link: '/',
 		},
 		{
-			name: 'liquidity',
-			text: 'Liquidity',
-			link: '/liquidity',
+			name: 'pool',
+			text: 'Pool',
+			link: '/pool',
 		},
 		{
 			name: 'Burn',
@@ -60,6 +60,7 @@ export const Header = (props) => {
 							color: 'rgb(213, 213, 213)',
 							padding: '0.4rem 0.8rem',
 							...(p.link === location.pathname && current),
+							...(p.link === '/pool' && location.pathname.includes('pool') && current),
 						}}
 					>
 						{p.text}

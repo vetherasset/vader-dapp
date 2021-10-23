@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Flex, Input, InputGroup, InputLeftElement, Image, Text, Button } from '@chakra-ui/react'
+import { useHistory } from 'react-router-dom'
+import { Box, Flex, Input, InputGroup, InputLeftElement, Image, Text } from '@chakra-ui/react'
 import { SearchIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { pools } from '../assets/dumpdata'
 import SortableHeader from '../components/SortableHeader'
 
-const Liquidity = (props) => {
+const Pool = (props) => {
 	const headers = [
 		{
 			name: 'name',
@@ -18,15 +19,6 @@ const Liquidity = (props) => {
 		{
 			name: 'type',
 			text: 'type',
-			style: {
-				display: { base: 'none', lg: 'flex' },
-				width: { base: '30%', md: '10%' },
-			},
-
-		},
-		{
-			name: 'price',
-			text: 'price',
 			style: {
 				display: { base: 'none', lg: 'flex' },
 				width: { base: '30%', md: '10%' },
@@ -55,22 +47,13 @@ const Liquidity = (props) => {
 			name: 'apy',
 			text: 'apy',
 			style: {
-				display: { base: 'none', md: 'flex' },
-				width: { base: '30%', md: '10%' },
-			},
-
-		},
-		{
-			name: 'refresh',
-			text: 'refresh',
-			style: {
-				justifyContent: 'right',
 				display: { base: 'flex' },
-				width: { base: '70%', md: '40%' },
+				width: { base: '', md: '10%' },
 			},
 
 		},
 	]
+	const history = useHistory()
 	const [tokens, setTokens] = useState([])
 	const [filteredToken, setFilteredToken] = useState([])
 	const [currentOrderKey, setCurrentOrderKey] = useState('')
@@ -109,10 +92,6 @@ const Liquidity = (props) => {
 			return
 		}
 		setFilteredToken(tokens.filter(t => t.name.toLowerCase().includes(query.trim().toLowerCase())))
-	}
-
-	const handleActionButton = (action, token) => {
-		console.log(action, token)
 	}
 
 	return (
@@ -179,6 +158,14 @@ const Liquidity = (props) => {
 								key={t.name}
 								justify='space-between'
 								padding='.5rem'
+								border='1px solid #ffffff00'
+								_hover={{
+									cursor: 'pointer',
+									borderRadius: '6px',
+									background: '#f49bca8f',
+									border: '1px solid #f49bca8f',
+								}}
+								onClick={() => history.push('/pool/address')}
 							>
 								<Flex alignItems='center' width={{ base: '30%', md: '10%' }}
 									flexWrap='wrap'>
@@ -189,36 +176,29 @@ const Liquidity = (props) => {
 											objectFit='none'
 											width='23px'
 											height='23px'
-											src={t.icon}/>
-										<Flex flexDir='column' width='60px' ml='5px'>
-											<Text>{t.symbol}</Text>
-										</Flex>
-									</Flex>
-									<Flex d='flex' flexDir='row'>
+											src={t.icon}
+											mr='6px'/>
 										<Image
 											bg='white'
 											borderRadius='50%'
 											objectFit='none'
 											width='23px'
 											height='23px'
-											src={t.icon}/>
-										<Flex flexDir='column' width='60px' ml='5px'>
-											<Text>{t.symbol}</Text>
-										</Flex>
+											src={t.icon}
+											mr='13px'/>
+										<Text textTransform='uppercase'>{t.base}</Text>
+										-
+										<Text textTransform='uppercase'>{t.quote}</Text>
 									</Flex>
 								</Flex>
-								<Flex alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>{t.type}</Flex>
-								<Flex alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>${t.price}</Flex>
+								<Flex
+									textTransform='capitalize'
+									alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>{t.type}</Flex>
 								<Flex alignItems='center' width='10%'
 									display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</Flex>
 								<Flex alignItems='center' width='10%'
 									display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</Flex>
-								<Flex alignItems='center' width='10%' display={{ base: 'none', md: 'flex' }}>{t.apy}%</Flex>
-								<Flex alignItems='center' width={{ base: '70%', md: '40%' }} justifyContent='flex-end'>
-									{t.actions.map(a => <Button mx='.5rem' size='sm' key={a} onClick={() => {
-										handleActionButton(a, t)
-									}}>{a}</Button>)}
-								</Flex>
+								<Flex alignItems='center' width='10%' display={{ base: 'flex' }}>{t.apy}%</Flex>
 							</Flex>)
 					})}
 				</Box>
@@ -227,4 +207,4 @@ const Liquidity = (props) => {
 	)
 }
 
-export default Liquidity
+export default Pool
