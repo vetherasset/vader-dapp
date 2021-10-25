@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 
 const ModalStyleContainer = ({ children, ...props })=>{
-	console.log(props)
 	return(
 		<Box
 			maxWidth={defaults.layout.container.sm.width}
