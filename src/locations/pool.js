@@ -7,6 +7,16 @@ import { pools } from '../assets/dumpdata'
 import SortableHeader from '../components/SortableHeader'
 
 const Pool = (props) => {
+	const providing = `
+	@keyframes animation-providing {
+		0% {
+			background-position: 1rem 0px;
+		}
+		100% {
+			background-position: 0px 0px;
+		}
+	}
+	`
 	const headers = [
 		{
 			name: 'name',
@@ -154,52 +164,64 @@ const Pool = (props) => {
 					</Flex>
 					{filteredToken.map(t => {
 						return (
-							<Flex
-								key={t.name}
-								justify='space-between'
-								padding='.5rem'
-								border='1px solid #ffffff00'
-								_hover={{
-									cursor: 'pointer',
-									borderRadius: '6px',
-									background: '#f49bca8f',
-									border: '1px solid #f49bca8f',
-								}}
-								onClick={() => history.push('/pool/address')}
-							>
-								<Flex alignItems='center' width={{ base: '30%', md: '10%' }}
-									flexWrap='wrap'>
-									<Flex d='flex' flexDir='row'>
-										<Image
-											bg='white'
-											borderRadius='50%'
-											objectFit='none'
-											width='23px'
-											height='23px'
-											src={t.icon}
-											mr='6px'/>
-										<Image
-											bg='white'
-											borderRadius='50%'
-											objectFit='none'
-											width='23px'
-											height='23px'
-											src={t.icon}
-											mr='13px'/>
-										<Text textTransform='uppercase'>{t.base}</Text>
-										-
-										<Text textTransform='uppercase'>{t.quote}</Text>
-									</Flex>
-								</Flex>
+							<>
+								<style>
+									{providing}
+								</style>
 								<Flex
-									textTransform='capitalize'
-									alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>{t.type}</Flex>
-								<Flex alignItems='center' width='10%'
-									display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</Flex>
-								<Flex alignItems='center' width='10%'
-									display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</Flex>
-								<Flex alignItems='center' width='10%' display={{ base: 'flex' }}>{t.apy}%</Flex>
-							</Flex>)
+									key={t.name}
+									justify='space-between'
+									padding='.5rem'
+									mb='0.6rem'
+									border='1px solid #ffffff00'
+									animation={ t.isProvider ? '1s linear 0s infinite normal none running animation-providing' : '' }
+									transition='all 0.3s ease 0s'
+									borderRadius='6px'
+									backgroundSize='1rem 1rem'
+									backgroundColor={ t.isProvider ? '#f49bca8f' : 'transparent' }
+									backgroundImage={ t.isProvider ? 'linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 75%, transparent 75%, transparent)' : '' }
+									_hover={{
+										cursor: 'pointer',
+										background: '#f49bca8f',
+										border: '1px solid #f49bca8f',
+									}}
+									onClick={() => history.push('/pool/address')}
+								>
+									<Flex alignItems='center' width={{ base: '30%', md: '10%' }}
+										flexWrap='wrap'>
+										<Flex d='flex' flexDir='row'>
+											<Image
+												bg='white'
+												borderRadius='50%'
+												objectFit='none'
+												width='23px'
+												height='23px'
+												src={t.icon}
+												mr='6px'/>
+											<Image
+												bg='white'
+												borderRadius='50%'
+												objectFit='none'
+												width='23px'
+												height='23px'
+												src={t.icon}
+												mr='13px'/>
+											<Text textTransform='uppercase'>{t.base}</Text>
+										-
+											<Text textTransform='uppercase'>{t.quote}</Text>
+										</Flex>
+									</Flex>
+									<Flex
+										textTransform='capitalize'
+										alignItems='center' width='10%' display={{ base: 'none', lg: 'flex' }}>{t.type}</Flex>
+									<Flex alignItems='center' width='10%'
+										display={{ base: 'none', md: 'flex' }}>${t.liquidity}M</Flex>
+									<Flex alignItems='center' width='10%'
+										display={{ base: 'none', md: 'flex' }}>${t.dayVolume}M</Flex>
+									<Flex alignItems='center' width='10%' display={{ base: 'flex' }}>{t.apy}%</Flex>
+								</Flex>
+							</>
+						)
 					})}
 				</Box>
 			</Flex>
