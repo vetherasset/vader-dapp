@@ -25,7 +25,7 @@ const PoolDetail = (props) => {
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.md.width}
 			m='0 auto'
-			pt='5rem'
+			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Flex
@@ -33,6 +33,7 @@ const PoolDetail = (props) => {
 				p='1.8rem'
 				flexDir='column'
 				layerStyle='colorful'
+				height='auto'
 			>
 				<Flex
 					{...flex}
@@ -59,22 +60,32 @@ const PoolDetail = (props) => {
 					<Box as='h3' fontSize='1.3rem' fontWeight='bold' textTransform='capitalize' ml='1rem'>DAI / USDC</Box>
 				</Flex>
 
-				<Flex>
+				<Flex
+					flexWrap={{ base: 'wrap', md: 'nowrap' }}
+				>
 					<Flex
 						p='0 0.3rem'
 						flexDir='column'
-						width='50%'
 						justifyContent='center'
 						alignItems='center'
+						width={{ base: '100%', md: '46.5%' }}
+						mt={{ base: '1rem', md: '0' }}
+						mb={{ base: '2rem', md: '0' }}
 					>
-						<BsCheckLg style={{ height: '9.5rem', width: '9.5rem', color: '#ff9ddb87', marginBottom: '2rem' }}/>
+						<BsCheckLg
+							style={{
+								height: 'auto',
+								width: '9.5rem',
+								color: '#ff9ddb87',
+								marginBottom: '2rem' }}
+						/>
 						<Text fontSize='1.1rem'>You&lsquo;re currently providing no liquidity.</Text>
 						<Text fontSize='1.1rem' color='#e3b2db' fontStyle='italic'>Go ahead, add some!</Text>
 					</Flex>
 					<Flex
 						p='0 0.3rem'
 						flexDir='column'
-						width='50%'
+						width={{ base: '100%', md: '54.5%' }}
 					>
 						<Text
 							as='h4'

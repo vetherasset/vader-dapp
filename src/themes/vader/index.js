@@ -84,7 +84,6 @@ const overrides = {
 		colorful: {
 			borderRadius: '24px',
 			background: 'linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)',
-			maxHeight: '660px',
 		},
 		inputLike: {
 			background: 'linear-gradient(90deg,#845a81 0%,#515a85 100%)',
