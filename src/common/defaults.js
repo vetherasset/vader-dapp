@@ -30,6 +30,9 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	1,
 )
 
+defaults.api = {}
+defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+
 defaults.layout = {}
 
 defaults.layout.header = {}
