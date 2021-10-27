@@ -67,21 +67,28 @@ export default {
 			},
 		}),
 		outline: () => ({
-			color: 'accent.100',
-			border: 'none',
-			backgroundSize: '150% auto',
-			backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
-			p: '1px',
+			color: '#fff',
+			textTransform: 'uppercase',
+			borderRadius: '12px',
+			backgroundSize: '150%',
+			backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 			_hover: {
-				backgroundSize: '150% auto',
-				backgroundPosition: 'right center',
-				backgroundImage: 'linear-gradient(90deg,#f472b6  0%, #3b82f6 100%)',
+				backgroundSize: '150%',
+				backgroundImage: 'linear-gradient(90deg, rgb(254, 201, 254) 0%, rgb(56, 233, 253) 100%)',
+				_disabled: {
+					backgroundSize: '150%',
+					background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
+				},
 			},
 			_active: {
-				backgroundImage: 'linear-gradient(90deg,#f280bc  0%, #5391f5 100%)',
+				backgroundSize: '150%',
+				backgroundImage: 'linear-gradient(90deg, rgb(254, 201, 254) 0%, rgb(56, 233, 253) 100%)',
+				opacity: '0.7',
 			},
 			_disabled: {
-				bg: 'transparent',
+				color: '#fff',
+				backgroundSize: '150%',
+				background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
 			},
 		}),
 		link: () => ({
