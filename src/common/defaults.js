@@ -67,7 +67,7 @@ defaults.address.vether = (
 )
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x8e7A48fC00cF9541392FB820628Ca730b6badf3e' :
+		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
 			undefined
 )
 
@@ -98,7 +98,5 @@ defaults.redeemables = [
 
 defaults.vader = {}
 defaults.vader.conversionRate = 1000
-
-defaults.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
 
 export default defaults
