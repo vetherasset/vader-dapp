@@ -72,7 +72,7 @@ defaults.address.converter = (
 )
 defaults.address.router = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+		defaults.network.chainId === 42 ? '0x80362414e23E64c404a8581779b28f037B8d5A05' :
 			undefined
 )
 
