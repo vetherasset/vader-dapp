@@ -73,7 +73,9 @@ const Pool = (props) => {
 						alignItems='center'
 					>
 						<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
-						<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
+						<Link to='/pool/deposit'>
+							<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
+						</Link>
 					</Flex>
 				</Flex>
 			</Flex>

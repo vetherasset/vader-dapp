@@ -173,17 +173,17 @@ const Deposit = (props) => {
 							<Flex
 								layerStyle='inputLike'
 								mb='1rem'
-								cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+								cursor={ token0 && token1 ? '' : 'not-allowed' }>
 								<Box
 									flex='1' pr='0.5rem'
-									cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+									cursor={ token0 && token1 ? '' : 'not-allowed' }>
 									<NumberInput
 										{...flex}
 										{...input}
 										isDisabled={ token0 && token1 ? false : true }
-										cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+										cursor={ token0 && token1 ? '' : 'not-allowed' }>
 										<NumberInputField
-											cursor={ token0 && token1 ? 'default' : 'not-allowed' }
+											cursor={ token0 && token1 ? '' : 'not-allowed' }
 											placeholder='0.0' {...field}/>
 									</NumberInput>
 								</Box>
@@ -219,20 +219,20 @@ const Deposit = (props) => {
 							<Flex
 								layerStyle='inputLike'
 								marginBottom='0.8rem'
-								cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+								cursor={ token0 && token1 ? '' : 'not-allowed' }>
 								<Box
 									flex='1'
 									pr='0.5rem'
-									cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+									cursor={ token0 && token1 ? '' : 'not-allowed' }>
 									<NumberInput
 										{...flex}
 										{...input}
 										isDisabled={ token0 && token1 ? false : true }
-										cursor={ token0 && token1 ? 'default' : 'not-allowed' }>
+										cursor={ token0 && token1 ? '' : 'not-allowed' }>
 										<NumberInputField
 											placeholder='0.0'
 											{...field}
-											cursor={ token0 && token1 ? 'default' : 'not-allowed' }
+											cursor={ token0 && token1 ? '' : 'not-allowed' }
 										/>
 									</NumberInput>
 								</Box>
