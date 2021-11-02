@@ -70,6 +70,11 @@ defaults.address.converter = (
 		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
 			undefined
 )
+defaults.address.router = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'

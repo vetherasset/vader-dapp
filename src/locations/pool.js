@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Box, Button, Flex, Text } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 
@@ -25,25 +26,27 @@ const Pool = (props) => {
 					fontWeight='bolder'>
 						Liquidity
 				</Text>
-				<Button
-					variant='outline'
-					size='sm'
-					padding='0'
-					alignItems='center'
-					backgroundSize='150%'
-				>
-					<Box
-						display='inline-flex'
+				<Link to='/pool/deposit'>
+					<Button
+						variant='outlineAlter'
+						size='sm'
+						padding='0'
 						alignItems='center'
-						justifyContent='center'
-						borderRadius='12px'
-						background='#000'
-						height='100%'
-						p='0 1rem'
+						backgroundSize='150%'
 					>
-    				<span>Deposit</span>
-					</Box>
-  			</Button>
+						<Box
+							display='inline-flex'
+							alignItems='center'
+							justifyContent='center'
+							borderRadius='12px'
+							background='#000'
+							height='100%'
+							p='0 1rem'
+						>
+							<span>Deposit</span>
+						</Box>
+					</Button>
+				</Link>
 			</Flex>
 			<Flex
 				m='0 auto'
@@ -57,6 +60,7 @@ const Pool = (props) => {
 					width='100%'
 					layerStyle='colorful'
 					background='#000000c4;'
+					minH='401.367px'
 					p='2.7rem'
 					flexDir='column'
 					justifyContent='center'
@@ -65,6 +69,7 @@ const Pool = (props) => {
 						p='0 0.3rem'
 						flexDir='column'
 						justifyContent='center'
+						textAlign='center'
 						alignItems='center'
 					>
 						<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>

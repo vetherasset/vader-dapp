@@ -70,6 +70,23 @@ export default {
 			color: '#fff',
 			textTransform: 'uppercase',
 			borderRadius: '12px',
+			_hover: {
+				_disabled: {
+				},
+			},
+			_active: {
+				opacity: '0.7',
+			},
+			_disabled: {
+				color: '#fff',
+			},
+		}),
+		outlineAlter: () => ({
+			color: '#fff',
+			textTransform: 'uppercase',
+			borderRadius: '12px',
+			border: '1px solid',
+			borderColor: 'rgba(255,255,255,0.16)',
 			backgroundSize: '150%',
 			backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 			_hover: {

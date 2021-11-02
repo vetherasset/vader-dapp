@@ -10,6 +10,9 @@ export default {
 				paddingInlineStart: '0',
 				paddingInlineEnd: '0',
 				background: 'transparent',
+				_disabled: {
+					opacity: '0.1',
+				},
 				_hover: {
 					background: 'transparent',
 				},
