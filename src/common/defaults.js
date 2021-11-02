@@ -102,6 +102,6 @@ defaults.redeemables = [
 ]
 
 defaults.vader = {}
-defaults.vader.conversionRate = 1000
+defaults.vader.conversionRate = 10000
 
 export default defaults
