@@ -185,7 +185,7 @@ const Deposit = (props) => {
 								</Button>
 							</Flex>
 							<Flex
-								marginBottom='0.7rem'>
+								marginBottom='0.4rem'>
 								<Button
 									variant='outline'
 									_focus={{
@@ -226,7 +226,8 @@ const Deposit = (props) => {
 							<Box
 								fontStyle='italic'
 								textAlign='center'
-								color='#adadb0'>
+								color='#adadb0'
+								marginBottom='0.4rem'>
 								<InfoIcon verticalAlign='sub'/>&nbsp;&nbsp;<b>USDV</b> is native asset that must be provided.
 							</Box>
 
