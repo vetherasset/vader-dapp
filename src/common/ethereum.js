@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
 import vaderAbi from '../artifacts/abi/vader'
 import converterAbi from '../artifacts/abi/converter'
+import poolAbi from '../artifacts/abi/vaderPoolV2'
 import defaults from './defaults'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
@@ -101,9 +102,30 @@ const convertVetherToVader = async (amount, provider) => {
 	return await contract.convert(amount)
 }
 
+const getSwapEstimate = async (foreignAsset, nativeAmount, foreignAmount, to, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.pool,
+		poolAbi,
+		provider.getSigner(0),
+	)
+	try {
+		return ethers.BigNumber.from(
+			await contract.callStatic.swap(
+				foreignAsset,
+				nativeAmount,
+				foreignAmount,
+				to,
+			),
+		)
+	}
+	catch {
+		return ethers.BigNumber.from(0)
+	}
+}
+
 const getSwapRate = async (from, to, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.router,
+		defaults.address.pool,
 		provider.getSigner(0),
 	)
 
@@ -163,6 +185,7 @@ const tokenHasPool = async (address, provider) => {
 export {
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
-	convertVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
+	convertVetherToVader, getSwapEstimate, getSwapRate, getSwapFee,
+	getUSDVburnRate, isAddressLiquidityProvider,
 	tokenHasPool, swapForAsset,
 }

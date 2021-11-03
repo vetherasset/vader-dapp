@@ -5,7 +5,7 @@ import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { getERC20BalanceOf } from '../common/ethereum'
+import { getERC20BalanceOf, getSwapEstimate } from '../common/ethereum'
 import { TokenSelector } from '../components/TokenSelector'
 
 const flex = {
@@ -37,6 +37,8 @@ const Swap = (props) => {
 	const [token1, setToken1] = useState(false)
 	const [balance0, setBalance0] = useState(false)
 	const [balance1, setBalance1] = useState(false)
+	const [amount0, setAmount0] = useState(false)
+	const [amount1, setAmount1] = useState(false)
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
@@ -44,8 +46,7 @@ const Swap = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token0) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(token0.address, wallet.account, provider)
+			getERC20BalanceOf(token0.address, wallet.account, defaults.network.provider)
 				.then(b => {
 					setBalance0(b)
 				})
@@ -58,8 +59,7 @@ const Swap = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token1) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(token1.address, wallet.account, provider)
+			getERC20BalanceOf(token1.address, wallet.account, defaults.network.provider)
 				.then(b => {
 					setBalance1(b)
 				})
@@ -69,6 +69,36 @@ const Swap = (props) => {
 				})
 		}
 	}, [wallet.account, token1])
+
+	useEffect(() => {
+		if (wallet.account && token0 && token1) {
+			const isNativeAsset = token0.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getSwapEstimate(
+				isNativeAsset ? token1.address : token0.address,
+				isNativeAsset ? amount0 : 0,
+				!isNativeAsset ? amount0 : 0,
+				wallet.account,
+				provider,
+			)
+				.then(a => console.log(a.toString()))
+		}
+	}, [amount0, token0, token1])
+
+	useEffect(() => {
+		if (wallet.account && token0 && token1) {
+			const isNativeAsset = token1.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getSwapEstimate(
+				isNativeAsset ? token0.address : token1.address,
+				isNativeAsset ? amount1 : 0,
+				!isNativeAsset ? amount1 : 0,
+				wallet.account,
+				provider,
+			)
+				.then(a => console.log(a.toString()))
+		}
+	}, [amount1, token0, token1])
 
 	return (
 		<>
@@ -112,7 +142,7 @@ const Swap = (props) => {
 								</Box>
 							}
 							<NumberInput {...flex} {...input}>
-								<NumberInputField placeholder='0.0' {...field}/>
+								<NumberInputField placeholder='0.0' {...field} onChange={(e) => setAmount0(e.target.value)}/>
 							</NumberInput>
 						</Box>
 						<Box
@@ -167,7 +197,7 @@ const Swap = (props) => {
 								</Box>
 							}
 							<NumberInput {...flex} {...input}>
-								<NumberInputField placeholder='0.0' {...field}/>
+								<NumberInputField placeholder='0.0' {...field} onChange={(e) => setAmount1(e.target.value)}/>
 							</NumberInput>
 						</Box>
 						<Box

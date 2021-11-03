@@ -57,12 +57,12 @@ defaults.toast.position = 'top'
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742' :
+		defaults.network.chainId === 42 ? '0x4ad25191285440992981B5B840F164b026bCE2A8' :
 			undefined
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x438f70ab08ab3f74833c439643c3fc1939ce2929' :
+		defaults.network.chainId === 42 ? '0x2393409067d2F2e4Ce072aB17e2D55B7f4f36303' :
 			undefined
 )
 defaults.address.converter = (
@@ -72,7 +72,7 @@ defaults.address.converter = (
 )
 defaults.address.pool = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x795bE6b0BF54AF587385604B9DB869E797db69E0' :
+		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
 			undefined
 )
 
@@ -83,11 +83,11 @@ defaults.tokenList.sources = tokenListSources
 defaults.tokenDefault = {
 	'chainId': defaults.network.chainId,
 	'address': defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xE90E0A75694Fc97576868243AD0364d10291f48A' :
+		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
 			undefined,
 	'name': 'USDV',
 	'symbol': 'USDV',
-	'decimals': 6,
+	'decimals': 18,
 	'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 }
 
