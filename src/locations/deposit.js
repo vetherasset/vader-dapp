@@ -3,12 +3,13 @@ import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure,
-	Spinner } from '@chakra-ui/react'
+	Spinner, useToast } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons'
 import { TokenSelector } from '../components/TokenSelector'
 import { getERC20Allowance } from '../common/ethereum'
 import defaults from '../common/defaults'
+import { walletNotConnected } from '../messages'
 
 const flex = {
 	flex: '1',
@@ -27,6 +28,7 @@ const Deposit = (props) => {
 
 	const wallet = useWallet()
 	const { isOpen, onOpen, onClose } = useDisclosure()
+	const toast = useToast()
 
 	const [isSelect, setIsSelect] = useState(-1)
 	const [token0, setToken0] = useState(false)
@@ -34,6 +36,10 @@ const Deposit = (props) => {
 	const [token1, setToken1] = useState(defaults.nativeAsset)
 	const [token1Approved, setToken1Approved] = useState(false)
 	const [working, setWorking] = useState(false)
+
+	const deposit = () => {
+		if(!wallet.account) toast(walletNotConnected)
+	}
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
@@ -333,6 +339,9 @@ const Deposit = (props) => {
 								m='.8rem auto 0'
 								size='lg'
 								variant='solidRounded'
+								onClick={() => {
+									deposit()
+								}}
 							>
 								<Box
 									fontWeight='1000'
