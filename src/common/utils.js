@@ -1,4 +1,5 @@
 import getTokenList from 'get-token-list'
+import defaults from './defaults'
 
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
@@ -137,7 +138,8 @@ const getCombinedTokenListFromSources = (sources) => {
 	return Promise.all(
 		sources.filter((source) => source.enabled === true)
 			.map((source) => {
-				const p = getTokenList(source.url).then(d => d.tokens)
+				const p = getTokenList(source.url)
+					.then(d => d.tokens.filter(token => token.chainId == defaults.network.chainId))
 				return p
 			})).then(data => {
 		return data.flat()

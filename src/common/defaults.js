@@ -70,18 +70,25 @@ defaults.address.converter = (
 		defaults.network.chainId === 42 ? '0x8e7A48fC00cF9541392FB820628Ca730b6badf3e' :
 			undefined
 )
+defaults.address.pool = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x795bE6b0BF54AF587385604B9DB869E797db69E0' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
 
 defaults.tokenDefault = {
-	'chainId':3,
-	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-	'name':'USDC',
-	'symbol':'USDC',
-	'decimals':6,
-	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'chainId': defaults.network.chainId,
+	'address': defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xE90E0A75694Fc97576868243AD0364d10291f48A' :
+			undefined,
+	'name': 'USDV',
+	'symbol': 'USDV',
+	'decimals': 6,
+	'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 }
 
 defaults.redeemables = [
