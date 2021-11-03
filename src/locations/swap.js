@@ -35,10 +35,13 @@ const Swap = (props) => {
 	const [isSelect, setIsSelect] = useState(-1)
 	const [token0, setToken0] = useState(defaults.tokenDefault)
 	const [token1, setToken1] = useState(false)
-	const [balance0, setBalance0] = useState(false)
-	const [balance1, setBalance1] = useState(false)
-	const [amount0, setAmount0] = useState(false)
-	const [amount1, setAmount1] = useState(false)
+	const [balance0, setBalance0] = useState(0)
+	const [balance1, setBalance1] = useState(0)
+	const [amount0, setAmount0] = useState(0)
+	const [amount1, setAmount1] = useState(0)
+	const [input0, setInput0] = useState('0')
+	const [input1, setInput1] = useState('0')
+	const [timeoutId, setTimeoutId] = useState(null)
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
@@ -72,31 +75,37 @@ const Swap = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token0 && token1) {
-			const isNativeAsset = token0.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getSwapEstimate(
-				isNativeAsset ? token1.address : token0.address,
-				isNativeAsset ? amount0 : 0,
-				!isNativeAsset ? amount0 : 0,
-				wallet.account,
-				provider,
-			)
-				.then(a => console.log(a.toString()))
+			setInput0(amount0)
+
+			if (timeoutId) {
+				clearTimeout(timeoutId)
+				setTimeoutId(null)
+			}
+
+			setTimeoutId(setTimeout(() => {
+				getSwapEstimate(token0, token1, amount0, 0, wallet)
+					.then(estimate => {
+						setInput1(estimate.toString())
+					})
+			}, 500))
 		}
 	}, [amount0, token0, token1])
 
 	useEffect(() => {
 		if (wallet.account && token0 && token1) {
-			const isNativeAsset = token1.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getSwapEstimate(
-				isNativeAsset ? token0.address : token1.address,
-				isNativeAsset ? amount1 : 0,
-				!isNativeAsset ? amount1 : 0,
-				wallet.account,
-				provider,
-			)
-				.then(a => console.log(a.toString()))
+			setInput1(amount1)
+
+			if (timeoutId) {
+				clearTimeout(timeoutId)
+				setTimeoutId(null)
+			}
+
+			setTimeoutId(setTimeout(() => {
+				getSwapEstimate(token0, token1, 0, amount1, wallet)
+					.then(estimate => {
+						setInput0(estimate.toString())
+					})
+			}, 500))
 		}
 	}, [amount1, token0, token1])
 
@@ -141,8 +150,8 @@ const Swap = (props) => {
 									Balance: {ethers.utils.formatUnits(balance0, token0.decimals)}&nbsp;{token0.symbol}
 								</Box>
 							}
-							<NumberInput {...flex} {...input}>
-								<NumberInputField placeholder='0.0' {...field} onChange={(e) => setAmount0(e.target.value)}/>
+							<NumberInput {...flex} {...input} value={input0}>
+								<NumberInputField placeholder='0.0' {...field} onChange={(e) => {setAmount0(e.target.value)}}/>
 							</NumberInput>
 						</Box>
 						<Box
@@ -196,7 +205,7 @@ const Swap = (props) => {
 									Balance: {ethers.utils.formatUnits(balance1, token1.decimals)}&nbsp;{token1.symbol}
 								</Box>
 							}
-							<NumberInput {...flex} {...input}>
+							<NumberInput {...flex} {...input} value={input1}>
 								<NumberInputField placeholder='0.0' {...field} onChange={(e) => setAmount1(e.target.value)}/>
 							</NumberInput>
 						</Box>

@@ -83,7 +83,7 @@ defaults.tokenList.sources = tokenListSources
 defaults.tokenDefault = {
 	'chainId': defaults.network.chainId,
 	'address': defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5cb12086536a26eec18e' :
 			undefined,
 	'name': 'USDV',
 	'symbol': 'USDV',

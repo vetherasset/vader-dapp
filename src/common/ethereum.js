@@ -102,21 +102,50 @@ const convertVetherToVader = async (amount, provider) => {
 	return await contract.convert(amount)
 }
 
-const getSwapEstimate = async (foreignAsset, nativeAmount, foreignAmount, to, provider) => {
+const getSwapEstimate = async (
+	token0,
+	token1,
+	amount0,
+	amount1,
+	wallet,
+) => {
+	const fromNativeAsset = token0.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
+	const toNativeAsset = token1.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
+	const doubleSwap = !fromNativeAsset && !toNativeAsset
+
+	const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 	const contract = new ethers.Contract(
 		defaults.address.pool,
 		poolAbi,
 		provider.getSigner(0),
 	)
 	try {
-		return ethers.BigNumber.from(
-			await contract.callStatic.swap(
-				foreignAsset,
-				nativeAmount,
-				foreignAmount,
-				to,
-			),
-		)
+		if (doubleSwap) {
+			return ethers.BigNumber.from(
+				await contract.callStatic.doubleSwap(
+					token0.address,
+					token1.address,
+					amount1 == 0 ? amount0 : amount1,
+					wallet.account,
+				),
+			)
+		}
+		else {
+			const nativeAmount = fromNativeAsset && amount1 == 0
+				? amount0
+				: (toNativeAsset && amount0 == 0 ? amount1 : 0)
+			const foreignAmount = !fromNativeAsset && amount1 == 0
+				? amount0
+				: (!toNativeAsset && amount0 == 0 ? amount1 : 0)
+			return ethers.BigNumber.from(
+				await contract.callStatic.swap(
+					toNativeAsset ? token0.address : token1.address,
+					nativeAmount,
+					foreignAmount,
+					wallet.account,
+				),
+			)
+		}
 	}
 	catch {
 		return ethers.BigNumber.from(0)
