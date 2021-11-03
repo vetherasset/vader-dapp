@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import { useWallet } from 'use-wallet'
+import { ethers } from 'ethers'
 import { Link } from 'react-router-dom'
-import { Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure } from '@chakra-ui/react'
+import { Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure,
+	Spinner } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons'
 import { TokenSelector } from '../components/TokenSelector'
+import { getERC20Allowance } from '../common/ethereum'
 import defaults from '../common/defaults'
 
 const flex = {
@@ -21,15 +25,60 @@ const field = {
 
 const Deposit = (props) => {
 
+	const wallet = useWallet()
 	const { isOpen, onOpen, onClose } = useDisclosure()
 
 	const [isSelect, setIsSelect] = useState(-1)
 	const [token0, setToken0] = useState(false)
+	const [token0Approved, setToken0Approved] = useState(false)
 	const [token1, setToken1] = useState(defaults.nativeAsset)
+	const [token1Approved, setToken1Approved] = useState(false)
+	const [working, setWorking] = useState(false)
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
 	}, [isOpen])
+
+	useEffect(() => {
+		if(wallet.account && token0) {
+			setWorking(true)
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20Allowance(
+				token0.address,
+				wallet.account,
+				defaults.address.pool,
+				provider,
+			).then((n) => {
+				setWorking(false)
+				if(n.gt(0))	setToken0Approved(true)
+			})
+		}
+		return () => {
+			setWorking(true)
+			setToken0Approved(false)
+		}
+	}, [wallet.account, token0])
+
+	useEffect(() => {
+		if(wallet.account && token1) {
+			setWorking(true)
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20Allowance(
+				token1.address,
+				wallet.account,
+				defaults.address.pool,
+				provider,
+			).then((n) => {
+				setWorking(false)
+				console.log(n)
+				if(n.gt(0))	setToken1Approved(true)
+			}).catch(console.log)
+			return () => {
+				setWorking(false)
+				setToken1Approved(false)
+			}
+		}
+	}, [wallet.account, token1])
 
 	return (
 		<>
@@ -288,9 +337,47 @@ const Deposit = (props) => {
 								<Box
 									fontWeight='1000'
 								>
-							DEPOSIT
+									{wallet.account &&
+										<>
+											{!working &&
+												<>
+													{token0 && token1 && !token0Approved && !token1Approved &&
+												<>
+													Approve {token1.symbol}
+												</>
+													}
+													{token0 && token1 && !token0Approved && token1Approved &&
+												<>
+													Approve {token0.symbol}
+												</>
+													}
+													{token0 && token1 && token0Approved && token1Approved &&
+												<>
+													Deposit
+												</>
+													}
+													{!token0 &&
+												<>
+													Deposit
+												</>
+													}
+												</>
+											}
+											{working &&
+												<>
+													<Spinner />
+												</>
+											}
+										</>
+									}
+									{!wallet.account &&
+										<>
+											Deposit
+										</>
+									}
 								</Box>
 							</Button>
+
 						</Flex>
 					</Flex>
 				</Flex>
