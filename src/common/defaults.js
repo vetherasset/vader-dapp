@@ -91,6 +91,16 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
+defaults.address.fakeVader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xb0c3f757b1a62701835fb4e9175e9589ed5687fe' :
+			undefined
+)
+defaults.address.xvader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x42980De4BF7926448ec75812955eB2762F067c30' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'

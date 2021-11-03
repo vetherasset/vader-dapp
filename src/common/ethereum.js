@@ -3,6 +3,7 @@ import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
 import converterAbi from '../artifacts/abi/converter'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
+import xVaderAbi from '../artifacts/abi/xvader'
 
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
@@ -126,8 +127,46 @@ const swapForAsset = async (amount, from, to, provider) => {
 }
 
 
+const stakeVader = async (amount, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.xvader,
+		xVaderAbi,
+		provider.getSigner(0),
+	)
+	return await contract.enter(amount)
+}
+
+const unstakeVader = async (shares, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.xvader,
+		xVaderAbi,
+		provider.getSigner(0),
+	)
+	return await contract.leave(shares)
+}
+
+const getERC20TotalSupply = async (tokenAddress, provider) => {
+	const contract = new ethers.Contract(
+		tokenAddress,
+		humanStandardTokenAbi,
+		provider,
+	)
+	return await contract.totalSupply()
+}
+
+const getVaderPerXVader = async (provider) => {
+	// TODO: change fakeVader to vader later
+	const totalVader = await getERC20BalanceOf(
+		defaults.address.fakeVader, defaults.address.xvader, provider,
+	)
+	const totalXVader = await getERC20TotalSupply(defaults.address.xvader, provider)
+	const vaderPrice = ethers.BigNumber.from(totalVader).div(totalXVader)
+	return vaderPrice
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVetherToVader,
 	getSwapRate, getSwapFee, swapForAsset, addLiquidity,
+	stakeVader, unstakeVader, getVaderPerXVader,
 }
