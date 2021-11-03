@@ -80,6 +80,15 @@ defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
 
+defaults.nativeAsset = {
+	'chainId':3,
+	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',
+	'name':'USDV',
+	'symbol':'USDV',
+	'decimals':18,
+	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+}
+
 defaults.tokenDefault = {
 	'chainId':3,
 	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',

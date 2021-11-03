@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons'
 import { TokenSelector } from '../components/TokenSelector'
 import defaults from '../common/defaults'
 
@@ -25,7 +25,7 @@ const Deposit = (props) => {
 
 	const [isSelect, setIsSelect] = useState(-1)
 	const [token0, setToken0] = useState(false)
-	const [token1, setToken1] = useState(false)
+	const [token1, setToken1] = useState(defaults.nativeAsset)
 
 	useEffect(() => {
 		if (!isOpen) setIsSelect(-1)
@@ -95,15 +95,14 @@ const Deposit = (props) => {
 								as='h4'
 								fontSize='1.24rem'
 								fontWeight='bolder'>
-						Select Tokens
+						Liquidity
 							</Text>
 							<Flex
-								marginBottom='1.1rem'>
+								marginBottom='0.7rem'>
 								<Button
 									variant='outline'
-									w='50%'
+									w='100%'
 									size='lg'
-									mr='0.5rem'
 									textTransform='capitalize'
 									leftIcon={ token0 ? <Image
 										width='23px'
@@ -129,11 +128,23 @@ const Deposit = (props) => {
 											</>
 									}
 								</Button>
+							</Flex>
+							<Flex
+								marginBottom='0.7rem'>
 								<Button
 									variant='outline'
-									w='50%'
+									_focus={{
+										boxShadow: '0',
+									}}
+									_active={{
+										background: 'none',
+									}}
+									_hover={{
+										cursor: 'default',
+										background: 'none',
+									}}
+									w='100%'
 									size='lg'
-									ml='0.5rem'
 									textTransform='capitalize'
 									leftIcon={token1 ? <Image
 										width='23px'
@@ -143,11 +154,7 @@ const Deposit = (props) => {
 										background='#fff'
 										src={token1.logoURI}
 									/> : '' }
-									rightIcon={<ChevronDownIcon />}
-									onClick={() => {
-										onOpen()
-										setIsSelect(1)
-									}}>
+								>
 									{token1 &&
 											<>
     										{token1.symbol}
@@ -160,6 +167,13 @@ const Deposit = (props) => {
 									}
 								</Button>
 							</Flex>
+
+							<Box
+								fontStyle='italic'
+								textAlign='center'
+								color='#adadb0'>
+								<InfoIcon verticalAlign='sub'/>&nbsp;&nbsp;<b>USDV</b> is native asset that must be provided.
+							</Box>
 
 							<Text
 								as='h4'
@@ -274,7 +288,7 @@ const Deposit = (props) => {
 								<Box
 									fontWeight='1000'
 								>
-							Add
+							DEPOSIT
 								</Box>
 							</Button>
 						</Flex>
