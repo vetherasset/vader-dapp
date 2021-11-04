@@ -26,6 +26,11 @@ export const Header = (props) => {
 			text: 'Burn',
 			link: '/burn',
 		},
+		{
+			name: 'Stake',
+			text: 'Stake',
+			link: '/stake',
+		},
 	]
 
 	const current = {

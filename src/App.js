@@ -8,6 +8,7 @@ import Swap from './locations/swap'
 import Pool from './locations/pool'
 import Deposit from './locations/deposit'
 import Burn from './locations/burn'
+import Stake from './locations/stake'
 import defaults from './common/defaults'
 import { Wave } from './assets/svg/effects/Wave'
 import PositionOverview from './components/PositionOverview'
@@ -48,6 +49,9 @@ const App = () => {
 						}/>
 						<Route path='/pool/deposit/:tokenAddressA/:tokenAddressB' exact render={() =>
 							<Deposit position='relative' zIndex='1'/>
+						}/>
+						<Route path='/stake' exact render={() =>
+							<Stake position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />

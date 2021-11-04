@@ -127,8 +127,27 @@ const positionOpened = {
 	position: defaults.toast.position,
 }
 
+const staked = {
+	title: 'VDR tokens staked',
+	description: 'Your VDR tokens have been staked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const unstaked = {
+	title: 'xVDR tokens unstaked',
+	description: 'Your xVDR tokens have been unstaked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokeValueTooSmall, positionOpened, exception,
+	staked, unstaked,
 }
