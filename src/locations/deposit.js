@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
 import { Link } from 'react-router-dom'
-import { Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure,
+import { Link as LinkExt, Box, Button, Flex, NumberInput, NumberInputField, Text, Image, useDisclosure,
 	Spinner, useToast } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { ChevronDownIcon, InfoIcon } from '@chakra-ui/icons'
 import { TokenSelector } from '../components/TokenSelector'
-import { getERC20Allowance } from '../common/ethereum'
+import { addLiquidity, getERC20Allowance, getERC20BalanceOf, approveERC20ToSpend } from '../common/ethereum'
 import defaults from '../common/defaults'
-import { walletNotConnected } from '../messages'
+import { walletNotConnected, noToken0, tokeValueTooSmall, insufficientBalance, rejected, noAmount,
+	positionOpened, exception, approved, failed } from '../messages'
 
 const flex = {
 	flex: '1',
@@ -33,12 +34,140 @@ const Deposit = (props) => {
 	const [isSelect, setIsSelect] = useState(-1)
 	const [token0, setToken0] = useState(false)
 	const [token0Approved, setToken0Approved] = useState(false)
+	const [token0amount, setToken0amount] = useState(0)
+	const [token0balance, setToken0balance] = useState(0)
 	const [token1, setToken1] = useState(defaults.nativeAsset)
 	const [token1Approved, setToken1Approved] = useState(false)
+	const [token1amount, setToken1amount] = useState(0)
+	const [token1balance, setToken1balance] = useState(0)
 	const [working, setWorking] = useState(false)
 
-	const deposit = () => {
-		if(!wallet.account) toast(walletNotConnected)
+	const submit = () => {
+		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+		if(!working) {
+			if(!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else if (!token0) {
+				toast(noToken0)
+			}
+			else if (token0 && token1 && !token0Approved && !token1Approved) {
+				setWorking(true)
+				approveERC20ToSpend(
+					token1.address,
+					defaults.address.pool,
+					defaults.network.erc20.maxApproval,
+					provider,
+				).then((tx) => {
+					tx.wait(defaults.network.tx.confirmations)
+						.then(() => {
+							setWorking(false)
+							setToken1Approved(true)
+							toast(approved)
+						})
+						.catch(e => {
+							setWorking(false)
+							if (e.code === 4001) toast(rejected)
+							if (e.code === -32016) toast(exception)
+						})
+				})
+					.catch(err => {
+						setWorking(false)
+						if(err.code === 'INSUFFICIENT_FUNDS') {
+							console.log('Insufficient balance: Your account balance is insufficient.')
+							toast(insufficientBalance)
+						}
+						else if(err.code === 4001) {
+							console.log('Transaction rejected: Your have decided to reject the transaction..')
+							toast(rejected)
+						}
+						else {
+							console.log(err)
+							toast(failed)
+						}
+					})
+				console.log('approve token1')
+			}
+			else if (token0 && token1 && !token0Approved && token1Approved) {
+				setWorking(true)
+				approveERC20ToSpend(
+					token0.address,
+					defaults.address.pool,
+					defaults.network.erc20.maxApproval,
+					provider,
+				).then((tx) => {
+					tx.wait(defaults.network.tx.confirmations)
+						.then(() => {
+							setWorking(false)
+							setToken0Approved(true)
+							toast(approved)
+						})
+						.catch(e => {
+							setWorking(false)
+							if (e.code === 4001) toast(rejected)
+							if (e.code === -32016) toast(exception)
+						})
+				})
+					.catch(err => {
+						setWorking(false)
+						if(err.code === 'INSUFFICIENT_FUNDS') {
+							console.log('Insufficient balance: Your account balance is insufficient.')
+							toast(insufficientBalance)
+						}
+						else if(err.code === 4001) {
+							console.log('Transaction rejected: Your have decided to reject the transaction..')
+							toast(rejected)
+						}
+						else {
+							console.log(err)
+							toast(failed)
+						}
+					})
+				console.log('approve token0')
+			}
+			else if ((token0amount > 0) && (token1amount > 0)) {
+				if ((token0balance.gte(token0amount)) && (token1balance.gte(token1amount))) {
+					setWorking(true)
+					addLiquidity(
+						token0.address,
+						token1.address,
+						token0amount,
+						token1amount,
+						wallet.account,
+						1636238850,
+						provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								toast({
+									...positionOpened,
+									description: <LinkExt
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+									duration: defaults.toast.duration + 3000,
+								})
+							})
+						})
+						.catch(e => {
+							setWorking(false)
+							if (e.code === 4001) toast(rejected)
+							if (e.code === -32016) toast(exception)
+						})
+				}
+				else {
+					toast(insufficientBalance)
+				}
+			}
+			else {
+				toast(noAmount)
+			}
+		}
 	}
 
 	useEffect(() => {
@@ -76,7 +205,6 @@ const Deposit = (props) => {
 				provider,
 			).then((n) => {
 				setWorking(false)
-				console.log(n)
 				if(n.gt(0))	setToken1Approved(true)
 			}).catch(console.log)
 			return () => {
@@ -85,6 +213,34 @@ const Deposit = (props) => {
 			}
 		}
 	}, [wallet.account, token1])
+
+	useEffect(() => {
+		if (wallet.account && token0) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(
+				token0.address,
+				wallet.account,
+				provider,
+			).then((b) => {
+				setToken0balance(b)
+			})
+		}
+		return () => setToken0balance(0)
+	}, [wallet.account, token0, working])
+
+	useEffect(() => {
+		if (wallet.account && token1) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(
+				token1.address,
+				wallet.account,
+				provider,
+			).then((b) => {
+				setToken1balance(b)
+			})
+		}
+		return () => setToken1balance(0)
+	}, [wallet.account, token1, working])
 
 	return (
 		<>
@@ -250,6 +406,19 @@ const Deposit = (props) => {
 									<NumberInput
 										{...flex}
 										{...input}
+										min={Number(String('0.').padEnd((token0.decimals - 1), '0') + '1')}
+										onChange={(n) => {
+											if(Number(n) > 0) {
+												try {
+													setToken0amount(ethers.utils.parseUnits(String(n), token0.decimals))
+												}
+												catch(e) {
+													if (e.code === 'NUMERIC_FAULT') {
+														toast(tokeValueTooSmall)
+													}
+												}
+											}
+										}}
 										isDisabled={ token0 && token1 ? false : true }
 										cursor={ token0 && token1 ? '' : 'not-allowed' }>
 										<NumberInputField
@@ -297,6 +466,20 @@ const Deposit = (props) => {
 									<NumberInput
 										{...flex}
 										{...input}
+										min={Number(String('0.').padEnd((token1.decimals - 1), '0') + '1')}
+										onChange={(n) => {
+											if(Number(n) > 0) {
+												try {
+													setToken1amount(ethers.utils.parseUnits(String(n), token1.decimals))
+												}
+												catch(e) {
+													if (e.code === 'NUMERIC_FAULT') {
+														toast(tokeValueTooSmall)
+														console.log(e)
+													}
+												}
+											}
+										}}
 										isDisabled={ token0 && token1 ? false : true }
 										cursor={ token0 && token1 ? '' : 'not-allowed' }>
 										<NumberInputField
@@ -340,9 +523,7 @@ const Deposit = (props) => {
 								m='.8rem auto 0'
 								size='lg'
 								variant='solidRounded'
-								onClick={() => {
-									deposit()
-								}}
+								onClick={() => submit()}
 							>
 								<Box
 									fontWeight='1000'

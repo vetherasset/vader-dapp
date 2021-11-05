@@ -30,8 +30,19 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	1,
 )
 
+defaults.network.tx = {}
+defaults.network.tx.confirmations = 1
+
+defaults.network.erc20 = {}
+defaults.network.erc20.maxApproval = '302503999000000000299700000'
+
 defaults.api = {}
 defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+defaults.api.etherscanUrl = (
+	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
+		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+			undefined
+)
 
 defaults.layout = {}
 
@@ -77,7 +88,7 @@ defaults.address.pool = (
 )
 defaults.address.router = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x80362414e23E64c404a8581779b28f037B8d5A05' :
+		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
 

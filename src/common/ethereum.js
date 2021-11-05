@@ -2,7 +2,18 @@ import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
 import vaderAbi from '../artifacts/abi/vader'
 import converterAbi from '../artifacts/abi/converter'
+import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
+
+const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.router,
+		routerAbi,
+		provider.getSigner(0),
+	)
+	// eslint-disable-next-line quotes
+	return await contract["addLiquidity(address,address,uint256,uint256,address,uint256)"](tokenA, tokenB, amountAdesired, amountBDesired, to, deadline)
+}
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -164,5 +175,5 @@ export {
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
 	convertVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
-	tokenHasPool, swapForAsset,
+	tokenHasPool, swapForAsset, addLiquidity,
 }
