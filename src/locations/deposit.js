@@ -86,7 +86,6 @@ const Deposit = (props) => {
 							toast(failed)
 						}
 					})
-				console.log('approve token1')
 			}
 			else if (token0 && token1 && !token0Approved && token1Approved) {
 				setWorking(true)
@@ -123,7 +122,6 @@ const Deposit = (props) => {
 							toast(failed)
 						}
 					})
-				console.log('approve token0')
 			}
 			else if ((token0amount > 0) && (token1amount > 0)) {
 				if ((token0balance.gte(token0amount)) && (token1balance.gte(token1amount))) {
