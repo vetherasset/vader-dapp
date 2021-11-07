@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNftitems } from '../hooks/useNftitems'
 import { Link } from 'react-router-dom'
-import { Box, Button, Flex, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Text, Spinner } from '@chakra-ui/react'
+import { Position } from '../components/Position'
 import defaults from '../common/defaults'
 
 const Pool = (props) => {
 
-	const [nftItems] = useNftitems()
+	const [nftItems, loading] = useNftitems()
+	const nftItemsMemo = useMemo(() => nftItems, [nftItems])
 
 	return (
 		<Box
@@ -32,7 +34,7 @@ const Pool = (props) => {
 				<Link to='/pool/deposit'>
 					<Button
 						variant='outlineAlter'
-						size='sm'
+						height='2.2rem'
 						padding='0'
 						alignItems='center'
 						backgroundSize='150%'
@@ -63,22 +65,59 @@ const Pool = (props) => {
 					width='100%'
 					layerStyle='colorful'
 					background='#000000c4;'
-					minH='401.367px'
-					p='2.7rem'
+					minH='884.4px'
+					p='1.5rem 0'
 					flexDir='column'
 					justifyContent='center'
 				>
 					<Flex
-						p='0 0.3rem'
+						p='0 20px'
 						flexDir='column'
 						justifyContent='center'
 						textAlign='center'
 						alignItems='center'
 					>
-						<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
-						<Link to='/pool/deposit'>
-							<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
-						</Link>
+						{nftItemsMemo &&
+							<Flex
+								width='100%'
+								alignItems='center'
+								justifyContent='space-between'
+								p='0 12px'
+								mb='1rem'>
+								<Flex>
+									<Text
+										as='h4'
+										fontSize='1.1rem'
+										fontWeight='bolder'>
+											Position
+									</Text>
+								</Flex>
+								<Flex>
+									<Text
+										as='h4'
+										fontSize='1.1rem'
+										fontWeight='bolder'>
+											Value
+									</Text>
+								</Flex>
+							</Flex>
+						}
+						{loading &&
+							<Spinner size='lg' />
+						}
+						{nftItemsMemo?.map((item, index) => {
+							return (
+								<Position key={index} position={item.position[0]} foreignTokenAddress={item.position[0].foreignAsset.address}/>
+							)
+						})}
+						{!nftItemsMemo?.length > 0 && !loading &&
+							<>
+								<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
+								<Link to='/pool/deposit'>
+									<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
+								</Link>
+							</>
+						}
 					</Flex>
 				</Flex>
 			</Flex>

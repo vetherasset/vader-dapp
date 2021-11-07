@@ -8,20 +8,29 @@ export const useNftitems = () => {
 
 	const positions = gql`
 		query Items($account: String!) {
-			nftitems(where: {owner: $account}) {
+			nftitems(
+				first: 10,
+				skip: 0,
+				orderBy: id,
+				orderDirection: desc,
+				where: {owner: $account})
+			{
 				id
 				owner {
-					id
+					address
 				}
 				token {
 					id
 				}
-				tokenId
 				position {
 					id
 					foreignAsset {
-						id
+						address
 					}
+          originalNative
+          originalForeign
+          creation
+          isDeleted
 				}
 			}
 		}
@@ -34,6 +43,6 @@ export const useNftitems = () => {
 		}
 	}, [wallet.account])
 
-	return [data?.nftitems, fetch, error, loading]
+	return [data?.nftitems, loading, error, fetch ]
 
 }

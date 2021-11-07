@@ -1,4 +1,5 @@
 import getTokenList from 'get-token-list'
+import defaults from './defaults'
 
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
@@ -15,7 +16,7 @@ const prettifyCurrency = (amount, minFractionDigits = 0, maxFractionDigits = 2, 
 		maximumFractionDigits: maxFractionDigits,
 	}
 
-	if (currency === 'ETH') {
+	if (currency === 'ETH' || currency === 'WETH') {
 		options = {
 			style: 'decimal',
 			minimumFractionDigits: minFractionDigits,
@@ -44,6 +45,17 @@ const prettifyCurrency = (amount, minFractionDigits = 0, maxFractionDigits = 2, 
 			maximumFractionDigits: maxFractionDigits,
 		}
 		symbol = 'VADER'
+		symbolPrepended = false
+		cryptocurrency = true
+	}
+
+	if (currency === 'USDV') {
+		options = {
+			style: 'decimal',
+			minimumFractionDigits: minFractionDigits,
+			maximumFractionDigits: maxFractionDigits,
+		}
+		symbol = 'USDV'
 		symbolPrepended = false
 		cryptocurrency = true
 	}
@@ -144,7 +156,14 @@ const getCombinedTokenListFromSources = (sources) => {
 	})
 }
 
+const getTokenByAddress = async (address) => {
+	const list = await getCombinedTokenListFromSources(defaults.tokenList.sources)
+	const tokenObj = await list.find(token => token.address === String(address))
+	return tokenObj
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
+	getTokenByAddress,
 }
