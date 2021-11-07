@@ -1,9 +1,12 @@
 import React from 'react'
+import { useNftitems } from '../hooks/useNftitems'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, Text } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 
 const Pool = (props) => {
+
+	const [nftItems] = useNftitems()
 
 	return (
 		<Box
