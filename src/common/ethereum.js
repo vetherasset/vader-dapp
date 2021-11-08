@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
-import vaderAbi from '../artifacts/abi/vader'
 import converterAbi from '../artifacts/abi/converter'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
@@ -24,15 +23,6 @@ const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provide
 	return await contract.approve(spenderAddress, amount)
 }
 
-const convertVaderToUsdv = async (amount, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.vader,
-		vaderAbi,
-		provider.getSigner(0),
-	)
-	return await contract.convertToUSDV(amount)
-}
-
 const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, provider) => {
 	const contract = new ethers.Contract(
 		tokenAddress,
@@ -49,15 +39,6 @@ const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 		provider,
 	)
 	return await contract.balanceOf(address)
-}
-
-const redeemToVADER = async (amountUsdv, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.vader,
-		vaderAbi,
-		provider.getSigner(0),
-	)
-	return await contract.redeemToVADER(amountUsdv)
 }
 
 const resolveUnknownERC20 = async (tokenAddress, provider) => {
@@ -144,36 +125,9 @@ const swapForAsset = async (amount, from, to, provider) => {
 	return ethers.BigNumber.from(await contract.swap(amount, from, to))
 }
 
-const getUSDVburnRate = async (provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-
-	return ethers.BigNumber.from(await contract.getVADERAmount(1))
-}
-
-const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.pools,
-		provider,
-	)
-
-	return ethers.BigNumber.from(await contract.getMemberUnits(poolAddress, address)).gt(0)
-}
-
-const tokenHasPool = async (address, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-
-	return await contract.isPool(address)
-}
 
 export {
-	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
-	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
-	convertVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
-	tokenHasPool, swapForAsset, addLiquidity,
+	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
+	estimateGasCost, getERC20Allowance, convertVetherToVader,
+	getSwapRate, getSwapFee, swapForAsset, addLiquidity,
 }
