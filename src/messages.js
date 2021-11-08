@@ -45,6 +45,16 @@ const failed = {
 	position: defaults.toast.position,
 }
 
+const exception = {
+	title: 'Something is wrong',
+	description: 'Such transaction would be reverted.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+
 const walletNotConnected = {
 	title: 'Wallet not connected',
 	description: 'Please connect a wallet.',
@@ -83,7 +93,34 @@ const vethupgraded = {
 
 const noAmount = {
 	title: 'No amount specified',
-	description: 'You didn\'t specify any amount.',
+	description: 'You didn\'t specify amount.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const noToken0 = {
+	title: 'No token selected',
+	description: 'You didn\'t select a token.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const tokeValueTooSmall = {
+	title: 'Token amount is too small',
+	description: 'The amount you specified is too small.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const positionOpened = {
+	title: 'Liquidity succesfully provided',
+	description: 'You\'ve opened liquidity position.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -93,5 +130,5 @@ const noAmount = {
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
-	noAmount,
+	noAmount, noToken0, tokeValueTooSmall, positionOpened, exception,
 }
