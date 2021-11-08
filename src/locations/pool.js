@@ -15,7 +15,7 @@ const Pool = (props) => {
 	const nftItemsMemo = useMemo(() => nftItems, [nftItems])
 
 	const [page, setPage] = useState(0)
-	const [positionsPerPage] = useState(10)
+	const [positionsPerPage] = useState(5)
 	const [pageCount, setPageCount] = useState(0)
 
 	const positionsCount = gql`
@@ -129,20 +129,20 @@ const Pool = (props) => {
 					width='100%'
 					layerStyle='colorful'
 					background='#000000c4;'
-					maxH='898.4px'
-					minH={ !loading ? '481.767px' : '898.4px' }
-					p='1.5rem 0'
+					minH='430.4px'
+					p='1.5rem 0 4.5rem'
 					flexDir='column'
 					justifyContent='center'
+					position='relative'
 				>
-					<Flex
+					<Box
 						p='0 20px'
+						display={ ((!nftItemsMemo?.length > 0) && (!loading)) || loading ? 'flex' : 'block'}
 						flexDir='column'
 						justifyContent='center'
 						textAlign='center'
 						alignItems='center'
-						maxH='898.4px'
-						minH={ !loading ? '481.767px' : '898.4px' }
+						minH='430.4px'
 					>
 						{wallet.account && data && data.nftitems[0] && !loading &&
 						<Flex
@@ -151,14 +151,15 @@ const Pool = (props) => {
 							justifyContent='space-between'
 							p='0 12px'
 							minH='34.4px'
-							mb='1rem'>
+							mb='1rem'
+						>
 							<>
 								<Flex>
 									<Text
 										as='h4'
 										fontSize='1.1rem'
 										fontWeight='bolder'>
-				Position
+											Position
 									</Text>
 								</Flex>
 								<Flex>
@@ -166,7 +167,7 @@ const Pool = (props) => {
 										as='h4'
 										fontSize='1.1rem'
 										fontWeight='bolder'>
-				Value
+											Value
 									</Text>
 								</Flex>
 							</>
@@ -180,43 +181,6 @@ const Pool = (props) => {
 								<Position key={index} position={item.position[0]} foreignTokenAddress={item.position[0].foreignAsset.address}/>
 							)
 						})}
-						{wallet.account && data && data.nftitems[0] && !loading &&
-						<Flex
-							flexDir='row'
-							alignItems='center'
-							justifyContent='center'
-							minH='40px'
-						>
-							{data && pageCount > 0 && !loading &&
-									<>
-										{ paginationButton(page - 1, <ChevronLeftIcon/>, page > 0) }
-										{
-											[...Array(pageCount)].map((_key, index) => {
-												if ((page < 4 && index < 5) || (page > pageCount - 5 && index > pageCount - 6)
-								|| index == 0 || index == pageCount - 1
-								|| index == page - 1 || index == page || index == page + 1) {
-													return paginationButton(index, index + 1)
-												}
-												else if (index == page - 2) {
-													return paginationButton(index, '...')
-												}
-												else if (index == pageCount - 6 && page > pageCount - 5) {
-													return paginationButton(index, '...')
-												}
-												else if (index == page + 2) {
-													return paginationButton(index, '...')
-												}
-												else if (index == 5 && page < 4) {
-													return paginationButton(index, '...')
-												}
-											})
-										}
-										{ paginationButton(page + 1, <ChevronRightIcon/>, (page + 1) * positionsPerPage < Number(data?.nftitems[0].position[0].id) - 0) }
-									</>
-							}
-						</Flex>
-						}
-
 						{!nftItemsMemo?.length > 0 && !loading &&
 							<>
 								<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
@@ -225,7 +189,48 @@ const Pool = (props) => {
 								</Link>
 							</>
 						}
+					</Box>
+					{wallet.account && data && data.nftitems[0] && !loading &&
+					<Flex
+						flexDir='row'
+						alignItems='center'
+						justifyContent='center'
+						minH='40px'
+						position='absolute'
+						left='50%'
+						transform='translateX(-50%)'
+						bottom='0'
+						marginBottom='1.5rem'
+					>
+						{data && pageCount > 0 && !loading &&
+								<>
+									{ paginationButton(page - 1, <ChevronLeftIcon/>, page > 0) }
+									{
+										[...Array(pageCount)].map((_key, index) => {
+											if ((page < 4 && index < 5) || (page > pageCount - 5 && index > pageCount - 6)
+							|| index == 0 || index == pageCount - 1
+							|| index == page - 1 || index == page || index == page + 1) {
+												return paginationButton(index, index + 1)
+											}
+											else if (index == page - 2) {
+												return paginationButton(index, '...')
+											}
+											else if (index == pageCount - 6 && page > pageCount - 5) {
+												return paginationButton(index, '...')
+											}
+											else if (index == page + 2) {
+												return paginationButton(index, '...')
+											}
+											else if (index == 5 && page < 4) {
+												return paginationButton(index, '...')
+											}
+										})
+									}
+									{ paginationButton(page + 1, <ChevronRightIcon/>, (page + 1) * positionsPerPage < Number(data?.nftitems[0].position[0].id) - 0) }
+								</>
+						}
 					</Flex>
+					}
 				</Flex>
 			</Flex>
 		</Box>

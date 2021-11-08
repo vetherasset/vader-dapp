@@ -46,7 +46,7 @@ export const useNftitems = () => {
 		if(wallet.account) {
 			fetch({ variables: {
 				account: String(wallet.account).toLocaleLowerCase(),
-				first: 10,
+				first: 5,
 				skip: skip,
 			} })
 		}

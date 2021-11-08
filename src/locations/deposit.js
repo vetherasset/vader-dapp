@@ -43,7 +43,6 @@ const Deposit = (props) => {
 	const [working, setWorking] = useState(false)
 
 	const submit = () => {
-		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 		if(!working) {
 			if(!wallet.account) {
 				toast(walletNotConnected)
@@ -52,6 +51,7 @@ const Deposit = (props) => {
 				toast(noToken0)
 			}
 			else if (token0 && token1 && !token0Approved && !token1Approved) {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				setWorking(true)
 				approveERC20ToSpend(
 					token1.address,
@@ -88,6 +88,7 @@ const Deposit = (props) => {
 					})
 			}
 			else if (token0 && token1 && !token0Approved && token1Approved) {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				setWorking(true)
 				approveERC20ToSpend(
 					token0.address,
@@ -125,6 +126,7 @@ const Deposit = (props) => {
 			}
 			else if ((token0amount > 0) && (token1amount > 0)) {
 				if ((token0balance.gte(token0amount)) && (token1balance.gte(token1amount))) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					addLiquidity(
 						token0.address,
@@ -291,6 +293,8 @@ const Deposit = (props) => {
 					flexDir='column'
 					layerStyle='colorful'
 					height='auto'
+					minH='526.4px'
+					justifyContent='center'
 				>
 					<Flex
 						flexWrap={{ base: 'wrap', md: 'nowrap' }}
