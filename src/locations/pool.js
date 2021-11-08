@@ -18,6 +18,17 @@ const Pool = (props) => {
 	const [positionsPerPage] = useState(5)
 	const [pageCount, setPageCount] = useState(0)
 
+	const NoLiquidityMessage = () => {
+		return (
+			<>
+				<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
+				<Link to='/pool/deposit'>
+					<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
+				</Link>
+			</>
+		)
+	}
+
 	const positionsCount = gql`
 		query Items(
 			$account: String!
@@ -181,13 +192,11 @@ const Pool = (props) => {
 								<Position key={index} position={item.position[0]} foreignTokenAddress={item.position[0].foreignAsset.address}/>
 							)
 						})}
-						{!nftItemsMemo?.length > 0 && !loading &&
-							<>
-								<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
-								<Link to='/pool/deposit'>
-									<Text fontSize='1.1rem' color='#3384ca' fontStyle='italic' cursor='pointer'>Go ahead, add some!</Text>
-								</Link>
-							</>
+						{(typeof nftItemsMemo === 'undefined' && !wallet.account) &&
+									<NoLiquidityMessage/>
+						}
+						{(wallet.account && typeof nftItemsMemo !== 'undefined' && !nftItemsMemo?.length > 0 && !loading) &&
+									<NoLiquidityMessage/>
 						}
 					</Box>
 					{wallet.account && data && data.nftitems[0] && !loading &&
