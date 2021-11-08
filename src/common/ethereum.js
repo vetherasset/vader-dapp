@@ -145,28 +145,10 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
-const getERC20TotalSupply = async (tokenAddress, provider) => {
-	const contract = new ethers.Contract(
-		tokenAddress,
-		humanStandardTokenAbi,
-		provider,
-	)
-	return await contract.totalSupply()
-}
-
-const getVaderPerXVader = async (provider) => {
-	// TODO: change fakeVader to vader later
-	const totalVader = await getERC20BalanceOf(
-		defaults.address.fakeVader, defaults.address.xvader, provider,
-	)
-	const totalXVader = await getERC20TotalSupply(defaults.address.xvader, provider)
-	const xvaderPrice = ethers.BigNumber.from(totalVader).div(totalXVader)
-	return xvaderPrice
-}
-
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
-	estimateGasCost, getERC20Allowance, convertVetherToVader,
-	getSwapRate, getSwapFee, swapForAsset, addLiquidity,
-	stakeVader, unstakeVader, getVaderPerXVader,
+	estimateGasCost, getERC20Allowance,
+	convertVetherToVader, getSwapRate, getSwapFee,
+	stakeVader, unstakeVader,
+	swapForAsset, addLiquidity,
 }

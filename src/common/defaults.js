@@ -44,6 +44,12 @@ defaults.api.etherscanUrl = (
 			undefined
 )
 defaults.api.graphUrl2 = 'https://api.thegraph.com/subgraphs/name/0xchewbacca/x-vader'
+defaults.api.etherscanApiUrl = (
+	defaults.network.chainId === 1 ? 'https://api.etherscan.io/' :
+		defaults.network.chainId === 42 ? 'https://api-kovan.etherscan.io' :
+			undefined
+)
+defaults.api.etherscanApiKey = 'S5KA2VNKFI3I7RXXUG3SQJCEDGN7HPEJ89'
 
 defaults.layout = {}
 
