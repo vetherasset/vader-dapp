@@ -144,6 +144,7 @@ const Pool = (props) => {
 						maxH='898.4px'
 						minH={ !loading ? '481.767px' : '898.4px' }
 					>
+						{wallet.account && data && data.nftitems[0] && !loading &&
 						<Flex
 							width='100%'
 							alignItems='center'
@@ -151,27 +152,26 @@ const Pool = (props) => {
 							p='0 12px'
 							minH='34.4px'
 							mb='1rem'>
-							{wallet.account && data && data.nftitems[0] && !loading &&
-								<>
-									<Flex>
-										<Text
-											as='h4'
-											fontSize='1.1rem'
-											fontWeight='bolder'>
+							<>
+								<Flex>
+									<Text
+										as='h4'
+										fontSize='1.1rem'
+										fontWeight='bolder'>
 				Position
-										</Text>
-									</Flex>
-									<Flex>
-										<Text
-											as='h4'
-											fontSize='1.1rem'
-											fontWeight='bolder'>
+									</Text>
+								</Flex>
+								<Flex>
+									<Text
+										as='h4'
+										fontSize='1.1rem'
+										fontWeight='bolder'>
 				Value
-										</Text>
-									</Flex>
-								</>
-							}
+									</Text>
+								</Flex>
+							</>
 						</Flex>
+						}
 						{loading &&
 							<Spinner size='lg' />
 						}
@@ -180,6 +180,7 @@ const Pool = (props) => {
 								<Position key={index} position={item.position[0]} foreignTokenAddress={item.position[0].foreignAsset.address}/>
 							)
 						})}
+						{wallet.account && data && data.nftitems[0] && !loading &&
 						<Flex
 							flexDir='row'
 							alignItems='center'
@@ -214,6 +215,7 @@ const Pool = (props) => {
 									</>
 							}
 						</Flex>
+						}
 
 						{!nftItemsMemo?.length > 0 && !loading &&
 							<>
