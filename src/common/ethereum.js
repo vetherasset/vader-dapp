@@ -160,8 +160,8 @@ const getVaderPerXVader = async (provider) => {
 		defaults.address.fakeVader, defaults.address.xvader, provider,
 	)
 	const totalXVader = await getERC20TotalSupply(defaults.address.xvader, provider)
-	const vaderPrice = ethers.BigNumber.from(totalVader).div(totalXVader)
-	return vaderPrice
+	const xvaderPrice = ethers.BigNumber.from(totalVader).div(totalXVader)
+	return xvaderPrice
 }
 
 export {

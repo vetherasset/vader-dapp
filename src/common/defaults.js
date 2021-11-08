@@ -43,6 +43,7 @@ defaults.api.etherscanUrl = (
 		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
 			undefined
 )
+defaults.api.graphUrl2 = 'https://api.thegraph.com/subgraphs/name/0xchewbacca/x-vader'
 
 defaults.layout = {}
 
