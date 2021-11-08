@@ -178,7 +178,7 @@ const Pool = (props) => {
 										as='h4'
 										fontSize='1.1rem'
 										fontWeight='bolder'>
-											Value
+											Size
 									</Text>
 								</Flex>
 							</>

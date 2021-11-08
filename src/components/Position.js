@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { ethers } from 'ethers'
-import { Flex, Image } from '@chakra-ui/react'
+import { Flex, Image, Tag } from '@chakra-ui/react'
 import { getTokenByAddress, prettifyCurrency } from '../common/utils'
 import defaults from '../common/defaults'
 
@@ -21,6 +21,8 @@ export const Position = (props) => {
 			})
 		return () => setToken({})
 	}, [props.foreignTokenAddress])
+
+	console.log(token.symbol)
 
 	return (
 		<>
@@ -60,8 +62,22 @@ export const Position = (props) => {
 					/>
 					{token.symbol}/{defaults.nativeAsset.symbol}
 				</Flex>
-				<Flex>
-					{prettifyCurrency(ethers.utils.formatUnits(props.position.originalNative, defaults.nativeAsset.decimals) * 3333 * ethers.utils.formatUnits(props.position.originalForeign, token.decimals), 0, 4, defaults.nativeAsset.symbol)}
+				<Flex
+					flexDir='row'
+					alignContent='flex-end'
+					justifyContent='flex-end'
+					gridGap='0.7rem'
+				>
+					{props.position.originalForeign &&
+						<Tag colorScheme='purple'>
+							{prettifyCurrency(ethers.utils.formatUnits(props.position.originalForeign, token.decimals), 0, 4, token.symbol)}
+						</Tag>
+					}
+					{props.position.originalNative &&
+						<Tag colorScheme='blue'>
+							{prettifyCurrency(ethers.utils.formatUnits(props.position.originalNative, defaults.nativeAsset.decimals), 0, 4, defaults.nativeAsset.symbol)}
+						</Tag>
+					}
 				</Flex>
 			</Flex>
 		</>
