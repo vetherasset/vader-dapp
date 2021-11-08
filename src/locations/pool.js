@@ -129,7 +129,8 @@ const Pool = (props) => {
 					width='100%'
 					layerStyle='colorful'
 					background='#000000c4;'
-					minH='900.4px'
+					maxH='898.4px'
+					minH={ !loading ? '481.767px' : '898.4px' }
 					p='1.5rem 0'
 					flexDir='column'
 					justifyContent='center'
@@ -140,33 +141,37 @@ const Pool = (props) => {
 						justifyContent='center'
 						textAlign='center'
 						alignItems='center'
-						minH='900.4px'
+						maxH='898.4px'
+						minH={ !loading ? '481.767px' : '898.4px' }
 					>
-						{wallet.account && data && data.nftitems[0] &&
-							<Flex
-								width='100%'
-								alignItems='center'
-								justifyContent='space-between'
-								p='0 12px'
-								mb='1rem'>
-								<Flex>
-									<Text
-										as='h4'
-										fontSize='1.1rem'
-										fontWeight='bolder'>
-											Position
-									</Text>
-								</Flex>
-								<Flex>
-									<Text
-										as='h4'
-										fontSize='1.1rem'
-										fontWeight='bolder'>
-											Value
-									</Text>
-								</Flex>
-							</Flex>
-						}
+						<Flex
+							width='100%'
+							alignItems='center'
+							justifyContent='space-between'
+							p='0 12px'
+							minH='34.4px'
+							mb='1rem'>
+							{wallet.account && data && data.nftitems[0] && !loading &&
+								<>
+									<Flex>
+										<Text
+											as='h4'
+											fontSize='1.1rem'
+											fontWeight='bolder'>
+				Position
+										</Text>
+									</Flex>
+									<Flex>
+										<Text
+											as='h4'
+											fontSize='1.1rem'
+											fontWeight='bolder'>
+				Value
+										</Text>
+									</Flex>
+								</>
+							}
+						</Flex>
 						{loading &&
 							<Spinner size='lg' />
 						}
