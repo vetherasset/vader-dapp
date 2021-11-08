@@ -68,7 +68,7 @@ const Pool = (props) => {
 	}, [wallet.account])
 
 	useEffect(() => {
-		if(data) {
+		if(wallet.account && data && data.nftitems[0]) {
 			setPageCount(Math.ceil(Number(data?.nftitems[0].position[0].id) / positionsPerPage))
 		}
 	}, [positionsPerPage, data, wallet.account])
@@ -77,7 +77,7 @@ const Pool = (props) => {
 		<Box
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.md.width}
-			m='0 auto 5rem auto'
+			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
@@ -121,6 +121,7 @@ const Pool = (props) => {
 				p='1px'
 				flexDir='column'
 				height='auto'
+				mb='98.4px'
 				layerStyle='colorful'
 				backgroundImage='linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)'
 			>
@@ -141,7 +142,7 @@ const Pool = (props) => {
 						alignItems='center'
 						minH='900.4px'
 					>
-						{nftItemsMemo &&
+						{wallet.account && data && data.nftitems[0] &&
 							<Flex
 								width='100%'
 								alignItems='center'
@@ -180,7 +181,7 @@ const Pool = (props) => {
 							justifyContent='center'
 							minH='40px'
 						>
-							{pageCount > 0 && !loading &&
+							{data && pageCount > 0 && !loading &&
 									<>
 										{ paginationButton(page - 1, <ChevronLeftIcon/>, page > 0) }
 										{
