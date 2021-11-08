@@ -194,7 +194,6 @@ export {
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
 	convertVetherToVader, getSwapRate, getSwapFee, getUSDVburnRate, isAddressLiquidityProvider,
-	tokenHasPool, swapForAsset,
 	stakeVader, unstakeVader,
 	tokenHasPool, swapForAsset, addLiquidity,
 }
