@@ -1,20 +1,83 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
+import { useWallet } from 'use-wallet'
+import { useLazyQuery, gql } from '@apollo/client'
 import { useNftitems } from '../hooks/useNftitems'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, Text, Spinner } from '@chakra-ui/react'
+import { ChevronRightIcon, ChevronLeftIcon } from '@chakra-ui/icons'
 import { Position } from '../components/Position'
 import defaults from '../common/defaults'
 
 const Pool = (props) => {
 
-	const [nftItems, loading] = useNftitems()
+	const wallet = useWallet()
+	const [nftItems, loading, setSkip] = useNftitems()
 	const nftItemsMemo = useMemo(() => nftItems, [nftItems])
+
+	const [page, setPage] = useState(0)
+	const [positionsPerPage] = useState(10)
+	const [pageCount, setPageCount] = useState(0)
+
+	const positionsCount = gql`
+		query Items(
+			$account: String!
+		) {
+			nftitems(
+							first: 1,
+							skip: 0,
+							orderBy: tokenId,
+							orderDirection: desc,
+							where: {owner: $account})
+						{
+							position {
+								id
+							}
+						}
+			}
+	`
+
+	const [fetch, { data }] = useLazyQuery(positionsCount)
+
+	const paginationButton = (pageNumber, name, enabled = true) => {
+		return (
+			<Button
+				variant='ghost'
+				key={pageNumber}
+				color={page == pageNumber ? 'accent.100' : 'white'}
+				textDecor={page == pageNumber ? 'underline' : 'none'}
+				style={{
+					boxShadow: 'none',
+					fontWeight: page == pageNumber ? 'bold' : 'normal',
+				}}
+				disabled={ !enabled }
+				onClick={() => {
+					 setPage(Number(pageNumber))
+					 setSkip(Number(pageNumber * positionsPerPage))
+				}}>
+				{ name }
+			</Button>
+		)
+	}
+
+	useEffect(() => {
+		if(wallet.account) {
+			fetch({ variables: {
+				account: String(wallet.account).toLocaleLowerCase(),
+			} })
+		}
+	}, [wallet.account])
+
+	useEffect(() => {
+		if(data) {
+			setPageCount(Math.ceil(Number(data?.nftitems[0].position[0].id) / positionsPerPage))
+		}
+	}, [positionsPerPage, data, wallet.account])
 
 	return (
 		<Box
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.md.width}
-			m='0 auto'
+			m='0 auto 5rem auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
@@ -65,7 +128,7 @@ const Pool = (props) => {
 					width='100%'
 					layerStyle='colorful'
 					background='#000000c4;'
-					minH='884.4px'
+					minH='900.4px'
 					p='1.5rem 0'
 					flexDir='column'
 					justifyContent='center'
@@ -76,6 +139,7 @@ const Pool = (props) => {
 						justifyContent='center'
 						textAlign='center'
 						alignItems='center'
+						minH='900.4px'
 					>
 						{nftItemsMemo &&
 							<Flex
@@ -110,6 +174,41 @@ const Pool = (props) => {
 								<Position key={index} position={item.position[0]} foreignTokenAddress={item.position[0].foreignAsset.address}/>
 							)
 						})}
+						<Flex
+							flexDir='row'
+							alignItems='center'
+							justifyContent='center'
+							minH='40px'
+						>
+							{pageCount > 0 && !loading &&
+									<>
+										{ paginationButton(page - 1, <ChevronLeftIcon/>, page > 0) }
+										{
+											[...Array(pageCount)].map((_key, index) => {
+												if ((page < 4 && index < 5) || (page > pageCount - 5 && index > pageCount - 6)
+								|| index == 0 || index == pageCount - 1
+								|| index == page - 1 || index == page || index == page + 1) {
+													return paginationButton(index, index + 1)
+												}
+												else if (index == page - 2) {
+													return paginationButton(index, '...')
+												}
+												else if (index == pageCount - 6 && page > pageCount - 5) {
+													return paginationButton(index, '...')
+												}
+												else if (index == page + 2) {
+													return paginationButton(index, '...')
+												}
+												else if (index == 5 && page < 4) {
+													return paginationButton(index, '...')
+												}
+											})
+										}
+										{ paginationButton(page + 1, <ChevronRightIcon/>, (page + 1) * positionsPerPage < Number(data?.nftitems[0].position[0].id) - 0) }
+									</>
+							}
+						</Flex>
+
 						{!nftItemsMemo?.length > 0 && !loading &&
 							<>
 								<Text fontSize='1.1rem' color='#adadb0'>You&lsquo;re currently providing no liquidity.</Text>
