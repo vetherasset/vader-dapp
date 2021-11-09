@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { ethers } from 'ethers'
 import { Flex, Image, Tag } from '@chakra-ui/react'
 import { getTokenByAddress, prettifyCurrency } from '../common/utils'
@@ -22,10 +23,8 @@ export const Position = (props) => {
 		return () => setToken({})
 	}, [props.foreignTokenAddress])
 
-	console.log(token.symbol)
-
 	return (
-		<>
+		<Link to={`/pool/position/${props.position.foreignAsset.address}/${props.position.id}`}>
 			<Flex
 				width='100%'
 				alignItems='center'
@@ -80,6 +79,6 @@ export const Position = (props) => {
 					}
 				</Flex>
 			</Flex>
-		</>
+		</Link>
 	)
 }
