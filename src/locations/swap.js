@@ -6,7 +6,13 @@ import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { getERC20BalanceOf, getSwapEstimate } from '../common/ethereum'
+import {
+	getERC20Allowance,
+	getERC20BalanceOf,
+	getSwapEstimate,
+	swapForAsset,
+	setERC20Allowance,
+} from '../common/ethereum'
 import { TokenSelector } from '../components/TokenSelector'
 
 const flex = {
@@ -34,34 +40,30 @@ const Swap = (props) => {
 	const wallet = useWallet()
 
 	const [isSelect, setIsSelect] = useState(-1)
+	const [inAction, setInAction] = useState(false)
+	const [isTurn, setIsTurn] = useState(false)
 	const [token0, setToken0] = useState(defaults.tokenDefault)
 	const [token1, setToken1] = useState(false)
+	const [allowance0, setAllowance0] = useState(0)
 	const [balance0, setBalance0] = useState(0)
 	const [balance1, setBalance1] = useState(0)
 	const [amount0, setAmount0] = useState(0)
 	const [amount1, setAmount1] = useState(0)
 	const [input0, setInput0] = useState('0')
 	const [input1, setInput1] = useState('0')
+	const [ratio, setRatio] = useState('')
 	const [timeoutId, setTimeoutId] = useState(null)
 
-	useEffect(() => {
-		if (!isOpen) setIsSelect(-1)
-	}, [isOpen])
-
-	useEffect(() => {
+	const getAllowance0 = async () => {
 		if (wallet.account && token0) {
-			getERC20BalanceOf(token0.address, wallet.account, defaults.network.provider)
-				.then(b => {
-					setBalance0(b)
-				})
-				.catch(err => {
-					setBalance0(false)
-					console.log(err)
+			getERC20Allowance(token0.address, wallet.account, defaults.address.router, defaults.network.provider)
+				.then(allowance => {
+					setAllowance0(allowance.toString())
 				})
 		}
-	}, [wallet.account, token0])
+	}
 
-	useEffect(() => {
+	const getBalance0 = async () => {
 		if (wallet.account && token1) {
 			getERC20BalanceOf(token1.address, wallet.account, defaults.network.provider)
 				.then(b => {
@@ -72,6 +74,53 @@ const Swap = (props) => {
 					console.log(err)
 				})
 		}
+	}
+
+	const getBalance1 = async () => {
+		if (wallet.account && token0) {
+			getERC20BalanceOf(token0.address, wallet.account, defaults.network.provider)
+				.then(b => {
+					setBalance0(b)
+				})
+				.catch(err => {
+					setBalance0(false)
+					console.log(err)
+				})
+		}
+	}
+
+	const swap = async () => {
+		setInAction(true)
+		swapForAsset(token0, token1, amount0, wallet)
+			.then(() => {
+				getBalance0()
+				getBalance1()
+				setAmount0(0)
+				setAmount1(0)
+				setInAction(false)
+			})
+	}
+
+	const approve = async () => {
+		setInAction(true)
+		setERC20Allowance(token0.address, defaults.address.router, wallet)
+			.then(() => {
+				getAllowance0()
+				setInAction(false)
+			})
+	}
+
+	useEffect(() => {
+		if (!isOpen) setIsSelect(-1)
+	}, [isOpen])
+
+	useEffect(() => {
+		getAllowance0()
+		getBalance0()
+	}, [wallet.account, token0])
+
+	useEffect(() => {
+		getBalance1()
 	}, [wallet.account, token1])
 
 	useEffect(() => {
@@ -86,13 +135,19 @@ const Swap = (props) => {
 			setTimeoutId(setTimeout(() => {
 				getSwapEstimate(token0, token1, wallet)
 					.then(estimate => {
-						setInput1(estimate.times(amount0).toFixed())
+						setInput1(estimate.times(amount0).toFixed(8))
+						const unit = BigNumber(1).div(estimate)
+						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
 					})
 			}, 500))
 		}
 	}, [amount0, token0, token1])
 
 	useEffect(() => {
+		if (isTurn) {
+			setIsTurn(false)
+			return
+		}
 		if (wallet.account && token0 && token1) {
 			setInput1(amount1)
 
@@ -104,7 +159,9 @@ const Swap = (props) => {
 			setTimeoutId(setTimeout(() => {
 				getSwapEstimate(token0, token1, wallet)
 					.then(estimate => {
-						setInput0(BigNumber(1).div(estimate).times(amount1).toFixed())
+						setInput0(BigNumber(1).div(estimate).times(amount1).toFixed(8))
+						const unit = BigNumber(1).div(estimate)
+						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
 					})
 			}, 500))
 		}
@@ -189,10 +246,12 @@ const Swap = (props) => {
 						width='22px'
 						onClick={() => {
 							if (token1) {
-								setToken0(token1)
-								setBalance0(balance1)
 								setToken1(token0)
 								setBalance1(balance0)
+								setToken0(token1)
+								setBalance0(balance1)
+								setIsTurn(true)
+								setAmount0(input1)
 							}
 						}}
 					>
@@ -239,16 +298,23 @@ const Swap = (props) => {
 						</Box>
 					</Flex>
 					<Flex {...flex}></Flex>
+					<Flex ml='auto' mr='12px'>{ratio}</Flex>
 					<Button
 						minWidth='230px'
 						m='2rem auto'
 						size='lg'
 						variant='solidRadial'
+						disabled={inAction || BigNumber(amount0).isZero()}
+						onClick={ BigNumber(allowance0).isLessThan(amount0) ? approve : swap}
 					>
 						<Box
 							fontWeight='1000'
 						>
-							SWAP
+							{
+								BigNumber(allowance0).isLessThan(amount0)
+									? (inAction ? 'APPROVING' : 'APPROVE')
+									: (inAction ? 'SWAPPING' : 'SWAP')
+							}
 						</Box>
 					</Button>
 				</Flex>
