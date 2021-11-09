@@ -15,7 +15,9 @@ const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provide
 		humanStandardTokenAbi,
 		provider.getSigner(0),
 	)
-	return await contract.approve(spenderAddress, amount)
+
+	const tx = await contract.approve(spenderAddress, amount)
+	await tx.wait()
 }
 
 const convertVaderToUsdv = async (amount, provider) => {
@@ -137,20 +139,15 @@ const getSwapEstimate = async (
 	let fromAssetInfo
 	let toAssetInfo
 	let reserve0 = 0
-	let reserve1 = 0
 	if (!fromNativeAsset) {
 		fromAssetInfo = await poolContract.pairInfo(from.address)
 		reserve0 = fromAssetInfo.reserveForeign.toString()
 	}
 	if (!toNativeAsset) {
 		toAssetInfo = await poolContract.pairInfo(to.address)
-		reserve1 = toAssetInfo.reserveForeign.toString()
 		if (fromNativeAsset) {
 			reserve0 = toAssetInfo.reserveNative.toString()
 		}
-	}
-	else {
-		reserve1 = fromAssetInfo.reserveNative.toString()
 	}
 
 	try {
@@ -282,6 +279,7 @@ const tokenHasPool = async (address, provider) => {
 }
 
 export {
+	MAX_UINT256,
 	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
 	convertVetherToVader, getSwapEstimate, getSwapRate, getSwapFee,

@@ -11,7 +11,8 @@ import {
 	getERC20BalanceOf,
 	getSwapEstimate,
 	swapForAsset,
-	setERC20Allowance,
+	approveERC20ToSpend,
+	MAX_UINT256,
 } from '../common/ethereum'
 import { TokenSelector } from '../components/TokenSelector'
 
@@ -64,19 +65,6 @@ const Swap = (props) => {
 	}
 
 	const getBalance0 = async () => {
-		if (wallet.account && token1) {
-			getERC20BalanceOf(token1.address, wallet.account, defaults.network.provider)
-				.then(b => {
-					setBalance1(b)
-				})
-				.catch(err => {
-					setBalance1(false)
-					console.log(err)
-				})
-		}
-	}
-
-	const getBalance1 = async () => {
 		if (wallet.account && token0) {
 			getERC20BalanceOf(token0.address, wallet.account, defaults.network.provider)
 				.then(b => {
@@ -84,6 +72,19 @@ const Swap = (props) => {
 				})
 				.catch(err => {
 					setBalance0(false)
+					console.log(err)
+				})
+		}
+	}
+
+	const getBalance1 = async () => {
+		if (wallet.account && token1) {
+			getERC20BalanceOf(token1.address, wallet.account, defaults.network.provider)
+				.then(b => {
+					setBalance1(b)
+				})
+				.catch(err => {
+					setBalance1(false)
 					console.log(err)
 				})
 		}
@@ -103,7 +104,8 @@ const Swap = (props) => {
 
 	const approve = async () => {
 		setInAction(true)
-		setERC20Allowance(token0.address, defaults.address.router, wallet)
+		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+		approveERC20ToSpend(token0.address, defaults.address.router, MAX_UINT256, provider)
 			.then(() => {
 				getAllowance0()
 				setInAction(false)
@@ -124,7 +126,7 @@ const Swap = (props) => {
 	}, [wallet.account, token1])
 
 	useEffect(() => {
-		if (wallet.account && token0 && token1) {
+		if (wallet.account && token0 && token1 && (token0.address != token1.address)) {
 			setInput0(amount0)
 
 			if (timeoutId) {
@@ -134,8 +136,9 @@ const Swap = (props) => {
 
 			setTimeoutId(setTimeout(() => {
 				getSwapEstimate(token0, token1, wallet)
-					.then(estimate => {
-						setInput1(estimate.times(amount0).toFixed(8))
+					.then(output => {
+						const estimate = output.times(Number(amount0) || 0)
+						setInput1(estimate.isZero() ? '0' : estimate.toFixed(8))
 						const unit = BigNumber(1).div(estimate)
 						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
 					})
@@ -148,7 +151,8 @@ const Swap = (props) => {
 			setIsTurn(false)
 			return
 		}
-		if (wallet.account && token0 && token1) {
+
+		if (wallet.account && token0 && token1 && (token0.address != token1.address)) {
 			setInput1(amount1)
 
 			if (timeoutId) {
@@ -158,9 +162,10 @@ const Swap = (props) => {
 
 			setTimeoutId(setTimeout(() => {
 				getSwapEstimate(token0, token1, wallet)
-					.then(estimate => {
-						setInput0(BigNumber(1).div(estimate).times(amount1).toFixed(8))
-						const unit = BigNumber(1).div(estimate)
+					.then(output => {
+						const estimate = BigNumber(1).div(output).times(Number(amount1) || 0)
+						setInput0(estimate.isZero() ? '0' : estimate.toFixed(8))
+						const unit = BigNumber(1).div(output)
 						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
 					})
 			}, 500))
