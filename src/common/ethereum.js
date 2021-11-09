@@ -10,14 +10,21 @@ import defaults from './defaults'
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
-	const contract = new ethers.Contract(
-		tokenAddress,
-		humanStandardTokenAbi,
-		provider.getSigner(0),
-	)
+	try {
+		const contract = new ethers.Contract(
+			tokenAddress,
+			humanStandardTokenAbi,
+			provider.getSigner(0),
+		)
 
-	const tx = await contract.approve(spenderAddress, amount)
-	await tx.wait()
+		const tx = await contract.approve(spenderAddress, amount)
+		await tx.wait()
+		return true
+	}
+	catch (e) {
+		console.log(e)
+		return false
+	}
 }
 
 const convertVaderToUsdv = async (amount, provider) => {
@@ -198,34 +205,41 @@ const swapForAsset = async (
 		provider.getSigner(0),
 	)
 
-	let tx
-	if (doubleSwap) {
-		tx = await routerContract.swapExactTokensForTokens(
-			amountInWei,
-			0,
-			[
-				from.address,
-				defaults.tokenDefault.address,
-				to.address,
-			],
-			wallet.account,
-			Math.round(Date.now() / 1000 + 600),
-		)
-	}
-	else {
-		tx = await routerContract.swapExactTokensForTokens(
-			amountInWei,
-			0,
-			[
-				from.address,
-				to.address,
-			],
-			wallet.account,
-			Math.round(Date.now() / 1000 + 600),
-		)
-	}
+	try {
+		let tx
+		if (doubleSwap) {
+			tx = await routerContract.swapExactTokensForTokens(
+				amountInWei,
+				0,
+				[
+					from.address,
+					defaults.tokenDefault.address,
+					to.address,
+				],
+				wallet.account,
+				Math.round(Date.now() / 1000 + 600),
+			)
+		}
+		else {
+			tx = await routerContract.swapExactTokensForTokens(
+				amountInWei,
+				0,
+				[
+					from.address,
+					to.address,
+				],
+				wallet.account,
+				Math.round(Date.now() / 1000 + 600),
+			)
+		}
 
-	await tx.wait()
+		await tx.wait()
+		return true
+	}
+	catch (e) {
+		console.log(e)
+		return false
+	}
 }
 
 const getSwapRate = async (from, to, provider) => {

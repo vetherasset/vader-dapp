@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import { Box, Flex, NumberInput, NumberInputField, Button, Image, useDisclosure,
+import {
+	Box,
+	Flex,
+	NumberInput,
+	NumberInputField,
+	Button,
+	Image,
+	useDisclosure,
+	useToast,
 } from '@chakra-ui/react'
 import { TriangleDownIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
+import { approved, swapped, failed } from '../messages'
 import {
 	getERC20Allowance,
 	getERC20BalanceOf,
@@ -39,6 +48,7 @@ const Swap = (props) => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 
 	const wallet = useWallet()
+	const toast = useToast()
 
 	const [isSelect, setIsSelect] = useState(-1)
 	const [inAction, setInAction] = useState(false)
@@ -90,25 +100,37 @@ const Swap = (props) => {
 		}
 	}
 
+	const approve = async () => {
+		setInAction(true)
+		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+		approveERC20ToSpend(token0.address, defaults.address.router, MAX_UINT256, provider)
+			.then((result) => {
+				getAllowance0()
+				setInAction(false)
+				if (result) {
+					toast(approved)
+				}
+				else {
+					toast(failed)
+				}
+			})
+	}
+
 	const swap = async () => {
 		setInAction(true)
 		swapForAsset(token0, token1, amount0, wallet)
-			.then(() => {
+			.then((result) => {
 				getBalance0()
 				getBalance1()
 				setAmount0(0)
 				setAmount1(0)
 				setInAction(false)
-			})
-	}
-
-	const approve = async () => {
-		setInAction(true)
-		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-		approveERC20ToSpend(token0.address, defaults.address.router, MAX_UINT256, provider)
-			.then(() => {
-				getAllowance0()
-				setInAction(false)
+				if (result) {
+					toast(swapped)
+				}
+				else {
+					toast(failed)
+				}
 			})
 	}
 
