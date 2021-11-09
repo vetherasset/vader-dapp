@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import BigNumber from 'bignumber.js'
 import { Box, Flex, NumberInput, NumberInputField, Button, Image, useDisclosure,
 } from '@chakra-ui/react'
 import { TriangleDownIcon } from '@chakra-ui/icons'
@@ -83,9 +84,9 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, amount0, 0, wallet)
+				getSwapEstimate(token0, token1, wallet)
 					.then(estimate => {
-						setInput1(estimate.toString())
+						setInput1(estimate.times(amount0).toFixed())
 					})
 			}, 500))
 		}
@@ -101,9 +102,9 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, 0, amount1, wallet)
+				getSwapEstimate(token0, token1, wallet)
 					.then(estimate => {
-						setInput0(estimate.toString())
+						setInput0(BigNumber(1).div(estimate).times(amount1).toFixed())
 					})
 			}, 500))
 		}
