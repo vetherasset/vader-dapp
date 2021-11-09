@@ -23,11 +23,11 @@ import { ethers } from 'ethers'
 import {
 	getERC20BalanceOf,
 	getERC20Allowance,
-	getVaderPerXVader,
 	approveERC20ToSpend,
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
+import { getXVaderPrice, getXVaderApy } from '../common/calculation'
 import {
 	approved,
 	rejected,
@@ -43,19 +43,21 @@ const Stake = props => {
 	const [accessApproved, setAccessApproved] = useState(false)
 	const [vdrBalance, setVdrBalance] = useState(0)
 	const [xvdrBalance, setXvdrBalance] = useState(0)
-	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(1)
+	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
+	const [stakeApy, setStakeApy] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	useEffect(() => {
-		if (wallet.ethereum) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getVaderPerXVader(provider)
-				.then(data => {
-					setXvdrExchangeRate(data.toNumber())
-				})
-				.catch(console.error)
-		}
-	}, [wallet.ethereum, refreshDataToken])
+		getXVaderPrice().then(price => {
+			setXvdrExchangeRate(Number(price))
+		})
+	}, [refreshDataToken])
+
+	useEffect(() => {
+		getXVaderApy().then(apy => {
+			setStakeApy(Number(apy))
+		})
+	}, [refreshDataToken])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -118,7 +120,7 @@ const Stake = props => {
 							APY
 						</Text>
 						<Text fontSize="1.5rem" fontWeight="bolder">
-							0.0%
+							{prettifyNumber(stakeApy, 2, 2)}%
 						</Text>
 					</Flex>
 					<Flex
