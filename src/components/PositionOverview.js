@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { useWallet } from 'use-wallet'
+import { useLazyQuery, gql } from '@apollo/client'
 import { Link } from 'react-router-dom'
 import { Box, Button, Flex, Text, Image } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
@@ -10,6 +11,48 @@ const PositionOverview = (props) => {
 
 	const wallet = useWallet()
 	const history = useHistory()
+	const{ id } = useParams()
+
+	const position = gql`
+	query Items(
+		$account: String!,
+		$id: String!,
+	) {
+		nftitems(
+			where: {
+				id: $id,
+				owner: $account,
+			})
+		{
+			id
+			owner {
+				address
+			}
+			position {
+				id
+				foreignAsset {
+					address
+				}
+				originalNative
+				originalForeign
+				creation
+				liquidity
+				isDeleted
+			}
+		}
+	}
+`
+
+	const [fetch, { data }] = useLazyQuery(position)
+
+	useEffect(() => {
+		if(wallet.account) {
+			fetch({ variables: {
+				id: `${defaults.address.pool.toLocaleLowerCase()}_${id}`,
+				account: String(wallet.account).toLocaleLowerCase(),
+			} })
+		}
+	}, [wallet.account, id])
 
 	useEffect(() => {
 		if (!wallet.account) history.push('/pool')
@@ -83,9 +126,15 @@ const PositionOverview = (props) => {
 										as='h4'
 										fontSize='1.24rem'
 										fontWeight='bolder'>
-						Overview
+										Overview
 									</Text>
-
+									{data?.nftitems[0].position[0].id}
+									{data?.nftitems[0].position[0].creation}
+									{data?.nftitems[0].position[0].foreignAsset.address}
+									{data?.nftitems[0].position[0].liquidity}
+									{data?.nftitems[0].position[0].originalForeign}
+									{data?.nftitems[0].position[0].originalNative}
+									{data?.nftitems[0].position[0].isDeleted}
 								</Flex>
 							</Flex>
 						</Flex>

@@ -18,6 +18,8 @@ const Pool = (props) => {
 	const [positionsPerPage] = useState(5)
 	const [pageCount, setPageCount] = useState(0)
 
+	console.log(nftItemsMemo)
+
 	const NoLiquidityMessage = () => {
 		return (
 			<>

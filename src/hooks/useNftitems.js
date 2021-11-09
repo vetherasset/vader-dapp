@@ -32,10 +32,11 @@ export const useNftitems = () => {
 					foreignAsset {
 						address
 					}
-          originalNative
-          originalForeign
-          creation
-          isDeleted
+					originalNative
+					originalForeign
+					creation
+					liquidity
+					isDeleted
 				}
 			}
 		}
