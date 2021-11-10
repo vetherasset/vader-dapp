@@ -12,19 +12,9 @@ export const Header = (props) => {
 	const location = useLocation()
 	const pages = [
 		{
-			name: 'swap',
-			text: 'Swap',
-			link: '/',
-		},
-		{
-			name: 'pool',
-			text: 'Pool',
-			link: '/pool',
-		},
-		{
-			name: 'Burn',
-			text: 'Burn',
-			link: '/burn',
+			name: 'Redeem',
+			text: 'redeem',
+			link: '/redeem',
 		},
 		{
 			name: 'Stake',
@@ -64,6 +54,7 @@ export const Header = (props) => {
 						style={ {
 							color: 'rgb(213, 213, 213)',
 							padding: '0.4rem 0.8rem',
+							...(location.pathname === '/' && p.name === 'Redeem' && current),
 							...(p.link === location.pathname && current),
 							...(p.link === '/pool' && location.pathname.includes('pool') && current),
 						}}
