@@ -128,8 +128,8 @@ const positionOpened = {
 }
 
 const staked = {
-	title: 'VDR tokens staked',
-	description: 'Your VDR tokens have been staked succesfully.',
+	title: 'VADER tokens staked',
+	description: 'Your VADER tokens have been staked succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -137,8 +137,8 @@ const staked = {
 }
 
 const unstaked = {
-	title: 'xVDR tokens unstaked',
-	description: 'Your xVDR tokens have been unstaked succesfully.',
+	title: 'xVADER tokens unstaked',
+	description: 'Your xVADER tokens have been unstaked succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,

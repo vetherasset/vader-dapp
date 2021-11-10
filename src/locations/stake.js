@@ -174,10 +174,10 @@ const Stake = props => {
 							Balance
 						</Text>
 						<Text fontSize="1.5rem" fontWeight="bolder" mt="1rem">
-							{prettifyNumber(vdrBalance, 2, 6)} VDR
+							{prettifyNumber(vdrBalance, 2, 6)} VADER
 						</Text>
 						<Text fontSize="1.5rem" fontWeight="bolder" mt="0.5rem">
-							{prettifyNumber(xvdrBalance, 2, 6)} xVDR
+							{prettifyNumber(xvdrBalance, 2, 6)} xVADER
 						</Text>
 					</Box>
 				</Box>
@@ -187,7 +187,7 @@ const Stake = props => {
 }
 
 const ExchangeRate = props => {
-	return <Text>1 xVDR = {prettifyNumber(props.rate, 2, 6)} VDR</Text>
+	return <Text>1 xVADER = {prettifyNumber(props.rate, 2, 6)} VADER</Text>
 }
 ExchangeRate.propTypes = {
 	rate: PropTypes.number.isRequired,
@@ -281,7 +281,7 @@ const StakePanel = props => {
 		<Box>
 			<Flex alignItems="center" justifyContent="space-between">
 				<Text align="center" fontSize="1.55rem" fontWeight="bolder">
-					Stake VDR
+					Stake VADER
 				</Text>
 				<ExchangeRate rate={props.exchangeRate} />
 			</Flex>
@@ -386,7 +386,7 @@ const UnstakePanel = props => {
 		<Box>
 			<Flex alignItems="center" justifyContent="space-between">
 				<Text align="center" fontSize="1.55rem" fontWeight="bolder">
-					Unstake xVDR
+					Unstake xVADER
 				</Text>
 				<ExchangeRate rate={props.exchangeRate} />
 			</Flex>
