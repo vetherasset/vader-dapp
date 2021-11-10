@@ -9,32 +9,31 @@ const client = new ApolloClient({
 const getXVaderPriceByBlock = async (block) => {
 	const tokensQuery = block ? `
 		query {
-			xvaderPrices(block: { number: ${block} }) {
+			globals(block: { number: ${block} }) {
 				id
-				xvaderTotalSupply
-				vaderTotalLocked
-				price
+				name
+				value
 			}
 		}
 	` : `
 		query {
-			xvaderPrices {
+			globals {
 				id
-				xvaderTotalSupply
-				vaderTotalLocked
-				price
+				name
+				value
 			}
 		}
 	`
 	try {
 		const result = await client.query({ query: gql(tokensQuery) })
-		const xvaderPrices = result.data && result.data.xvaderPrices
-		if (xvaderPrices.length === 0) {
+		if (!result || !result.data || !result.data.globals) {
 			return null
 		}
-		return xvaderPrices[0].price
+		const xvaderPrice = result.data.globals.find(r => r.id === 'XVADER_PRICE')
+		return xvaderPrice && xvaderPrice.value
 	}
 	catch (err) {
+		console.error('getXVaderPriceByBlock', err)
 		return null
 	}
 }
