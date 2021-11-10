@@ -110,6 +110,13 @@ defaults.redeemables = [
 
 defaults.vader = {}
 defaults.vader.conversionRate = 1000
+defaults.swap = {}
+defaults.swap.slippage = 0.5
+defaults.swap.minSlippage = 0.05
+defaults.swap.maxSlippage = 1
+defaults.swap.deadline = 30
+defaults.swap.minDeadline = 1
+defaults.swap.maxDeadline = 180
 
 defaults.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
 
