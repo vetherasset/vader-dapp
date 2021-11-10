@@ -5,6 +5,8 @@ import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
+import Bonds from './locations/bond/bonds'
+import Bond from './locations/bond/bond'
 import defaults from './common/defaults'
 import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
@@ -30,6 +32,12 @@ const App = () => {
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
+						}/>
+						<Route path='/bonds' exact render={() =>
+							<Bonds position='relative' zIndex='1'/>
+						}/>
+						<Route path='/bonds/:token' exact render={() =>
+							<Bond position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />

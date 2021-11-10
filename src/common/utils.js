@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { MerkleTree } from 'merkletreejs'
 import getTokenList from 'get-token-list'
 import defaults from './defaults'
+const EST_BLOCKS_PER_HOURS = 262
 
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
@@ -201,8 +202,19 @@ const getMerkleProofForAccount = (account, snapshot) => {
 	return proof
 }
 
+const convertBlocksToDays = (blocks) => {
+	return blocks / (EST_BLOCKS_PER_HOURS * 24)
+}
+
+const getTokenPrice = (tokenId) => {
+	return fetch(`${defaults.api.coingeckoUrl}?vs_currencies=usd&ids=${tokenId}`)
+		.then(res => res.json())
+		.then(res => res[tokenId]?.usd || 0)
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
+	convertBlocksToDays, getTokenPrice,
 }

@@ -5,6 +5,7 @@ import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
+import bondAbi from '../artifacts/abi/bond'
 
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
@@ -173,6 +174,52 @@ const swapForAsset = async (amount, from, to, provider) => {
 	return ethers.BigNumber.from(await contract.swap(amount, from, to))
 }
 
+const bond = (contractAddress, provider) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		bondAbi,
+		provider,
+	)
+	const price = () => contract.bondPrice()
+
+	const deposit = async (amount, from) => {
+		const maxPrice = await price()
+		return contract.deposit(amount, maxPrice, from)
+	}
+
+	const redeem = (from) => contract.redeem(from)
+
+	const debtRatio = () => contract.debtRatio()
+
+	const maxBondSize = () => contract.maxPayout()
+
+	// amount of bond to payout
+	const payoutFor = (amount) => contract.payoutFor(amount)
+
+	// how far into vesting a depositor is
+	const percentVestedFor = (from) => contract.percentVestedFor(from)
+
+	// amount of payout token available for claim
+	const pendingPayoutFor = (from) => contract.pendingPayoutFor(from)
+
+	const terms = () => contract.terms()
+
+	const bondInfo = (from) => contract.bondInfo(from)
+
+	return {
+		price,
+		deposit,
+		redeem,
+		debtRatio,
+		maxBondSize,
+		payoutFor,
+		percentVestedFor,
+		pendingPayoutFor,
+		terms,
+		bondInfo,
+	}
+}
+
 const stakeVader = async (amount, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.xvader,
@@ -199,4 +246,5 @@ export {
 	swapForAsset, addLiquidity,
 	getSalt, getClaimed, getClaim, getVester,
 	claim,
+	bond,
 }

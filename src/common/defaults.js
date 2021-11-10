@@ -1,3 +1,4 @@
+/* eslint-disable no-inline-comments */
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources.json'
 import snapshot from '../artifacts/json/vetherSnapshot'
@@ -34,6 +35,7 @@ defaults.api.etherscanUrl = (
 		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
 			undefined
 )
+defaults.api.coingeckoUrl = 'https://api.coingecko.com/api/v3/simple/price'
 
 defaults.address = {}
 defaults.address.vader = (
@@ -76,6 +78,33 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
+defaults.address.xvader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x42980De4BF7926448ec75812955eB2762F067c30' :
+			undefined
+)
+defaults.address.bond = {
+	bond: (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '0x20cC5BdB87182cf00F64f92E443d5F89F58CB6BD' :
+				undefined
+	),
+	principalToken: (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B' :
+				undefined
+	),
+	payoutToken: (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '0x78CE3ba64Da9D241757603A914b30D992f36Ff24' :
+				undefined
+	),
+	treasury: (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '0xD4D721C66bc6acB58321d5673e84c0B1AF245686' :
+				undefined
+	),
+}
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
@@ -139,6 +168,31 @@ defaults.unstakeable = [
 		'symbol':'xVADER',
 		'decimals':18,
 		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+	},
+]
+
+defaults.bondable = [
+	{
+		'chainId':3,
+		'address': defaults.address.bond.bond,
+		'name':'TEST',
+		'treasury': defaults.address.bond.treasury,
+		'principalToken': {
+			'address': defaults.address.bond.principalToken,
+			'name':'TEST',
+			'symbol':'TEST',
+			'decimals':18,
+			'coingeckoId': 'vether',
+			'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
+		},
+		'payoutToken': {
+			'address': defaults.address.bond.payoutToken,
+			'name':'VADER',
+			'symbol':'VADER',
+			'decimals':18,
+			'coingeckoId': 'vader-protocol',
+			'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		},
 	},
 ]
 

@@ -181,10 +181,47 @@ const unstaked = {
 	position: defaults.toast.position,
 }
 
+const bondDeposited = {
+	title: 'TEST tokens deposited',
+	description: 'Your TEST tokens have been deposited succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const bondDepositExceedsMaxBondSize = {
+	title: 'Invalid amount',
+	description: 'You cannot buy more than max bond size.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const bondRedeemed = {
+	title: 'VADER tokens redeemed',
+	description: 'Your VADER tokens has been redeemed succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const bondNoRewards = {
+	title: 'No rewards',
+	description: 'You don\'t have any rewards to redeem.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible,
+	bondDeposited, bondRedeemed, bondNoRewards, bondDepositExceedsMaxBondSize,
 }
