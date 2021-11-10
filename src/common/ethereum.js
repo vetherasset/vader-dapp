@@ -125,9 +125,51 @@ const swapForAsset = async (amount, from, to, provider) => {
 	return ethers.BigNumber.from(await contract.swap(amount, from, to))
 }
 
+const bond = (token, provider) => {
+	if (!defaults.address.bond[token]) {
+		throw new Error('Invalid token')
+	}
+	const contract = new ethers.Contract(
+		defaults.address.bond[token],
+		provider.getSigner(0),
+	)
+	const price = () => contract.bondPrice()
+
+	const deposit = async (amount, from) => {
+		const maxPrice = await price()
+		return contract.deposit(amount, maxPrice, from)
+	}
+
+	const redeem = (from) => contract.redeem(from)
+
+	const debtRatio = () => contract.debtRatio()
+
+	const maxBondSize = () => contract.maxPayout()
+
+	// amount of bond to payout
+	const payoutFor = (amount) => contract.payoutFor(amount)
+
+	// how far into vesting a depositor is
+	const percentVestedFor = (from) => contract.percentVestedFor(from)
+
+	// amount of payout token available for claim
+	const pendingPayoutFor = (from) => contract.pendingPayoutFor(from)
+
+	return {
+		price,
+		deposit,
+		redeem,
+		debtRatio,
+		maxBondSize,
+		payoutFor,
+		percentVestedFor,
+		pendingPayoutFor,
+	}
+}
 
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVetherToVader,
 	getSwapRate, getSwapFee, swapForAsset, addLiquidity,
+	bond,
 }

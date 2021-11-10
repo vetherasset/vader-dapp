@@ -91,6 +91,13 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
+defaults.address.bond = {
+	'USDV': (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '' :
+				undefined
+	),
+}
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
