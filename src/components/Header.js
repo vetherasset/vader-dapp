@@ -13,7 +13,7 @@ export const Header = (props) => {
 	const pages = [
 		{
 			name: 'Redeem',
-			text: 'redeem',
+			text: 'Redeem',
 			link: '/redeem',
 		},
 		{

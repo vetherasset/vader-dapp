@@ -16,6 +16,7 @@ import {
 	InputGroup,
 	InputRightElement,
 	useToast,
+	Image,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -100,108 +101,99 @@ const Stake = props => {
 	return (
 		<Box
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
-			maxWidth={defaults.layout.container.md.width}
-			m="0 auto"
+			maxWidth={defaults.layout.container.sm.width}
+			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
-			<Flex m="0 auto" flexDir="row" height="auto">
-				<Box width="67%">
-					<Flex
-						p="1.8rem"
-						flexDir="row"
-						height="auto"
-						layerStyle="colorful"
-						backgroundImage="linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)"
-						alignItems="center"
-						justifyContent="space-between"
+			<Flex
+				w='100%'
+				maxW='49ch'
+				minH='478.65px'
+				m='0 auto'
+				p='2rem 0'
+				layerStyle='colorful'
+				flexDir='column'
+			>
+				<Tabs isFitted>
+					<TabList mb='1rem'>
+						<Tab>
+							<Text as='h3' m='0' fontSize='1.24rem'>
+            		Stake
+							</Text>
+						</Tab>
+						<Tab>
+							<Text as='h3' m='0' fontSize='1.24rem'>
+            		Unstake
+							</Text>
+						</Tab>
+					</TabList>
+					<TabPanels
+						p='0 2.6rem'
 					>
-						<Text fontSize="1.2rem" fontWeight="bolder">
-							APY
-						</Text>
-						<Text fontSize="1.5rem" fontWeight="bolder">
-							{prettifyNumber(stakeApy, 2, 2)}%
-						</Text>
-					</Flex>
-					<Flex
-						mt="1.5rem"
-						p="1.8rem"
-						flexDir="column"
-						height="auto"
-						layerStyle="colorful"
-						backgroundImage="linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)"
-					>
-						<Tabs isFitted variant="enclosed">
-							<TabList mb="1rem">
-								<Tab>
-									<Text fontSize="1.25rem" fontWeight="medium">
-										Stake
-									</Text>
-								</Tab>
-								<Tab>
-									<Text fontSize="1.25rem" fontWeight="medium">
-										Unstake
-									</Text>
-								</Tab>
-							</TabList>
-							<TabPanels>
-								<TabPanel>
-									<StakePanel
-										exchangeRate={xvdrExchangeRate}
-										accessApproved={accessApproved}
-										balance={vdrBalance}
-										refreshData={setRefreshDataToken}
-									/>
-								</TabPanel>
-								<TabPanel>
-									<UnstakePanel
-										exchangeRate={xvdrExchangeRate}
-										balance={xvdrBalance}
-										refreshData={setRefreshDataToken}
-									/>
-								</TabPanel>
-							</TabPanels>
-						</Tabs>
-					</Flex>
-				</Box>
-				<Box ml="1.5rem" flex="1">
-					<Box
-						p="1.8rem"
-						layerStyle="colorful"
-						backgroundImage="linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)"
-					>
-						<Text fontSize="1.2rem" fontWeight="bolder">
-							Balance
-						</Text>
-						<Text fontSize="1.5rem" fontWeight="bolder" mt="1rem">
-							{prettifyNumber(vdrBalance, 2, 6)} VADER
-						</Text>
-						<Text fontSize="1.5rem" fontWeight="bolder" mt="0.5rem">
-							{prettifyNumber(xvdrBalance, 2, 6)} xVADER
-						</Text>
-					</Box>
-				</Box>
+						<TabPanel p='0'>
+							<StakePanel
+								exchangeRate={xvdrExchangeRate}
+								accessApproved={accessApproved}
+								balance={vdrBalance}
+								refreshData={setRefreshDataToken}
+							/>
+						</TabPanel>
+						<TabPanel p='0'>
+							<UnstakePanel
+								exchangeRate={xvdrExchangeRate}
+								balance={xvdrBalance}
+								refreshData={setRefreshDataToken}
+							/>
+						</TabPanel>
+					</TabPanels>
+				</Tabs>
 			</Flex>
 		</Box>
 	)
 }
 
 const ExchangeRate = props => {
-	return <Text>1 xVADER = {prettifyNumber(props.rate, 2, 6)} VADER</Text>
+	return <>1 xVADER = {prettifyNumber(props.rate, 2, 6)} VADER</>
 }
 ExchangeRate.propTypes = {
 	rate: PropTypes.number.isRequired,
 }
 
 const StakePanel = props => {
+
+	const tokens = defaults.stakeable
+
 	const [amount, setAmount] = useState('')
 	const [processingTxStatus, setProcessingTxStatus] = useState(false)
 
 	const wallet = useWallet()
 	const toast = useToast()
+	const [showTokenList, setShowTokenList] = useState(false)
+	const [tokenSelect, setTokenSelect] = useState(tokens[0])
 	const setMaxAmount = () => {
 		setAmount(props.balance)
 	}
+
+	const HiddenList = {
+		visibility: 'hidden',
+		opacity: 0,
+		display: 'none',
+	}
+
+	const ShowList = {
+		position: 'absolute',
+		transition: 'all 0.5s ease',
+		marginTop: '1rem',
+		left: '-18px',
+	}
+
+	const ToggleList = {
+		visibility: 'visible',
+		opacity: 1,
+		display: 'block',
+	}
+
 	const handleChange = value => {
 		if (value > props.balance) {
 			value = props.balance
@@ -278,53 +270,91 @@ const StakePanel = props => {
 		}
 	}
 	return (
-		<Box>
-			<Flex alignItems="center" justifyContent="space-between">
-				<Text align="center" fontSize="1.55rem" fontWeight="bolder">
-					Stake VADER
-				</Text>
-				<ExchangeRate rate={props.exchangeRate} />
-			</Flex>
-			<Flex mt="1rem" layerStyle="inputLike">
-				<InputGroup>
-					<NumberInput
-						variant="transparent"
-						flex="1"
-						value={amount}
-						max={props.balance}
-						onChange={handleChange}
-					>
-						<NumberInputField
-							placeholder="0"
-							fontSize="1.3rem"
-							fontWeight="bold"
-						/>
-					</NumberInput>
-					<InputRightElement>
-						<Button h="1.75rem" size="sm" onClick={setMaxAmount}>
-							Max
-						</Button>
-					</InputRightElement>
-				</InputGroup>
-			</Flex>
-			<Flex mt="2rem" justifyContent="center">
-				<Button
-					minWidth="230px"
-					size="lg"
-					variant="solidRadial"
-					onClick={submit}
-					disabled={processingTxStatus}
-				>
-					<Text fontWeight="bold">
-						{processingTxStatus
-							? 'PROCESSING TRANSACTION'
-							: props.accessApproved || !wallet.account
-								? 'STAKE'
-								: 'APPROVE ACCESS'}
+		<>
+			<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
+      	Deposit to earn APY.
+			</Text>
+			<Flex
+				mt='3.1rem'
+				flexDir='column'>
+				<Flex alignItems="center" justifyContent="space-between">
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount to stake</Text>
+					<Text as='h4'>
+						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
-				</Button>
+				</Flex>
+				<Flex
+					layerStyle='inputLike'
+				>
+					<InputGroup>
+						<NumberInput
+							variant="transparent"
+							flex="1"
+							value={amount}
+							max={props.balance}
+							onChange={handleChange}
+						>
+							<NumberInputField
+								placeholder="0"
+								fontSize="1.3rem"
+								fontWeight="bold"
+							/>
+						</NumberInput>
+						<InputRightElement
+							width='auto'
+						>
+							<Flex
+								cursor='pointer'
+								zIndex='1'
+							>
+								<Box d='flex' alignItems='center'>
+									<Image
+										width='24px'
+										height='24px'
+										mr='10px'
+										src={tokenSelect.logoURI}
+									/>
+									<Box
+										as='h3'
+										m='0'
+										fontSize='1.02rem'
+										fontWeight='bold'
+										textTransform='capitalize'>{tokenSelect.symbol}</Box>
+								</Box>
+							</Flex>
+						</InputRightElement>
+					</InputGroup>
+				</Flex>
+				<Flex
+					mt='.6rem'
+					justifyContent='flex-start'
+				>
+					<Button
+						variant='outline'
+						size='sm'
+						onClick={setMaxAmount}>
+							Max
+					</Button>
+				</Flex>
+				<Flex mt='3.4rem' justifyContent='center'>
+					<Button
+						minWidth="230px"
+						size="lg"
+						variant="solidRadial"
+						onClick={submit}
+						disabled={processingTxStatus}
+					>
+						<Text fontWeight="bold">
+							{processingTxStatus
+								? 'PROCESSING TRANSACTION'
+								: props.accessApproved || !wallet.account
+									? 'STAKE'
+									: 'APPROVE ACCESS'}
+						</Text>
+					</Button>
+				</Flex>
 			</Flex>
-		</Box>
+		</>
 	)
 }
 StakePanel.propTypes = {
@@ -335,31 +365,57 @@ StakePanel.propTypes = {
 }
 
 const UnstakePanel = props => {
+	const tokens = defaults.unstakeable
+
 	const [amount, setAmount] = useState('')
 	const [processingTxStatus, setProcessingTxStatus] = useState(false)
+
 	const wallet = useWallet()
 	const toast = useToast()
-
+	const [showTokenList, setShowTokenList] = useState(false)
+	const [tokenSelect, setTokenSelect] = useState(tokens[0])
 	const setMaxAmount = () => {
 		setAmount(props.balance)
 	}
+
+	const HiddenList = {
+		visibility: 'hidden',
+		opacity: 0,
+		display: 'none',
+	}
+
+	const ShowList = {
+		position: 'absolute',
+		transition: 'all 0.5s ease',
+		marginTop: '1rem',
+		left: '-18px',
+	}
+
+	const ToggleList = {
+		visibility: 'visible',
+		opacity: 1,
+		display: 'block',
+	}
+
 	const handleChange = value => {
 		if (value > props.balance) {
 			value = props.balance
 		}
 		setAmount(value)
 	}
-	const submit = async () => {
-		if (!wallet.account) {
-			return toast(walletNotConnected)
-		}
-		if (!amount) {
-			return toast(noAmount)
-		}
-		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-		setProcessingTxStatus(true)
+
+	const approveAccess = async provider => {
+		return approveERC20ToSpend(
+			defaults.address.fakeVader,
+			defaults.address.xvader,
+			'0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+			provider,
+		)
+	}
+
+	const stake = async provider => {
 		try {
-			const ret = await unstakeVader(
+			const ret = await stakeVader(
 				ethers.utils.parseEther(String(amount)),
 				provider,
 			)
@@ -368,7 +424,7 @@ const UnstakePanel = props => {
 				if (tx.status === 1) {
 					props.refreshData(Date.now())
 					setAmount(0)
-					return toast(unstaked)
+					return toast(staked)
 				} else {
 					return toast(failed)
 				}
@@ -382,50 +438,142 @@ const UnstakePanel = props => {
 			toast(failed)
 		}
 	}
+
+	const submit = async () => {
+		if (!wallet.account) {
+			return toast(walletNotConnected)
+		}
+		if (!amount) {
+			return toast(noAmount)
+		}
+		const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+		setProcessingTxStatus(true)
+		try {
+			const ret = await approveAccess(provider)
+			provider.once(ret.hash, tx => {
+				if (tx.status === 1) {
+					toast(approved)
+					props.refreshData(Date.now())
+					return stake(provider)
+				} else {
+					setProcessingTxStatus(false)
+					return toast(failed)
+				}
+			})
+		} catch (error) {
+			console.error(error)
+			setProcessingTxStatus(false)
+			if (error.code === 4001) {
+				return toast(rejected)
+			}
+			toast(failed)
+		}
+	}
 	return (
-		<Box>
-			<Flex alignItems="center" justifyContent="space-between">
-				<Text align="center" fontSize="1.55rem" fontWeight="bolder">
-					Unstake xVADER
-				</Text>
-				<ExchangeRate rate={props.exchangeRate} />
-			</Flex>
-			<Flex mt="1rem" layerStyle="inputLike">
-				<InputGroup>
-					<NumberInput
-						variant="transparent"
-						flex="1"
-						value={amount}
-						max={props.balance}
-						onChange={handleChange}
-					>
-						<NumberInputField
-							placeholder="0"
-							fontSize="1.3rem"
-							fontWeight="bold"
-						/>
-					</NumberInput>
-					<InputRightElement>
-						<Button h="1.75rem" size="sm" onClick={setMaxAmount}>
-							Max
-						</Button>
-					</InputRightElement>
-				</InputGroup>
-			</Flex>
-			<Flex mt="2rem" justifyContent="center">
-				<Button
-					minWidth="230px"
-					size="lg"
-					variant="solidRadial"
-					onClick={submit}
-					disabled={processingTxStatus}
-				>
-					<Text fontWeight="bold">
-						{processingTxStatus ? 'PROCESSING TRANSACTION' : 'UNSTAKE'}
+		<>
+			<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
+      	Collect your rewards.
+			</Text>
+			<Flex
+				mt='3.1rem'
+				flexDir='column'>
+				<Flex alignItems="center" justifyContent="space-between">
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount to unstake</Text>
+					<Text as='h4'>
+						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
-				</Button>
+				</Flex>
+				<Flex
+					layerStyle='inputLike'
+				>
+					<InputGroup>
+						<NumberInput
+							variant="transparent"
+							flex="1"
+							value={amount}
+							max={props.balance}
+							onChange={handleChange}
+						>
+							<NumberInputField
+								placeholder="0"
+								fontSize="1.3rem"
+								fontWeight="bold"
+							/>
+						</NumberInput>
+						<InputRightElement
+							width='auto'
+						>
+							<Flex
+								cursor='default'
+								zIndex='1'
+							>
+								<Box d='flex' alignItems='center'>
+									<Image
+										width='24px'
+										height='24px'
+										mr='10px'
+										src={tokenSelect.logoURI}
+									/>
+									<Box
+										as='h3'
+										m='0'
+										fontSize='1.02rem'
+										fontWeight='bold'
+									>{tokenSelect.symbol}</Box>
+								</Box>
+							</Flex>
+						</InputRightElement>
+					</InputGroup>
+				</Flex>
+				<Flex
+					mt='.6rem'
+					justifyContent='flex-start'
+					flexDir='row'
+				>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							MAX
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							15%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							25%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							75%
+					</Button>
+				</Flex>
+				<Flex mt='3.4rem' justifyContent='center'>
+					<Button
+						minWidth="230px"
+						size="lg"
+						variant="solidRadial"
+						onClick={submit}
+						disabled={processingTxStatus}
+					>
+						<Text fontWeight="bold">
+								UNSTAKE
+						</Text>
+					</Button>
+				</Flex>
 			</Flex>
-		</Box>
+		</>
 	)
 }
 UnstakePanel.propTypes = {

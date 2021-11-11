@@ -147,6 +147,28 @@ defaults.redeemables = [
 	},
 ]
 
+defaults.stakeable = [
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.vader,
+		'name':'VADER',
+		'symbol':'VADER',
+		'decimals':18,
+		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	},
+]
+
+defaults.unstakeable = [
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.vader,
+		'name':'xVADER',
+		'symbol':'xVADER',
+		'decimals':18,
+		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	},
+]
+
 defaults.vader = {}
 defaults.vader.conversionRate = 10000
 
