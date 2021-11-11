@@ -1,4 +1,4 @@
-/* eslint-disable brace-style */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import {
@@ -111,18 +111,24 @@ const Stake = props => {
 				maxW='49ch'
 				minH='478.65px'
 				m='0 auto'
-				p='2rem 0'
+				p='0 0 2rem'
 				layerStyle='colorful'
 				flexDir='column'
 			>
-				<Tabs isFitted>
+				<Tabs isFitted colorScheme='bluish'>
 					<TabList mb='1rem'>
-						<Tab>
+						<Tab p='1.5rem 0' _focus={{
+							boxShadow: '0',
+							borderRadius: '24px 0 0 0',
+						}}>
 							<Text as='h3' m='0' fontSize='1.24rem'>
             		Stake
 							</Text>
 						</Tab>
-						<Tab>
+						<Tab p='1.5rem 0' _focus={{
+							boxShadow: '0',
+							borderRadius: '0 24px 0 0',
+						}}>
 							<Text as='h3' m='0' fontSize='1.24rem'>
             		Unstake
 							</Text>
@@ -222,11 +228,13 @@ const StakePanel = props => {
 					props.refreshData(Date.now())
 					setAmount(0)
 					return toast(staked)
-				} else {
+				}
+				else {
 					return toast(failed)
 				}
 			})
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error)
 			setProcessingTxStatus(false)
 			if (error.code === 4001) {
@@ -255,12 +263,14 @@ const StakePanel = props => {
 					toast(approved)
 					props.refreshData(Date.now())
 					return stake(provider)
-				} else {
+				}
+				else {
 					setProcessingTxStatus(false)
 					return toast(failed)
 				}
 			})
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error)
 			setProcessingTxStatus(false)
 			if (error.code === 4001) {
@@ -271,14 +281,11 @@ const StakePanel = props => {
 	}
 	return (
 		<>
-			<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
-      	Deposit to earn APY.
-			</Text>
 			<Flex
-				mt='3.1rem'
+				mt='4.5rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount to stake</Text>
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
 					<Text as='h4'>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
@@ -336,7 +343,7 @@ const StakePanel = props => {
 							Max
 					</Button>
 				</Flex>
-				<Flex mt='3.4rem' justifyContent='center'>
+				<Flex mt='4.75rem' justifyContent='center'>
 					<Button
 						minWidth="230px"
 						size="lg"
@@ -425,11 +432,13 @@ const UnstakePanel = props => {
 					props.refreshData(Date.now())
 					setAmount(0)
 					return toast(staked)
-				} else {
+				}
+				else {
 					return toast(failed)
 				}
 			})
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error)
 			setProcessingTxStatus(false)
 			if (error.code === 4001) {
@@ -455,12 +464,14 @@ const UnstakePanel = props => {
 					toast(approved)
 					props.refreshData(Date.now())
 					return stake(provider)
-				} else {
+				}
+				else {
 					setProcessingTxStatus(false)
 					return toast(failed)
 				}
 			})
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error)
 			setProcessingTxStatus(false)
 			if (error.code === 4001) {
@@ -471,14 +482,11 @@ const UnstakePanel = props => {
 	}
 	return (
 		<>
-			<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
-      	Collect your rewards.
-			</Text>
 			<Flex
-				mt='3.1rem'
+				mt='4.5rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount to unstake</Text>
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
 					<Text as='h4'>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
@@ -542,14 +550,14 @@ const UnstakePanel = props => {
 						size='sm'
 						mr='0.4rem'
 						onClick={setMaxAmount}>
-							15%
+							25%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
 						onClick={setMaxAmount}>
-							25%
+							50%
 					</Button>
 					<Button
 						variant='outline'
@@ -559,7 +567,7 @@ const UnstakePanel = props => {
 							75%
 					</Button>
 				</Flex>
-				<Flex mt='3.4rem' justifyContent='center'>
+				<Flex mt='4.75rem' justifyContent='center'>
 					<Button
 						minWidth="230px"
 						size="lg"

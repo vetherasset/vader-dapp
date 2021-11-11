@@ -5,6 +5,11 @@ export default {
 		200: '#f44ca2',
 		300: '#d95d9c',
 	},
+	bluish: {
+		100: '#3fa3fa',
+		200: '#3fa3fa',
+		300: '#3fa3fa',
+	},
 	white: {
 		100: '#FFD8FE',
 	},
