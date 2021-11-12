@@ -29,7 +29,6 @@ export const TransactionSettings = (props) => {
 	}
 
 	const initialRef = useRef()
-	const [auto, setAuto] = useState(true)
 	const [slippage, setSlippage] = useState(defaults.swap.slippage)
 	const [deadline, setDeadline] = useState(defaults.swap.deadline)
 
@@ -57,7 +56,7 @@ export const TransactionSettings = (props) => {
 								size='sm'
 								variant='solidRadial'
 								background={ props.auto ? 'red' : null }
-								onClick={() => { setAuto(true), props.onAuto(true), setSlippage(defaults.swap.slippage) }}
+								onClick={() => { props.onAuto(true), setSlippage(defaults.swap.slippage) }}
 							>
 								<Box
 									fontWeight='1000'
@@ -65,8 +64,21 @@ export const TransactionSettings = (props) => {
 									Auto
 								</Box>
 							</Button>
-							<NumberInput size='sm' width='100%' value={props.slippage}>
-								<InputLeftElement color='#f3841e'><WarningIcon/></InputLeftElement>
+							<NumberInput
+								size='sm'
+								width='100%'
+								value={props.slippage}
+								onBlur={() => {
+									slippage > 50 || slippage < 0
+										? (setSlippage(defaults.swap.slippage), props.onAuto(true))
+										: null
+								}}
+							>
+								{
+									slippage < defaults.swap.minSlippage || slippage > defaults.swap.maxSlippage
+									 ? <InputLeftElement color='#f3841e'><WarningIcon/></InputLeftElement>
+									 : null
+								}
 								<NumberInputField
 									borderRadius='50px'
 									background='#ffe5fe'
@@ -79,10 +91,45 @@ export const TransactionSettings = (props) => {
 											|| props.slippage > defaults.swap.maxSlippage
 											? 'red' : null
 									}
-									onChange={(e) => { setSlippage(e.target.value), setAuto(false), props.onAuto(false)}}
+									onChange={(e) => { setSlippage(e.target.value), props.onAuto(false)}}
 								/>
 								<InputRightElement>%</InputRightElement>
 							</NumberInput>
+						</Flex>
+						<Flex
+							gridGap='4px'
+						>
+							<Button
+								size='xs'
+								ml='auto'
+								p='8px'
+								fontSize='0.9rem'
+								variant='solidRadial'
+								background='#deb5de'
+								onClick={() => { props.onAuto(false), setSlippage(0.1) }}
+							>
+								0.1 %
+							</Button>
+							<Button
+								size='xs'
+								p='8px'
+								fontSize='0.9rem'
+								variant='solidRadial'
+								background='#deb5de'
+								onClick={() => { props.onAuto(false), setSlippage(0.5) }}
+							>
+								0.5 %
+							</Button>
+							<Button
+								size='xs'
+								p='8px'
+								fontSize='0.9rem'
+								variant='solidRadial'
+								background='#deb5de'
+								onClick={() => { props.onAuto(false), setSlippage(1) }}
+							>
+								1 %
+							</Button>
 						</Flex>
 						<Box
 							as='h3'

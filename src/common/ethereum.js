@@ -130,6 +130,7 @@ const convertVetherToVader = async (amount, provider) => {
 const getSwapEstimate = async (
 	from,
 	to,
+	amount,
 	wallet,
 ) => {
 	const fromNativeAsset = from.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
@@ -145,15 +146,24 @@ const getSwapEstimate = async (
 
 	let fromAssetInfo
 	let toAssetInfo
-	let reserve0 = 0
+	let deReserve0 = 0
 	if (!fromNativeAsset) {
 		fromAssetInfo = await poolContract.pairInfo(from.address)
-		reserve0 = fromAssetInfo.reserveForeign.toString()
+		deReserve0 = BigNumber(fromAssetInfo.reserveForeign).toString()
+		const amountInWei = BigNumber(amount).times(10 ** from.decimals).integerValue()
+
+		if (amountInWei.isLessThan(deReserve0)) {
+			deReserve0 = amountInWei.toString()
+		}
 	}
 	if (!toNativeAsset) {
 		toAssetInfo = await poolContract.pairInfo(to.address)
 		if (fromNativeAsset) {
-			reserve0 = toAssetInfo.reserveNative.toString()
+			deReserve0 = BigNumber(toAssetInfo.reserveNative).toString()
+			const amountInWei = BigNumber(amount).times(10 ** to.decimals).integerValue()
+			if (amountInWei.isLessThan(deReserve0)) {
+				deReserve0 = amountInWei.toString()
+			}
 		}
 	}
 
@@ -163,14 +173,14 @@ const getSwapEstimate = async (
 				await poolContract.callStatic.doubleSwap(
 					from.address,
 					to.address,
-					reserve0,
+					deReserve0,
 					wallet.account,
 				),
-			).div(reserve0).times(10 ** from.decimals).div(10 ** to.decimals)
+			).div(deReserve0).times(10 ** from.decimals).div(10 ** to.decimals)
 		}
 		else {
-			const nativeAmount = fromNativeAsset ? reserve0 : 0
-			const foreignAmount = toNativeAsset ? reserve0 : 0
+			const nativeAmount = fromNativeAsset ? deReserve0 : 0
+			const foreignAmount = toNativeAsset ? deReserve0 : 0
 
 			return BigNumber(
 				await poolContract.callStatic.swap(
@@ -179,10 +189,11 @@ const getSwapEstimate = async (
 					foreignAmount,
 					wallet.account,
 				),
-			).div(reserve0).times(10 ** from.decimals).div(10 ** to.decimals)
+			).div(deReserve0).times(10 ** from.decimals).div(10 ** to.decimals)
 		}
 	}
-	catch {
+	catch (e) {
+		console.log(e)
 		return BigNumber(0)
 	}
 }
@@ -191,12 +202,16 @@ const swapForAsset = async (
 	from,
 	to,
 	amount,
+	amountOutMin,
+	deadline,
 	wallet,
 ) => {
 	const fromNativeAsset = from.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const toNativeAsset = to.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const doubleSwap = !fromNativeAsset && !toNativeAsset
 	const amountInWei =	BigNumber(amount).times(10 ** from.decimals).toFixed()
+	const amountOutMinInWei =	BigNumber(amountOutMin).times(10 ** to.decimals).toFixed()
+	const deadlineTimeStamp = Math.round(Date.now() / 1000 + deadline * 60)
 
 	const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 	const routerContract = new ethers.Contract(
@@ -210,26 +225,26 @@ const swapForAsset = async (
 		if (doubleSwap) {
 			tx = await routerContract.swapExactTokensForTokens(
 				amountInWei,
-				0,
+				amountOutMinInWei,
 				[
 					from.address,
 					defaults.tokenDefault.address,
 					to.address,
 				],
 				wallet.account,
-				Math.round(Date.now() / 1000 + 600),
+				deadlineTimeStamp,
 			)
 		}
 		else {
 			tx = await routerContract.swapExactTokensForTokens(
 				amountInWei,
-				0,
+				amountOutMinInWei,
 				[
 					from.address,
 					to.address,
 				],
 				wallet.account,
-				Math.round(Date.now() / 1000 + 600),
+				deadlineTimeStamp,
 			)
 		}
 

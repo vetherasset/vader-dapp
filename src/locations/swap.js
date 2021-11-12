@@ -123,7 +123,16 @@ const Swap = (props) => {
 
 	const swap = async () => {
 		setInAction(true)
-		swapForAsset(token0, token1, amount0, wallet)
+		const swapSlippage = auto ? defaults.swap.slippage : slippage
+		const amountOutMin = BigNumber(input1).times(100 - swapSlippage).div(100).toFixed()
+		swapForAsset(
+			token0,
+			token1,
+			amount0,
+			amountOutMin,
+			deadline,
+			wallet,
+		)
 			.then((result) => {
 				getBalance0()
 				getBalance1()
@@ -185,7 +194,7 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, wallet)
+				getSwapEstimate(token0, token1, amount0, wallet)
 					.then(output => {
 						const estimate = output.times(Number(amount0) || 0)
 						setInput1(estimate.isZero() ? '0' : estimate.toFixed(8))
@@ -211,7 +220,7 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, wallet)
+				getSwapEstimate(token0, token1, amount1, wallet)
 					.then(output => {
 						const estimate = BigNumber(1).div(output).times(Number(amount1) || 0)
 						setInput0(estimate.isZero() ? '0' : estimate.toFixed(8))
@@ -247,7 +256,15 @@ const Swap = (props) => {
 						justifyContent='space-between'
 						alignItems='first baseline'
 					>
-						<Box as='h3' m='0' fontSize='1.3rem' fontWeight='bold' textTransform='capitalize'>Swap</Box>
+						<Box
+							as='h3'
+							m='0'
+							fontSize='1.3rem'
+							fontWeight='bold'
+							textTransform='capitalize'
+						>
+							Swap
+						</Box>
 						<Box
 							as='button'
 							width='22px'
@@ -277,7 +294,11 @@ const Swap = (props) => {
 								</Box>
 							}
 							<NumberInput {...flex} {...input} value={input0}>
-								<NumberInputField placeholder='0.0' {...field} onChange={(e) => {setAmount0(e.target.value)}}/>
+								<NumberInputField
+									placeholder='0.0'
+									{...field}
+									onChange={(e) => {setAmount0(e.target.value)}}
+								/>
 							</NumberInput>
 						</Box>
 						<Box
@@ -366,7 +387,9 @@ const Swap = (props) => {
 						</Box>
 					</Flex>
 					<Flex {...flex}></Flex>
-					<Flex ml='auto' mr='12px'>{ratio}</Flex>
+					<Flex ml='auto' mr='12px'>
+						{ !BigNumber(amount0).isZero() ? ratio : null}
+					</Flex>
 					<Button
 						minWidth='230px'
 						m='2rem auto'
