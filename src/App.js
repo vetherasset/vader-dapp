@@ -62,7 +62,10 @@ const App = () => {
 
 const maskTransform = () => {
 	const location = useLocation()
-	if(location.pathname.includes('pool')) {
+	if(
+		location.pathname.includes('pool') ||
+		location.pathname.includes('stake')
+	) {
 		return {
 			base: 'scaleX(1.5)',
 			md: 'scaleX(1.4)',

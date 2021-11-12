@@ -1,22 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import {
-	Box,
-	Button,
-	Flex,
-	Text,
-	Tab,
-	TabList,
-	Tabs,
-	TabPanels,
-	TabPanel,
-	NumberInput,
-	NumberInputField,
-	InputGroup,
-	InputRightElement,
-	useToast,
-	Image,
+import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel, NumberInput, NumberInputField,
+	InputGroup, InputRightElement, useToast, Image, Container, Heading, Badge,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -101,59 +87,98 @@ const Stake = props => {
 	return (
 		<Box
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
-			maxWidth={defaults.layout.container.sm.width}
+			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
-			<Flex
-				w='100%'
-				maxW='49ch'
-				minH='478.65px'
-				m='0 auto'
-				p='0 0 2rem'
-				layerStyle='colorful'
-				flexDir='column'
-			>
-				<Tabs isFitted colorScheme='bluish'>
-					<TabList mb='1rem'>
-						<Tab p='1.5rem 0' _focus={{
-							boxShadow: '0',
-							borderRadius: '24px 0 0 0',
-						}}>
-							<Text as='h3' m='0' fontSize='1.24rem'>
+			<Flex>
+				<Flex
+					flexDir='column'
+					w='100%'
+					paddingRight='2rem'
+					justifyContent='center'
+				>
+					<Flex>
+						<Container mb='23px' p='0'>
+							<Heading as='h1' size='md'>EARN ON YOUR Vader.</Heading>
+							<Box>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor. Amet consectetur adipiscing elit ut aliquam purus. Eu lobortis elementum nibh tellus molestie nunc. Cras tincidunt lobortis feugiat vivamus at augue eget arcu.</Box>
+						</Container>
+					</Flex>
+
+					<Flex>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Badge
+									fontSize='1rem'
+									colorScheme='accent'
+								>7 DAYS APY</Badge>
+							</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+						2159%
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Badge
+									fontSize='1rem'
+									colorScheme='accent'
+								>1 xVADER RATE</Badge>
+							</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+						1 VADER
+							</Box>
+						</Container>
+					</Flex>
+				</Flex>
+				<Flex
+					w='77.777%'
+					minH='478.65px'
+					m='0 auto'
+					p='0 0 2rem'
+					layerStyle='colorful'
+					flexDir='column'
+				>
+					<Tabs isFitted colorScheme='bluish'>
+						<TabList mb='1rem'>
+							<Tab p='1.5rem 0' _focus={{
+								boxShadow: '0',
+								borderRadius: '24px 0 0 0',
+							}}>
+								<Text as='h3' m='0' fontSize='1.24rem'>
             		Stake
-							</Text>
-						</Tab>
-						<Tab p='1.5rem 0' _focus={{
-							boxShadow: '0',
-							borderRadius: '0 24px 0 0',
-						}}>
-							<Text as='h3' m='0' fontSize='1.24rem'>
+								</Text>
+							</Tab>
+							<Tab p='1.5rem 0' _focus={{
+								boxShadow: '0',
+								borderRadius: '0 24px 0 0',
+							}}>
+								<Text as='h3' m='0' fontSize='1.24rem'>
             		Unstake
-							</Text>
-						</Tab>
-					</TabList>
-					<TabPanels
-						p='0 2.6rem'
-					>
-						<TabPanel p='0'>
-							<StakePanel
-								exchangeRate={xvdrExchangeRate}
-								accessApproved={accessApproved}
-								balance={vdrBalance}
-								refreshData={setRefreshDataToken}
-							/>
-						</TabPanel>
-						<TabPanel p='0'>
-							<UnstakePanel
-								exchangeRate={xvdrExchangeRate}
-								balance={xvdrBalance}
-								refreshData={setRefreshDataToken}
-							/>
-						</TabPanel>
-					</TabPanels>
-				</Tabs>
+								</Text>
+							</Tab>
+						</TabList>
+						<TabPanels
+							p='0 2.6rem'
+						>
+							<TabPanel p='0'>
+								<StakePanel
+									exchangeRate={xvdrExchangeRate}
+									accessApproved={accessApproved}
+									balance={vdrBalance}
+									refreshData={setRefreshDataToken}
+								/>
+							</TabPanel>
+							<TabPanel p='0'>
+								<UnstakePanel
+									exchangeRate={xvdrExchangeRate}
+									balance={xvdrBalance}
+									refreshData={setRefreshDataToken}
+								/>
+							</TabPanel>
+						</TabPanels>
+					</Tabs>
+				</Flex>
 			</Flex>
 		</Box>
 	)
@@ -282,7 +307,7 @@ const StakePanel = props => {
 	return (
 		<>
 			<Flex
-				mt='4.5rem'
+				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
 					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
@@ -311,7 +336,7 @@ const StakePanel = props => {
 							width='auto'
 						>
 							<Flex
-								cursor='pointer'
+								cursor='default'
 								zIndex='1'
 							>
 								<Box d='flex' alignItems='center'>
@@ -335,15 +360,38 @@ const StakePanel = props => {
 				<Flex
 					mt='.6rem'
 					justifyContent='flex-start'
+					flexDir='row'
 				>
 					<Button
 						variant='outline'
 						size='sm'
+						mr='0.4rem'
 						onClick={setMaxAmount}>
-							Max
+							MAX
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							25%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							50%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={setMaxAmount}>
+							75%
 					</Button>
 				</Flex>
-				<Flex mt='4.75rem' justifyContent='center'>
+				<Flex mt='5.05rem' justifyContent='center'>
 					<Button
 						minWidth="230px"
 						size="lg"
@@ -483,7 +531,7 @@ const UnstakePanel = props => {
 	return (
 		<>
 			<Flex
-				mt='4.5rem'
+				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
 					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
@@ -567,7 +615,7 @@ const UnstakePanel = props => {
 							75%
 					</Button>
 				</Flex>
-				<Flex mt='4.75rem' justifyContent='center'>
+				<Flex mt='5.05rem' justifyContent='center'>
 					<Button
 						minWidth="230px"
 						size="lg"

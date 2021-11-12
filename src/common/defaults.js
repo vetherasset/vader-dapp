@@ -59,8 +59,10 @@ defaults.layout.header.padding = '1.2rem 1rem'
 defaults.layout.header.minHeight = '98.4px'
 
 defaults.layout.container = {}
+defaults.layout.container.xl = {}
+defaults.layout.container.xl.width = '75rem'
 defaults.layout.container.lg = {}
-defaults.layout.container.lg.width = '75rem'
+defaults.layout.container.lg.width = '65rem'
 defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
 defaults.layout.container.md = {}
 defaults.layout.container.md.width = '840px'
