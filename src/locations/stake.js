@@ -25,7 +25,9 @@ import {
 	unstaked,
 } from '../messages'
 import { prettifyNumber } from '../common/utils'
+
 const Stake = props => {
+
 	const wallet = useWallet()
 	const [accessApproved, setAccessApproved] = useState(false)
 	const [vdrBalance, setVdrBalance] = useState(0)
@@ -33,6 +35,14 @@ const Stake = props => {
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakeApy, setStakeApy] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
+
+	const stakedNow = `
+		@keyframes colorAnimation {
+			0% { color: white; }
+			50% { color: #f44ca2; }
+			100% { color: white; }
+		}
+	`
 
 	useEffect(() => {
 		getXVaderPrice().then(price => {
@@ -99,7 +109,7 @@ const Stake = props => {
 					paddingRight='2rem'
 					justifyContent='center'
 				>
-					<Flex>
+					{/* <Flex>
 						<Container mb='23px' p='0'>
 							<Heading as='h1' size='md'>EARN ON YOUR Vader.</Heading>
 							<Box>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor. Amet consectetur adipiscing elit ut aliquam purus. Eu lobortis elementum nibh tellus molestie nunc. Cras tincidunt lobortis feugiat vivamus at augue eget arcu.</Box>
@@ -127,6 +137,115 @@ const Stake = props => {
 							</Box>
 							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
 						1 VADER
+							</Box>
+						</Container>
+					</Flex> */}
+
+					<Flex>
+						<Container mb='17px' p='0'>
+							<style>
+								{stakedNow}
+							</style>
+							<Heading
+								as='h1'
+								size='md'
+								animation='5s ease-in-out infinite colorAnimation'
+								transition='all 0.3s ease 0s'>
+									YOU&#39;RE STAKED NOW.
+							</Heading>
+						</Container>
+					</Flex>
+
+					<Flex mb='0.6rem'>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Badge
+									fontSize='1rem'
+									colorScheme='accent'
+								>7 DAYS APY</Badge>
+							</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+						2159%
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Badge
+									fontSize='1rem'
+									colorScheme='accent'
+								>1 xVADER RATE</Badge>
+							</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+						1 VADER
+							</Box>
+						</Container>
+					</Flex>
+
+					<Flex>
+						<Container p='0'>
+							<Text
+								as='h4'
+								fontSize='1.24rem'
+								fontWeight='bolder'>
+							Asset
+							</Text>
+						</Container>
+						<Container p='0'>
+							<Text
+								as='h4'
+								fontSize='1.24rem'
+								fontWeight='bolder'>
+							Balance
+							</Text>
+						</Container>
+					</Flex>
+
+					<Flex mb='1rem'>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Flex
+									fontWeight='bolder'>
+									<Image
+										width='23px'
+										height='23px'
+										borderRadius='50%'
+										objectFit='none'
+										background='#fff'
+										mr='10px'
+										src='https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627'
+									/>
+								VADER
+								</Flex>
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box textAlign='left'>
+								1000
+							</Box>
+						</Container>
+					</Flex>
+
+					<Flex>
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Flex
+									fontWeight='bolder'>
+									<Image
+										width='23px'
+										height='23px'
+										borderRadius='50%'
+										objectFit='none'
+										background='#fff'
+										mr='10px'
+										src='https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627'
+									/>
+								xVADER
+								</Flex>
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box textAlign='left'>
+								85589
 							</Box>
 						</Container>
 					</Flex>
