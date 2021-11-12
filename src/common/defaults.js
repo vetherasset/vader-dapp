@@ -111,6 +111,14 @@ defaults.address.xvader = (
 			undefined
 )
 
+defaults.address.stakingContracts = {
+	'USDV-3CRV': (
+		defaults.network.chainId === 1 ? '' :
+			defaults.network.chainId === 42 ? '' :
+				undefined
+	)
+}
+
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources

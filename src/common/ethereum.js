@@ -145,10 +145,32 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
+const lpTokenStaking = (token, provider) => async () => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingContracts[token],
+		xVaderAbi,
+		provider.getSigner(0),
+	)
+	const balanceOf = (address) => contract.balanceOf(address);
+	const stake = (amount) => contract.stake(amount);
+	const withdraw = (amount) => contract.withdraw(amount);
+	const earned = (address) => contract.earned(address);
+	const claim = () => contract.getReward();
+
+	return {
+		balanceOf,
+		stake,
+		withdraw,
+		earned,
+		claim,
+	}
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
 	convertVetherToVader, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
+	lpTokenStaking,
 }
