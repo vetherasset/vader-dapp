@@ -9,7 +9,7 @@ import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
 
 const client = new ApolloClient({
-	uri: defaults.api.graphql,
+	uri: defaults.api.graphUrl,
 	cache: new InMemoryCache(),
 })
 

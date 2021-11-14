@@ -15,11 +15,10 @@ import {
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { convertVaderToUsdv, convertVetherToVader, redeemToVADER } from '../common/ethereum'
+import { convertVetherToVader } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
-import { insufficientBalance, rejected, failed,
-	vaderconverted, vethupgraded, usdvredeemed, walletNotConnected, noAmount } from '../messages'
+import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount } from '../messages'
 
 const Burn = (props) => {
 	const tokens = defaults.redeemables
@@ -212,56 +211,60 @@ const Burn = (props) => {
 										})
 								}
 								if (tokenSelect.symbol === 'VADER') {
-									convertVaderToUsdv(
-										ethers.utils.parseUnits(String(amount)).toString(),
-										provider,
-									)
-										.then(() => {
-											setWorking(false)
-											toast(vaderconverted)
-										})
-										.catch(err => {
-											setWorking(false)
-											if(err.code === -32016) {
-												console.log('Insufficient balance: Your account balance is insufficient.')
-												toast(insufficientBalance)
-											}
-											else if(err.code === 4001) {
-												console.log('Transaction rejected: Your have decided to reject the transaction..')
-												toast(rejected)
-											}
-											else {
-												console.log('Error code is:' + err.code)
-												console.log('Error:' + err)
-												toast(failed)
-											}
-										})
+									// This call is DEPRECATED
+									//
+									// convertVaderToUsdv(
+									// 	ethers.utils.parseUnits(String(amount)).toString(),
+									// 	provider,
+									// )
+									// 	.then(() => {
+									// 		setWorking(false)
+									// 		toast(vaderconverted)
+									// 	})
+									// 	.catch(err => {
+									// 		setWorking(false)
+									// 		if(err.code === -32016) {
+									// 			console.log('Insufficient balance: Your account balance is insufficient.')
+									// 			toast(insufficientBalance)
+									// 		}
+									// 		else if(err.code === 4001) {
+									// 			console.log('Transaction rejected: Your have decided to reject the transaction..')
+									// 			toast(rejected)
+									// 		}
+									// 		else {
+									// 			console.log('Error code is:' + err.code)
+									// 			console.log('Error:' + err)
+									// 			toast(failed)
+									// 		}
+									// 	})
 								}
 								if (tokenSelect.symbol === 'USDV') {
-									redeemToVADER(
-										ethers.utils.parseUnits(String(amount)).toString(),
-										provider,
-									)
-										.then(() => {
-											setWorking(false)
-											toast(usdvredeemed)
-										})
-										.catch(err => {
-											setWorking(false)
-											if(err.code === -32016) {
-												console.log('Insufficient balance: Your account balance is insufficient.')
-												toast(insufficientBalance)
-											}
-											else if(err.code === 4001) {
-												console.log('Transaction rejected: Your have decided to reject the transaction..')
-												toast(rejected)
-											}
-											else {
-												console.log('Error code is:' + err.code)
-												console.log('Error:' + err)
-												toast(failed)
-											}
-										})
+								// This call is DEPRECATED
+								//
+								// 	redeemToVADER(
+								// 		ethers.utils.parseUnits(String(amount)).toString(),
+								// 		provider,
+								// 	)
+								// 		.then(() => {
+								// 			setWorking(false)
+								// 			toast(usdvredeemed)
+								// 		})
+								// 		.catch(err => {
+								// 			setWorking(false)
+								// 			if(err.code === -32016) {
+								// 				console.log('Insufficient balance: Your account balance is insufficient.')
+								// 				toast(insufficientBalance)
+								// 			}
+								// 			else if(err.code === 4001) {
+								// 				console.log('Transaction rejected: Your have decided to reject the transaction..')
+								// 				toast(rejected)
+								// 			}
+								// 			else {
+								// 				console.log('Error code is:' + err.code)
+								// 				console.log('Error:' + err)
+								// 				toast(failed)
+								// 			}
+								// 		})
 								}
 							}
 							else {

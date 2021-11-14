@@ -236,7 +236,6 @@ export const TokenSelector = (props) => {
 		)
 			.then(data => {
 				setTokenListCombined(data)
-				console.log(data)
 			})
 			.catch(err => {
 				setTokenListCombined(false)

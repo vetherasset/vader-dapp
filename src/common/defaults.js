@@ -30,8 +30,19 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	1,
 )
 
+defaults.network.tx = {}
+defaults.network.tx.confirmations = 1
+
+defaults.network.erc20 = {}
+defaults.network.erc20.maxApproval = '302503999000000000299700000'
+
 defaults.api = {}
 defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+defaults.api.etherscanUrl = (
+	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
+		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+			undefined
+)
 
 defaults.layout = {}
 
@@ -67,7 +78,17 @@ defaults.address.vether = (
 )
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x8e7A48fC00cF9541392FB820628Ca730b6badf3e' :
+		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+			undefined
+)
+defaults.address.pool = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
+			undefined
+)
+defaults.address.router = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
 defaults.address.pool = (
@@ -84,6 +105,19 @@ defaults.address.router = (
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
+
+defaults.nativeAsset = {
+	'chainId':3,
+	'address': (
+		defaults.network.chainId === 1 ? undefined :
+			defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+				undefined
+	),
+	'name':'USDV',
+	'symbol':'USDV',
+	'decimals':18,
+	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+}
 
 defaults.tokenDefault = {
 	'chainId': defaults.network.chainId,
@@ -109,7 +143,7 @@ defaults.redeemables = [
 ]
 
 defaults.vader = {}
-defaults.vader.conversionRate = 1000
+defaults.vader.conversionRate = 10000
 defaults.swap = {}
 defaults.swap.slippage = 0.5
 defaults.swap.minSlippage = 0.05

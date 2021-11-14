@@ -1,7 +1,6 @@
 import { ethers } from 'ethers'
 import BigNumber from 'bignumber.js'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
-import vaderAbi from '../artifacts/abi/vader'
 import converterAbi from '../artifacts/abi/converter'
 import poolAbi from '../artifacts/abi/vaderPoolV2'
 import routerAbi from '../artifacts/abi/vaderRouter'
@@ -25,15 +24,24 @@ const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provide
 		console.log(e)
 		return false
 	}
-}
 
-const convertVaderToUsdv = async (amount, provider) => {
+const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.vader,
-		vaderAbi,
+		defaults.address.router,
+		routerAbi,
 		provider.getSigner(0),
 	)
-	return await contract.convertToUSDV(amount)
+	// eslint-disable-next-line quotes
+	return await contract["addLiquidity(address,address,uint256,uint256,address,uint256)"](tokenA, tokenB, amountAdesired, amountBDesired, to, deadline)
+}
+
+const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
+	const contract = new ethers.Contract(
+		tokenAddress,
+		humanStandardTokenAbi,
+		provider.getSigner(0),
+	)
+	return await contract.approve(spenderAddress, amount)
 }
 
 const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, provider) => {
@@ -64,15 +72,6 @@ const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 		provider,
 	)
 	return await contract.balanceOf(address)
-}
-
-const redeemToVADER = async (amountUsdv, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.vader,
-		vaderAbi,
-		provider.getSigner(0),
-	)
-	return await contract.redeemToVADER(amountUsdv)
 }
 
 const resolveUnknownERC20 = async (tokenAddress, provider) => {
@@ -309,9 +308,9 @@ const tokenHasPool = async (address, provider) => {
 
 export {
 	MAX_UINT256,
-	approveERC20ToSpend, getERC20BalanceOf, redeemToVADER, resolveUnknownERC20,
-	estimateGasCost, getERC20Allowance, convertVaderToUsdv,
+	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
+	estimateGasCost, getERC20Allowance, convertVetherToVader,
 	convertVetherToVader, getSwapEstimate, getSwapRate, getSwapFee,
 	getUSDVburnRate, isAddressLiquidityProvider,
-	tokenHasPool, swapForAsset, setERC20Allowance,
+	tokenHasPool, swapForAsset, setERC20Allowance, addLiquidity,
 }

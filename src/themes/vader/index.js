@@ -14,6 +14,7 @@ import link from './link'
 import { extendTheme } from '@chakra-ui/react'
 import spinner from './spinner'
 import modal from './modal'
+import tag from './tag'
 
 const overrides = {
 	config: {
@@ -73,6 +74,7 @@ const overrides = {
 		Spinner: spinner,
 		Modal: modal,
 		Switch: switchComp,
+		Tag: tag,
 	},
 	layerStyles: {
 		opaque: {
