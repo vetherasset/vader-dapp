@@ -20,7 +20,6 @@ import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 import { prettifyNumber } from '../common/utils'
 
 const Stake = props => {
-
 	const wallet = useWallet()
 	const [accessApproved, setAccessApproved] = useState(false)
 	const [vdrBalance, setVdrBalance] = useState(0)
@@ -28,7 +27,6 @@ const Stake = props => {
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakeApy, setStakeApy] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
-
 	const stakedNow = `
 		@keyframes colorAnimation {
 			0% { color: white; }
@@ -53,7 +51,7 @@ const Stake = props => {
 		if (wallet.account) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
-				defaults.address.fakeVader,
+				defaults.address.vader,
 				wallet.account,
 				defaults.address.xvader,
 				provider,
@@ -68,7 +66,7 @@ const Stake = props => {
 	useEffect(() => {
 		if (wallet.account) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(defaults.address.fakeVader, wallet.account, provider)
+			getERC20BalanceOf(defaults.address.vader, wallet.account, provider)
 				.then(data => {
 					setVdrBalance(+ethers.utils.formatEther(data))
 				})
@@ -631,7 +629,7 @@ const UnstakePanel = props => {
 
 	const approveAccess = async provider => {
 		return approveERC20ToSpend(
-			defaults.address.fakeVader,
+			defaults.address.vader,
 			defaults.address.xvader,
 			'0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
 			provider,
