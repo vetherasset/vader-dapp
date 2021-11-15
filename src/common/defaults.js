@@ -112,7 +112,7 @@ defaults.address.stakingContracts = {
 		defaults.network.chainId === 1 ? '' :
 			defaults.network.chainId === 42 ? '' :
 				undefined
-	)
+	),
 }
 
 defaults.tokenList = {}

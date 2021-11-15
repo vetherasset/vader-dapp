@@ -151,11 +151,11 @@ const lpTokenStaking = (token, provider) => async () => {
 		xVaderAbi,
 		provider.getSigner(0),
 	)
-	const balanceOf = (address) => contract.balanceOf(address);
-	const stake = (amount) => contract.stake(amount);
-	const withdraw = (amount) => contract.withdraw(amount);
-	const earned = (address) => contract.earned(address);
-	const claim = () => contract.getReward();
+	const balanceOf = (address) => contract.balanceOf(address)
+	const stake = (amount) => contract.stake(amount)
+	const withdraw = (amount) => contract.withdraw(amount)
+	const earned = (address) => contract.earned(address)
+	const claim = () => contract.getReward()
 
 	return {
 		balanceOf,
