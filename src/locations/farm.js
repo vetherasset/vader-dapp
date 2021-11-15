@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import {
 	Box, Button, Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel, NumberInput, NumberInputField,
-	InputGroup, InputRightElement, useToast, Image, Container, Heading, Badge, Link,
+	InputGroup, InputRightElement, Image, Container, Heading, Badge, Link,
 	Accordion,
 	AccordionItem,
 	AccordionButton,
@@ -11,8 +10,6 @@ import {
 } from '@chakra-ui/react'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import defaults from '../common/defaults'
-import { useWallet } from 'use-wallet'
-import { ethers } from 'ethers'
 
 const Farm = props => {
 	return (
@@ -77,7 +74,7 @@ const Farm = props => {
 		</Box>
 	)
 }
-const LPStaking = props => {
+const LPStaking = () => {
 	return (
 		<>
 			<Tabs isFitted colorScheme='bluish'>
@@ -128,7 +125,7 @@ const LPStaking = props => {
 	)
 }
 
-const DetailSection = (props) => {
+const DetailSection = () => {
 	return (
 		<>
 			<Flex>
@@ -200,10 +197,10 @@ const DetailSection = (props) => {
 	)
 }
 
-const StakePanel = (props) => {
+const StakePanel = () => {
 	const tokenSelect = defaults.stakeable[0]
 	const amount = '100'
-	const handleChange = () => {}
+	const handleChange = () => { console.log('handling')}
 	return (
 		<>
 			<Flex
@@ -307,10 +304,10 @@ const StakePanel = (props) => {
 	)
 }
 
-const UnstakePanel = props => {
+const UnstakePanel = () => {
 	const tokenSelect = defaults.stakeable[0]
 	const amount = '100'
-	const handleChange = () => { }
+	const handleChange = () => { console.log('handling') }
 	return (
 		<>
 			<Flex
@@ -414,10 +411,10 @@ const UnstakePanel = props => {
 	)
 }
 
-const ClaimPanel = props => {
+const ClaimPanel = () => {
 	const tokenSelect = defaults.stakeable[0]
 	const amount = '100'
-	const handleChange = () => {}
+	const handleChange = () => { console.log('handling') }
 	return (
 		<>
 			<Flex
