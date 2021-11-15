@@ -71,6 +71,7 @@ defaults.layout.container.sm.width = '768px'
 
 defaults.toast = {}
 defaults.toast.duration = 5000
+defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
 
@@ -98,11 +99,6 @@ defaults.address.pool = (
 defaults.address.router = (
 	defaults.network.chainId === 1 ? '' :
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
-			undefined
-)
-defaults.address.fakeVader = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xb0c3f757b1a62701835fb4e9175e9589ed5687fe' :
 			undefined
 )
 defaults.address.xvader = (
