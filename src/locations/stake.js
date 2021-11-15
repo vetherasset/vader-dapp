@@ -17,16 +17,17 @@ import {
 import { getXVaderPrice, getXVaderApy } from '../common/calculation'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokeValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
-import { prettifyNumber } from '../common/utils'
+import { prettifyNumber, getPercentage } from '../common/utils'
 
 const Stake = props => {
 	const wallet = useWallet()
 	const [accessApproved, setAccessApproved] = useState(false)
-	const [vdrBalance, setVdrBalance] = useState(0)
+	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrBalance, setXvdrBalance] = useState(0)
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakeApy, setStakeApy] = useState(0)
+	const [stakingApy, setStakingApy] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
+
 	const stakedNow = `
 		@keyframes colorAnimation {
 			0% { color: white; }
@@ -39,13 +40,14 @@ const Stake = props => {
 		getXVaderPrice().then(price => {
 			setXvdrExchangeRate(Number(price))
 		})
-	}, [refreshDataToken])
+	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApy().then(apy => {
-			setStakeApy(Number(apy))
-		})
-	}, [refreshDataToken])
+		getXVaderApy()
+			.then((apy) => {
+				setStakingApy(Number(apy))
+			})
+	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -57,6 +59,7 @@ const Stake = props => {
 				provider,
 			)
 				.then(data => {
+					console.log(data.gt(0))
 					setAccessApproved(data.gt(0))
 				})
 				.catch(console.error)
@@ -68,7 +71,7 @@ const Stake = props => {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(defaults.address.vader, wallet.account, provider)
 				.then(data => {
-					setVdrBalance(+ethers.utils.formatEther(data))
+					setToken0balance(data)
 				})
 				.catch(console.error)
 		}
@@ -117,24 +120,26 @@ const Stake = props => {
 									colorScheme='accent'
 								>7 DAYS APY</Badge>
 							</Box>
-							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-						2159%
-							</Box>
+							{stakingApy >= 0 &&
+								<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+									{getPercentage(stakingApy)}
+								</Box>
+							}
 						</Container>
 
-						{xvdrExchangeRate > 0 &&
-							<Container p='0'>
-								<Box textAlign='left'>
-									<Badge
-										fontSize='1rem'
-										colorScheme='accent'
-									>1 xVADER RATE</Badge>
-								</Box>
-								<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-									{prettifyNumber(xvdrExchangeRate, 0, 5)}
-								</Box>
-							</Container>
-						}
+						<Container p='0'>
+							<Box textAlign='left'>
+								<Badge
+									fontSize='1rem'
+									colorScheme='accent'
+								>1 xVADER RATE</Badge>
+							</Box>
+							{xvdrExchangeRate > 0 &&
+									<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+										{prettifyNumber(xvdrExchangeRate, 0, 5)}
+									</Box>
+							}
+						</Container>
 					</Flex>
 
 					{/* <Flex>
@@ -280,7 +285,7 @@ const Stake = props => {
 								<StakePanel
 									exchangeRate={xvdrExchangeRate}
 									accessApproved={accessApproved}
-									balance={vdrBalance}
+									balance={token0balance}
 									refreshData={setRefreshDataToken}
 								/>
 							</TabPanel>
@@ -321,13 +326,14 @@ const StakePanel = (props) => {
 	StakePanel.propTypes = {
 		exchangeRate: PropTypes.number.isRequired,
 		accessApproved: PropTypes.bool.isRequired,
-		balance: PropTypes.number.isRequired,
+		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
 
 	const wallet = useWallet()
 	const toast = useToast()
-	const [amount, setAmount] = useState(0)
+	const [value, setValue] = useState(0)
+	const [inputAmount, setInputAmount] = useState('')
 	const [token0] = useState(defaults.stakeable[0])
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [token0balance, setToken0balance] = useState(0)
@@ -346,7 +352,7 @@ const StakePanel = (props) => {
 				setWorking(true)
 				approveERC20ToSpend(
 					token0.address,
-					defaults.address.pool,
+					defaults.address.xvader,
 					defaults.network.erc20.maxApproval,
 					provider,
 				).then((tx) => {
@@ -378,12 +384,12 @@ const StakePanel = (props) => {
 						}
 					})
 			}
-			else if ((amount > 0)) {
-				if ((token0balance.gte(amount))) {
+			else if ((value > 0)) {
+				if ((token0balance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					stakeVader(
-						amount,
+						value,
 						provider)
 						.then((tx) => {
 							tx.wait(
@@ -428,10 +434,6 @@ const StakePanel = (props) => {
 		}
 	}
 
-	const setMaxAmount = () => {
-		setAmount(props.balance)
-	}
-
 	useEffect(() => {
 		if(wallet.account && token0) {
 			setWorking(true)
@@ -443,7 +445,6 @@ const StakePanel = (props) => {
 				provider,
 			).then((n) => {
 				setWorking(false)
-				console.log(n)
 				if(n.gt(0))	setToken0Approved(true)
 			})
 		}
@@ -485,11 +486,13 @@ const StakePanel = (props) => {
 						<NumberInput
 							variant='transparent'
 							flex='1'
-							min={Number(String('0.').padEnd((token0.decimals - 1), '0') + '1')}
+							min={Number('0.'.concat(String('').padEnd((token0.decimals - 1), '0') + '1'))}
+							value={inputAmount}
 							onChange={(n) => {
+								setInputAmount(n)
 								if(Number(n) > 0) {
 									try {
-										setAmount(ethers.utils.parseUnits(String(n), token0.decimals))
+										setValue(ethers.utils.parseUnits(String(n), token0.decimals))
 									}
 									catch(e) {
 										if (e.code === 'NUMERIC_FAULT') {
@@ -538,28 +541,48 @@ const StakePanel = (props) => {
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={setMaxAmount}>
+						onClick={() => {
+							setInputAmount(ethers.utils.formatUnits(props.balance, token0.decimals))
+						}}>
 							MAX
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={setMaxAmount}>
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(
+									props.balance.div(100).mul(25),
+									token0.decimals),
+							)
+						}}>
 							25%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={setMaxAmount}>
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(
+									props.balance.div(100).mul(50),
+									token0.decimals),
+							)
+						}}>
 							50%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={setMaxAmount}>
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(
+									props.balance.div(100).mul(75),
+									token0.decimals),
+							)
+						}}>
 							75%
 					</Button>
 				</Flex>

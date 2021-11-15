@@ -71,7 +71,7 @@ defaults.toast.position = 'top'
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742' :
+		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
 			undefined
 )
 defaults.address.vether = (
@@ -96,7 +96,7 @@ defaults.address.router = (
 )
 defaults.address.xvader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x42980De4BF7926448ec75812955eB2762F067c30' :
+		defaults.network.chainId === 42 ? '0x8238Fd02096e408E60767F06DE1bB0B3934C5a8A' :
 			undefined
 )
 
