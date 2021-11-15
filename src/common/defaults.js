@@ -68,17 +68,27 @@ defaults.toast.position = 'top'
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x1E6F42f04D64D55ec08d6D4e6A7CB4a235E1c742' :
+		defaults.network.chainId === 42 ? '0x4ad25191285440992981B5B840F164b026bCE2A8' :
 			undefined
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x438f70ab08ab3f74833c439643c3fc1939ce2929' :
+		defaults.network.chainId === 42 ? '0x2393409067d2F2e4Ce072aB17e2D55B7f4f36303' :
 			undefined
 )
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
 		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+			undefined
+)
+defaults.address.pool = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
+			undefined
+)
+defaults.address.router = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
 defaults.address.pool = (
@@ -110,12 +120,14 @@ defaults.nativeAsset = {
 }
 
 defaults.tokenDefault = {
-	'chainId':3,
-	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-	'name':'USDC',
-	'symbol':'USDC',
-	'decimals':6,
-	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'chainId': defaults.network.chainId,
+	'address': defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5cb12086536a26eec18e' :
+			undefined,
+	'name': 'USDV',
+	'symbol': 'USDV',
+	'decimals': 18,
+	'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
 }
 
 defaults.redeemables = [
@@ -132,5 +144,14 @@ defaults.redeemables = [
 
 defaults.vader = {}
 defaults.vader.conversionRate = 10000
+defaults.swap = {}
+defaults.swap.slippage = 0.5
+defaults.swap.minSlippage = 0.05
+defaults.swap.maxSlippage = 1
+defaults.swap.deadline = 30
+defaults.swap.minDeadline = 1
+defaults.swap.maxDeadline = 180
+
+defaults.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
 
 export default defaults
