@@ -152,7 +152,7 @@ defaults.stakeable = [
 defaults.unstakeable = [
 	{
 		'chainId':defaults.network.chainId,
-		'address':defaults.address.vader,
+		'address':defaults.address.xvader,
 		'name':'xVADER',
 		'symbol':'xVADER',
 		'decimals':18,
