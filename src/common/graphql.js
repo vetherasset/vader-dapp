@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import defaults from './defaults'
 
 const client = new ApolloClient({
-	uri: defaults.api.graphUrl2,
+	uri: defaults.api.graphUrl,
 	cache: new InMemoryCache(),
 })
 

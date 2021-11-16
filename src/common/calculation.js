@@ -1,5 +1,5 @@
-import axios from 'axios'
 import BN from 'bignumber.js'
+import EthDater from 'ethereum-block-by-date'
 import { getXVaderPriceByBlock } from './graphql'
 import { getStartOfTheDayTimeStamp, getCompoundApy } from './utils'
 import defaults from './defaults'
@@ -7,19 +7,22 @@ import defaults from './defaults'
 const getXVaderPrice = () => getXVaderPriceByBlock()
 
 const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
+	const dater = new EthDater(defaults.network.provider)
 	const SECOND_IN_A_DAY = 86400
 	const startOfDayTs = getStartOfTheDayTimeStamp()
 	const sevenDaysAgoTs = startOfDayTs - SECOND_IN_A_DAY * numberOfDays
-	const url = `${defaults.api.etherscanApiUrl}/api
-		?module=block
-		&action=getblocknobytime
-		&timestamp=${sevenDaysAgoTs}
-		&closest=before
-		&apikey=${defaults.api.etherscanApiKey}
-	`
+	const timestampInMs = sevenDaysAgoTs * 1000
+	const cachedHits = localStorage.getItem('BLOCK_NUMBER_BY_TIMESTAMP')
+	if (cachedHits) {
+		const data = JSON.parse(cachedHits)
+		if (data.timestamp === timestampInMs) {
+			return data.block
+		}
+	}
 	try {
-		const response = await axios.get(url)
-		return response && response.data && response.data.result
+		const response = await dater.getDate(timestampInMs, true)
+		localStorage.setItem('BLOCK_NUMBER_BY_TIMESTAMP', JSON.stringify(response))
+		return response && response.block
 	}
 	catch (err) {
 		console.log('getBlockNumberPriorDaysAgo', err)
