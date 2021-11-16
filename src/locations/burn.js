@@ -224,15 +224,15 @@ const Burn = (props) => {
 			<Flex
 				w='100%'
 				maxW='49ch'
-				minH='478.65px'
 				m='0 auto'
-				p={{ base: '2rem 0.6rem', md: '2rem 2.6rem' }}
+				minH={{ base: 'auto', md: '478.65px' }}
+				p={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
 				layerStyle='colorful'
 				flexDir='column'
 			>
 				<Text
 					align='center'
-					fontSize={{ base: '1.15rem', md: '1.55rem' }}
+					fontSize={{ base: '1.25rem', md: '1.55rem' }}
 					fontWeight='bolder'
 				>
             Asset redemption
