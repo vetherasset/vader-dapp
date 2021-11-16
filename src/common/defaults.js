@@ -89,21 +89,21 @@ defaults.vader = {}
 defaults.vader.conversionRate = 10000
 
 defaults.nativeAsset = {
-	'chainId':3,
+	'chainId':defaults.network.chainId,
 	'address':defaults.address.usdv,
 	'name':'USDV',
 	'symbol':'USDV',
 	'decimals':18,
-	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
 }
 
 defaults.tokenDefault = {
-	'chainId':3,
-	'address':'0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-	'name':'USDC',
-	'symbol':'USDC',
-	'decimals':6,
-	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.usdv,
+	'name':'USDV',
+	'symbol':'USDV',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
 }
 
 defaults.redeemables = [
@@ -113,7 +113,7 @@ defaults.redeemables = [
 		'name':'VETHER',
 		'symbol':'VETH',
 		'decimals':18,
-		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
 	},
 ]
@@ -125,7 +125,7 @@ defaults.stakeable = [
 		'name':'VADER',
 		'symbol':'VADER',
 		'decimals':18,
-		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
 	},
 ]
 
@@ -136,7 +136,7 @@ defaults.unstakeable = [
 		'name':'xVADER',
 		'symbol':'xVADER',
 		'decimals':18,
-		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
 	},
 ]
 
