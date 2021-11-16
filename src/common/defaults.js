@@ -44,30 +44,6 @@ defaults.api.etherscanUrl = (
 			undefined
 )
 
-defaults.layout = {}
-
-defaults.layout.header = {}
-defaults.layout.header.width = '100%'
-defaults.layout.header.padding = '1.2rem 1rem'
-defaults.layout.header.minHeight = '98.4px'
-
-defaults.layout.container = {}
-defaults.layout.container.xl = {}
-defaults.layout.container.xl.width = '75rem'
-defaults.layout.container.lg = {}
-defaults.layout.container.lg.width = '65rem'
-defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
-defaults.layout.container.md = {}
-defaults.layout.container.md.width = '840px'
-defaults.layout.container.sm = {}
-defaults.layout.container.sm.width = '768px'
-
-defaults.toast = {}
-defaults.toast.duration = 5000
-defaults.toast.txHashDuration = 8000
-defaults.toast.closable = true
-defaults.toast.position = 'top'
-
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '' :
@@ -79,6 +55,16 @@ defaults.address.vether = (
 		defaults.network.chainId === 42 ? '0x438f70ab08ab3f74833c439643c3fc1939ce2929' :
 			undefined
 )
+defaults.address.xvader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x8238Fd02096e408E60767F06DE1bB0B3934C5a8A' :
+			undefined
+)
+defaults.address.usdv = (
+	defaults.network.chainId === 1 ? undefined :
+		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+			undefined
+),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
 		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
@@ -94,23 +80,17 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
-defaults.address.xvader = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x8238Fd02096e408E60767F06DE1bB0B3934C5a8A' :
-			undefined
-)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
 
+defaults.vader = {}
+defaults.vader.conversionRate = 10000
+
 defaults.nativeAsset = {
 	'chainId':3,
-	'address': (
-		defaults.network.chainId === 1 ? undefined :
-			defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
-				undefined
-	),
+	'address':defaults.address.usdv,
 	'name':'USDV',
 	'symbol':'USDV',
 	'decimals':18,
@@ -160,7 +140,27 @@ defaults.unstakeable = [
 	},
 ]
 
-defaults.vader = {}
-defaults.vader.conversionRate = 10000
+defaults.layout = {}
+defaults.layout.header = {}
+defaults.layout.header.width = '100%'
+defaults.layout.header.padding = '1.2rem 1rem'
+defaults.layout.header.minHeight = '98.4px'
+
+defaults.layout.container = {}
+defaults.layout.container.xl = {}
+defaults.layout.container.xl.width = '75rem'
+defaults.layout.container.lg = {}
+defaults.layout.container.lg.width = '65rem'
+defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
+defaults.layout.container.md = {}
+defaults.layout.container.md.width = '840px'
+defaults.layout.container.sm = {}
+defaults.layout.container.sm.width = '768px'
+
+defaults.toast = {}
+defaults.toast.duration = 5000
+defaults.toast.txHashDuration = 8000
+defaults.toast.closable = true
+defaults.toast.position = 'top'
 
 export default defaults
