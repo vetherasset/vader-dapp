@@ -89,15 +89,20 @@ const Stake = (props) => {
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
-			<Flex>
+			<Flex
+				pb={{ base: '6rem', md: '0' }}
+				flexDir={{ base: 'column', md: 'row' }}
+			>
 				<Flex
 					flexDir='column'
 					w='100%'
-					paddingRight='2rem'
-					paddingTop='2.33rem'
+					paddingRight={{ base: '0', md: '2rem' }}
+					paddingTop={{ base: '0', md: '2.33rem' }}
 					justifyContent='flex-start'
 				>
-					<Flex>
+					<Flex
+						marginBottom={{ base: '1.2rem', md: '0' }}
+					>
 						<Container mb='23px' p='0'>
 							<>
 								<Heading as='h1' size='md'>EARN ADDITIONAL VADER.</Heading>
@@ -110,7 +115,7 @@ const Stake = (props) => {
 
 					<Flex>
 						<Container p='0'>
-							<Box textAlign='left'>
+							<Box textAlign={{ base: 'center', md: 'left' }}>
 								<Badge
 									fontSize='1rem'
 									colorScheme='accent'
@@ -122,14 +127,14 @@ const Stake = (props) => {
 									lineHeight='1.2'
 									fontWeight='normal'
 									mb='23px'
-									textAlign='left'>
+									textAlign={{ base: 'center', md: 'left' }}>
 									{getPercentage(stakingApy)}
 								</Box>
 							}
 						</Container>
 
 						<Container p='0'>
-							<Box textAlign='left'>
+							<Box textAlign={{ base: 'center', md: 'left' }}>
 								<Badge
 									fontSize='1rem'
 									colorScheme='accent'
@@ -141,7 +146,7 @@ const Stake = (props) => {
 										lineHeight='1.2'
 										fontWeight='normal'
 										mb='23px'
-										textAlign='left'>
+										textAlign={{ base: 'center', md: 'left' }}>
 										{prettifyNumber(xvdrExchangeRate, 0, 5)}
 									</Box>
 							}
@@ -156,6 +161,7 @@ const Stake = (props) => {
 								<Heading
 									as='h2'
 									size='sm'
+									textAlign={{ base: 'center', md: 'left' }}
 									animation='5s ease-in-out infinite colorAnimation'
 									transition='all 0.3s ease 0s'>
 										YOU&#39;RE STAKING NOW
@@ -178,8 +184,11 @@ const Stake = (props) => {
 						<>
 							<Flex mb='0.354rem'>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										<Flex
+											justifyContent={{ base: 'center', md: '' }}
 											fontWeight='bolder'>
 											<Image
 												width='23px'
@@ -214,8 +223,10 @@ const Stake = (props) => {
 						<>
 							<Flex>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}>
 										<Flex
+											justifyContent={{ base: 'center', md: '' }}
 											fontWeight='bolder'>
 											<Image
 												width='23px'
@@ -249,9 +260,9 @@ const Stake = (props) => {
 				</Flex>
 
 				<Flex
-					w='77.777%'
+					w={{ base: '100%', md: '77%' }}
 					minH='478.65px'
-					m='0 auto'
+					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
 					p='0 0 2rem'
 					layerStyle='colorful'
 					flexDir='column'
@@ -276,7 +287,7 @@ const Stake = (props) => {
 							</Tab>
 						</TabList>
 						<TabPanels
-							p='0 2.6rem'
+							p={{ base: '0 0.9rem', md: '0 2.6rem' }}
 						>
 							<TabPanel p='0'>
 								<StakePanel
@@ -455,8 +466,16 @@ const StakePanel = (props) => {
 				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text as='h4'>
+					<Text
+						as='h4'
+						fontSize={{ base: '1rem', md: '1.24rem' }}
+						fontWeight='bolder'>
+							Amount
+					</Text>
+					<Text
+						as='h4'
+						fontSize={{ base: '0.8rem', md: '1rem' }}
+					>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
@@ -761,8 +780,15 @@ const UnstakePanel = (props) => {
 				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text as='h4'>
+					<Text
+						as='h4'
+						fontSize={{ base: '1rem', md: '1.24rem' }}
+						fontWeight='bolder'>
+							Amount
+					</Text>
+					<Text
+						fontSize={{ base: '0.8rem', md: '1rem' }}
+						as='h4'>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
