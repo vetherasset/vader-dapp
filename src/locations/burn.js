@@ -218,7 +218,7 @@ const Burn = (props) => {
 			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
-			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
+			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Flex
