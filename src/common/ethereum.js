@@ -4,6 +4,7 @@ import converterAbi from '../artifacts/abi/converter'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
+import lpStakingAbi from '../artifacts/abi/lpStaking'
 
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
@@ -145,10 +146,10 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
-const lpTokenStaking = (token, provider) => async () => {
+const lpTokenStaking = (contractAddress, provider) => async () => {
 	const contract = new ethers.Contract(
-		defaults.address.stakingContracts[token],
-		xVaderAbi,
+		contractAddress,
+		lpStakingAbi,
 		provider.getSigner(0),
 	)
 	const balanceOf = (address) => contract.balanceOf(address)

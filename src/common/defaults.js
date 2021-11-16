@@ -81,14 +81,6 @@ defaults.address.router = (
 			undefined
 )
 
-defaults.address.stakingContracts = {
-	'USDV-3CRV': (
-		defaults.network.chainId === 1 ? '' :
-			defaults.network.chainId === 42 ? '' :
-				undefined
-	),
-}
-
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
@@ -145,6 +137,33 @@ defaults.unstakeable = [
 		'symbol':'xVADER',
 		'decimals':18,
 		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	},
+]
+
+defaults.lpStakingTokens = [
+	{
+		'tokenContractAddress': '0xfd87ba583bd2071713fb5cb12086536a26eec18e',
+		'tokenDecimal': 18,
+		'externalLink': 'https://curve.fi/3pool',
+		'externalText': 'From Curve',
+		'stakingContractAddress': '0xfd87ba583bd2071713fb5cb12086536a26eec18e',
+		'rewardToken': {
+			'symbol': 'VADER',
+			'decimal': 18,
+			'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		},
+		'pairTokens': [
+			{
+				'name': 'USDV',
+				'symbol': 'USDV',
+				'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			},
+			{
+				'name': '3CRV',
+				'symbol': '3CRV',
+				'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+			},
+		],
 	},
 ]
 
