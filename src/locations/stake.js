@@ -198,14 +198,11 @@ const Stake = (props) => {
 										textAlign={{ base: 'center', md: 'left' }}
 									>
 										<Flex
-											justifyContent={{ base: 'center', md: '' }}
+											justifyContent={{ base: 'center', md: 'flex-start' }}
 											fontWeight='bolder'>
 											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
+												width='24px'
+												height='24px'
 												mr='10px'
 												src={defaults.unstakeable[0].logoURI}
 											/>
@@ -236,14 +233,11 @@ const Stake = (props) => {
 									<Box
 										textAlign={{ base: 'center', md: 'left' }}>
 										<Flex
-											justifyContent={{ base: 'center', md: '' }}
+											justifyContent={{ base: 'center', md: 'flex-start' }}
 											fontWeight='bolder'>
 											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
+												width='24px'
+												height='24px'
 												mr='10px'
 												src={defaults.stakeable[0].logoURI}
 											/>
