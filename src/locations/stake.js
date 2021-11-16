@@ -105,9 +105,19 @@ const Stake = (props) => {
 					>
 						<Container mb='23px' p='0'>
 							<>
-								<Heading as='h1' size='md'>EARN ADDITIONAL VADER.</Heading>
-								<Box as='p' mb='0.65rem'>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
-								<Box as='p'><b>xVADER</b> is fully composable that can interact with other protocols and you&lsquo;ll receive voting rights with your <i>xVADER</i>.
+								<Heading
+									as='h1'
+									size='md'
+									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
+								<Box
+									as='p'
+									mb='0.65rem'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
+								>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
+								<Box
+									as='p'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
+								><b>xVADER</b> is fully composable that can interact with other protocols and&nbsp;you&lsquo;ll receive voting rights with your <i>xVADER</i>.
 									Your <i>xVADER</i> will continuously compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.</Box>
 							</>
 						</Container>
@@ -117,13 +127,13 @@ const Stake = (props) => {
 						<Container p='0'>
 							<Box textAlign={{ base: 'center', md: 'left' }}>
 								<Badge
-									fontSize='1rem'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
 									colorScheme='accent'
 								>7 DAYS APY</Badge>
 							</Box>
 							{stakingApy >= 0 &&
 								<Box
-									fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+									fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
 									lineHeight='1.2'
 									fontWeight='normal'
 									mb='23px'
@@ -136,13 +146,13 @@ const Stake = (props) => {
 						<Container p='0'>
 							<Box textAlign={{ base: 'center', md: 'left' }}>
 								<Badge
-									fontSize='1rem'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
 									colorScheme='accent'
 								>1 xVADER RATE</Badge>
 							</Box>
 							{xvdrExchangeRate > 0 &&
 									<Box
-										fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
 										lineHeight='1.2'
 										fontWeight='normal'
 										mb='23px'
