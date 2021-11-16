@@ -8,17 +8,22 @@ import {
 	Input,
 	Image,
 	List,
+	Link,
+	Spinner,
 	ListItem,
 	useToast,
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 // import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { convertVetherToVader } from '../common/ethereum'
+import { getERC20Allowance, convertVetherToVader, approveERC20ToSpend, getERC20BalanceOf } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
-	tokenValueTooSmall } from '../messages'
+	tokenValueTooSmall,
+	noToken0,
+	approved,
+	exception } from '../messages'
 
 const Burn = (props) => {
 
@@ -27,6 +32,8 @@ const Burn = (props) => {
 	const toast = useToast()
 	const [showTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[0])
+	const [tokenApproved, setTokenApproved] = useState(false)
+	const [tokenBalance, setTokenBalance] = useState(ethers.BigNumber.from('0'))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
@@ -65,6 +72,100 @@ const Burn = (props) => {
 		</>
 	}
 
+	const submit = () => {
+		if(!working) {
+			if(!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else if (!tokenSelect) {
+				toast(noToken0)
+			}
+			else if (tokenSelect && !tokenApproved) {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+				setWorking(true)
+				approveERC20ToSpend(
+					tokenSelect.address,
+					defaults.address.xvader,
+					defaults.network.erc20.maxApproval,
+					provider,
+				).then((tx) => {
+					tx.wait(defaults.network.tx.confirmations)
+						.then(() => {
+							setWorking(false)
+							setTokenApproved(true)
+							toast(approved)
+						})
+						.catch(e => {
+							setWorking(false)
+							if (e.code === 4001) toast(rejected)
+							if (e.code === -32016) toast(exception)
+						})
+				})
+					.catch(err => {
+						setWorking(false)
+						if(err.code === 'INSUFFICIENT_FUNDS') {
+							console.log('Insufficient balance: Your account balance is insufficient.')
+							toast(insufficientBalance)
+						}
+						else if(err.code === 4001) {
+							console.log('Transaction rejected: Your have decided to reject the transaction..')
+							toast(rejected)
+						}
+						else {
+							console.log(err)
+							toast(failed)
+						}
+					})
+			}
+			else if ((value > 0)) {
+				if ((tokenBalance.gte(value))) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					setWorking(true)
+					if (tokenSelect.symbol === 'VETH') {
+						convertVetherToVader(
+							value,
+							provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setWorking(false)
+									toast({
+										...vethupgraded,
+										description: <Link
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+										duration: defaults.toast.txHashDuration,
+									})
+								})
+							})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
+				}
+				else {
+					toast(insufficientBalance)
+				}
+			}
+			else {
+				toast(noAmount)
+			}
+		}
+	}
+
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
 			setConversionFactor(
@@ -73,6 +174,44 @@ const Burn = (props) => {
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect])
+
+	useEffect(() => {
+		if(wallet.account && tokenSelect) {
+			setWorking(true)
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20Allowance(
+				tokenSelect.address,
+				wallet.account,
+				defaults.address.xvader,
+				provider,
+			).then((n) => {
+				setWorking(false)
+				if(n.gt(0))	setTokenApproved(true)
+			})
+		}
+		return () => {
+			setWorking(true)
+			setTokenApproved(false)
+		}
+	}, [wallet.account, tokenSelect])
+
+	useEffect(() => {
+		if (wallet.account && tokenSelect) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(
+				tokenSelect.address,
+				wallet.account,
+				provider,
+			)
+				.then(data => {
+					setTokenBalance(data)
+				})
+				.catch(console.error)
+		}
+		return () => setTokenBalance(ethers.BigNumber.from('0'))
+	}, [wallet.account, tokenSelect])
+
+	console.log(tokenBalance)
 
 	return (
 		<Box
@@ -202,107 +341,37 @@ const Burn = (props) => {
 					size='lg'
 					minWidth='230px'
 					textTransform='uppercase'
-					loadingText='Submitting'
-					isLoading={working}
-					onClick={() => {
-						if(wallet.account) {
-							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-							setWorking(true)
-							if (value > 0) {
-								if (tokenSelect.symbol === 'VETH') {
-									convertVetherToVader(
-										ethers.utils.parseUnits(String(value)).toString(),
-										provider,
-									)
-										.then(() => {
-											setWorking(false)
-											toast(vethupgraded)
-										})
-										.catch(err => {
-											setWorking(false)
-											if(err.code === -32016) {
-												console.log('Insufficient balance: Your account balance is insufficient.')
-												toast(insufficientBalance)
-											}
-											else if(err.code === 4001) {
-												console.log('Transaction rejected: Your have decided to reject the transaction..')
-												toast(rejected)
-											}
-											else {
-												console.log('Error code is:' + err.code)
-												console.log('Error:' + err)
-												toast(failed)
-											}
-										})
-								}
-								if (tokenSelect.symbol === 'VADER') {
-									// This call is DEPRECATED
-									//
-									// convertVaderToUsdv(
-									// 	ethers.utils.parseUnits(String(amount)).toString(),
-									// 	provider,
-									// )
-									// 	.then(() => {
-									// 		setWorking(false)
-									// 		toast(vaderconverted)
-									// 	})
-									// 	.catch(err => {
-									// 		setWorking(false)
-									// 		if(err.code === -32016) {
-									// 			console.log('Insufficient balance: Your account balance is insufficient.')
-									// 			toast(insufficientBalance)
-									// 		}
-									// 		else if(err.code === 4001) {
-									// 			console.log('Transaction rejected: Your have decided to reject the transaction..')
-									// 			toast(rejected)
-									// 		}
-									// 		else {
-									// 			console.log('Error code is:' + err.code)
-									// 			console.log('Error:' + err)
-									// 			toast(failed)
-									// 		}
-									// 	})
-								}
-								if (tokenSelect.symbol === 'USDV') {
-								// This call is DEPRECATED
-								//
-								// 	redeemToVADER(
-								// 		ethers.utils.parseUnits(String(amount)).toString(),
-								// 		provider,
-								// 	)
-								// 		.then(() => {
-								// 			setWorking(false)
-								// 			toast(usdvredeemed)
-								// 		})
-								// 		.catch(err => {
-								// 			setWorking(false)
-								// 			if(err.code === -32016) {
-								// 				console.log('Insufficient balance: Your account balance is insufficient.')
-								// 				toast(insufficientBalance)
-								// 			}
-								// 			else if(err.code === 4001) {
-								// 				console.log('Transaction rejected: Your have decided to reject the transaction..')
-								// 				toast(rejected)
-								// 			}
-								// 			else {
-								// 				console.log('Error code is:' + err.code)
-								// 				console.log('Error:' + err)
-								// 				toast(failed)
-								// 			}
-								// 		})
-								}
-							}
-							else {
-								setWorking(false)
-								toast(noAmount)
-							}
-						}
-						else {
-							toast(walletNotConnected)
-						}
-					}}
+					disabled={working}
+					onClick={() => submit()}
 				>
-					Burn
+					{wallet.account &&
+								<>
+									{!working &&
+										<>
+											{tokenSelect && !tokenApproved &&
+												<>
+													Approve {tokenSelect.symbol}
+												</>
+											}
+											{tokenSelect && tokenApproved &&
+												<>
+													Burn
+												</>
+											}
+										</>
+									}
+									{working &&
+										<>
+											<Spinner />
+										</>
+									}
+								</>
+					}
+					{!wallet.account &&
+								<>
+									Burn
+								</>
+					}
 				</Button>
 			</Flex>
 		</Box>
