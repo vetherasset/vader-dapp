@@ -184,13 +184,19 @@ const Stake = (props) => {
 								<Heading
 									as='h2'
 									size='sm'
+									textAlign={{ base: 'center', md: 'left' }}
 								>
 										YOUR BALANCE
 								</Heading>
 							</>
 					}
 
-					{token1balance.gt(0) &&
+					{((token1balance.gt(0)) || (token0balance.gt(0))) &&
+						<Flex
+							flexDir='column'
+							marginBottom='2.33rem'
+						>
+							{token1balance.gt(0) &&
 						<>
 							<Flex mb='0.354rem'>
 								<Container p='0'>
@@ -211,7 +217,9 @@ const Stake = (props) => {
 									</Box>
 								</Container>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										{token1balance.gt(0) &&
 											prettifyNumber(
 												ethers.utils.formatUnits(
@@ -225,8 +233,8 @@ const Stake = (props) => {
 								</Container>
 							</Flex>
 						</>
-					}
-					{token0balance.gt(0) &&
+							}
+							{token0balance.gt(0) &&
 						<>
 							<Flex>
 								<Container p='0'>
@@ -238,7 +246,7 @@ const Stake = (props) => {
 											<Image
 												width='24px'
 												height='24px'
-												mr='10px'
+												mr='20px'
 												src={defaults.stakeable[0].logoURI}
 											/>
 												VADER
@@ -246,7 +254,9 @@ const Stake = (props) => {
 									</Box>
 								</Container>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										{token0balance.gt(0) &&
 											prettifyNumber(
 												ethers.utils.formatUnits(
@@ -260,7 +270,11 @@ const Stake = (props) => {
 								</Container>
 							</Flex>
 						</>
+							}
+						</Flex>
+
 					}
+
 				</Flex>
 
 				<Flex
