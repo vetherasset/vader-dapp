@@ -235,7 +235,7 @@ const Burn = (props) => {
 					fontSize={{ base: '1.25rem', md: '1.55rem' }}
 					fontWeight='bolder'
 				>
-            Asset redemption
+            Acquire assets
 				</Text>
 				<Text
 					align='center'
@@ -243,13 +243,13 @@ const Burn = (props) => {
 					display='block'
 					mb='2rem'
 				>
-            Redeem assets by burning your tokens.
+            Burn tokens to obtain assets.
 				</Text>
 				<Text
 					as='h4'
 					fontSize={{ base: '1rem', md: '1.23rem' }}
 					fontWeight='bolder'>
-						Asset amount to burn
+						Amount to burn
 				</Text>
 				<Flex layerStyle='inputLike'>
 					<Box flex='1' pr='0.5rem'>

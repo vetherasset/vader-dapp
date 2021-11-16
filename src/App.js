@@ -28,7 +28,7 @@ const App = () => {
 						<Route path='/' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
 						}/>
-						<Route path='/redeem' exact render={() =>
+						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
 						}/>
 						<Route path='/stake' exact render={() =>
