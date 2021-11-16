@@ -16,7 +16,7 @@ import {
 } from '../common/ethereum'
 import { getXVaderPrice, getXVaderApy } from '../common/calculation'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
-	unstaked, tokeValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
+	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
 
 const Stake = (props) => {
@@ -53,21 +53,6 @@ const Stake = (props) => {
 		if (wallet.account) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(
-				defaults.address.vader,
-				wallet.account,
-				provider,
-			)
-				.then(data => {
-					setToken0balance(data)
-				})
-				.catch(console.error)
-		}
-	}, [wallet.account, refreshDataToken])
-
-	useEffect(() => {
-		if (wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(
 				defaults.address.xvader,
 				wallet.account,
 				provider,
@@ -77,6 +62,23 @@ const Stake = (props) => {
 				})
 				.catch(console.error)
 		}
+		return () => setToken1balance(ethers.BigNumber.from('0'))
+	}, [wallet.account, refreshDataToken])
+
+	useEffect(() => {
+		if (wallet.account) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20BalanceOf(
+				defaults.address.vader,
+				wallet.account,
+				provider,
+			)
+				.then(data => {
+					setToken0balance(data)
+				})
+				.catch(console.error)
+		}
+		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	return (
@@ -92,14 +94,17 @@ const Stake = (props) => {
 					flexDir='column'
 					w='100%'
 					paddingRight='2rem'
-					justifyContent='center'
+					paddingTop='2.33rem'
+					justifyContent='flex-start'
 				>
 					<Flex>
 						<Container mb='23px' p='0'>
-							<Heading as='h1' size='md'>EARN ADDITIONAL VADER.</Heading>
-							<Box as='p' mb='0.65rem'>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
-							<Box as='p'><b>xVADER</b> is fully composable that can interact with other protocols and you&lsquo;ll receive voting rights with your <i>xVADER</i>.
-							Your <i>xVADER</i> will continuously compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.</Box>
+							<>
+								<Heading as='h1' size='md'>EARN ADDITIONAL VADER.</Heading>
+								<Box as='p' mb='0.65rem'>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
+								<Box as='p'><b>xVADER</b> is fully composable that can interact with other protocols and you&lsquo;ll receive voting rights with your <i>xVADER</i>.
+									Your <i>xVADER</i> will continuously compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.</Box>
+							</>
 						</Container>
 					</Flex>
 
@@ -112,7 +117,12 @@ const Stake = (props) => {
 								>7 DAYS APY</Badge>
 							</Box>
 							{stakingApy >= 0 &&
-								<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+								<Box
+									fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+									lineHeight='1.2'
+									fontWeight='normal'
+									mb='23px'
+									textAlign='left'>
 									{getPercentage(stakingApy)}
 								</Box>
 							}
@@ -126,122 +136,118 @@ const Stake = (props) => {
 								>1 xVADER RATE</Badge>
 							</Box>
 							{xvdrExchangeRate > 0 &&
-									<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
+									<Box
+										fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+										lineHeight='1.2'
+										fontWeight='normal'
+										mb='23px'
+										textAlign='left'>
 										{prettifyNumber(xvdrExchangeRate, 0, 5)}
 									</Box>
 							}
 						</Container>
 					</Flex>
 
-					{/* <Flex>
-						<Container mb='17px' p='0'>
-							<style>
-								{stakedNow}
-							</style>
-							<Heading
-								as='h1'
-								size='md'
-								animation='5s ease-in-out infinite colorAnimation'
-								transition='all 0.3s ease 0s'>
-									YOU&#39;RE STAKED NOW.
-							</Heading>
-						</Container>
-					</Flex>
+					{token1balance.gt(0) &&
+							<>
+								<style>
+									{stakedNow}
+								</style>
+								<Heading
+									as='h2'
+									size='sm'
+									animation='5s ease-in-out infinite colorAnimation'
+									transition='all 0.3s ease 0s'>
+										YOU&#39;RE STAKING NOW
+								</Heading>
+							</>
+					}
 
-					<Flex mb='0.6rem'>
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Badge
-									fontSize='1rem'
-									colorScheme='accent'
-								>7 DAYS APY</Badge>
-							</Box>
-							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-						2159%
-							</Box>
-						</Container>
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Badge
-									fontSize='1rem'
-									colorScheme='accent'
-								>1 xVADER RATE</Badge>
-							</Box>
-							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-						1 VADER
-							</Box>
-						</Container>
-					</Flex>
+					{((token0balance.gt(0)) && (!token1balance.gt(0))) &&
+							<>
+								<Heading
+									as='h2'
+									size='sm'
+								>
+										YOUR BALANCE
+								</Heading>
+							</>
+					}
 
-					<Flex>
-						<Container p='0'>
-							<Text
-								as='h4'
-								fontSize='1.24rem'
-								fontWeight='bolder'>
-							Asset
-							</Text>
-						</Container>
-						<Container p='0'>
-							<Text
-								as='h4'
-								fontSize='1.24rem'
-								fontWeight='bolder'>
-							Balance
-							</Text>
-						</Container>
-					</Flex>
-
-					<Flex mb='1rem'>
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Flex
-									fontWeight='bolder'>
-									<Image
-										width='23px'
-										height='23px'
-										borderRadius='50%'
-										objectFit='none'
-										background='#fff'
-										mr='10px'
-										src='https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627'
-									/>
-								VADER
-								</Flex>
-							</Box>
-						</Container>
-						<Container p='0'>
-							<Box textAlign='left'>
-								1000
-							</Box>
-						</Container>
-					</Flex>
-
-					<Flex>
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Flex
-									fontWeight='bolder'>
-									<Image
-										width='23px'
-										height='23px'
-										borderRadius='50%'
-										objectFit='none'
-										background='#fff'
-										mr='10px'
-										src='https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627'
-									/>
-								xVADER
-								</Flex>
-							</Box>
-						</Container>
-						<Container p='0'>
-							<Box textAlign='left'>
-								85589
-							</Box>
-						</Container>
-					</Flex> */}
+					{token1balance.gt(0) &&
+						<>
+							<Flex mb='0.354rem'>
+								<Container p='0'>
+									<Box textAlign='left'>
+										<Flex
+											fontWeight='bolder'>
+											<Image
+												width='23px'
+												height='23px'
+												borderRadius='50%'
+												objectFit='none'
+												background='#fff'
+												mr='10px'
+												src={defaults.unstakeable[0].logoURI}
+											/>
+												xVADER
+										</Flex>
+									</Box>
+								</Container>
+								<Container p='0'>
+									<Box textAlign='left'>
+										{token1balance.gt(0) &&
+											prettifyNumber(
+												ethers.utils.formatUnits(
+													token1balance,
+													defaults.unstakeable[0].decimals,
+												),
+												0,
+												5)
+										}
+									</Box>
+								</Container>
+							</Flex>
+						</>
+					}
+					{token0balance.gt(0) &&
+						<>
+							<Flex>
+								<Container p='0'>
+									<Box textAlign='left'>
+										<Flex
+											fontWeight='bolder'>
+											<Image
+												width='23px'
+												height='23px'
+												borderRadius='50%'
+												objectFit='none'
+												background='#fff'
+												mr='10px'
+												src={defaults.stakeable[0].logoURI}
+											/>
+												VADER
+										</Flex>
+									</Box>
+								</Container>
+								<Container p='0'>
+									<Box textAlign='left'>
+										{token0balance.gt(0) &&
+											prettifyNumber(
+												ethers.utils.formatUnits(
+													token0balance,
+													defaults.stakeable[0].decimals,
+												),
+												0,
+												5)
+										}
+									</Box>
+								</Container>
+							</Flex>
+						</>
+					}
 				</Flex>
+
 				<Flex
 					w='77.777%'
 					minH='478.65px'
@@ -325,7 +331,6 @@ const StakePanel = (props) => {
 	const [inputAmount, setInputAmount] = useState('')
 	const [token0] = useState(defaults.stakeable[0])
 	const [token0Approved, setToken0Approved] = useState(false)
-	const [token0balance, setToken0balance] = useState(0)
 	const [working, setWorking] = useState(false)
 
 	const submit = () => {
@@ -374,7 +379,7 @@ const StakePanel = (props) => {
 					})
 			}
 			else if ((value > 0)) {
-				if ((token0balance.gte(value))) {
+				if ((props.balance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					stakeVader(
@@ -444,20 +449,6 @@ const StakePanel = (props) => {
 		}
 	}, [wallet.account, token0])
 
-	useEffect(() => {
-		if (wallet.account && token0) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(
-				token0.address,
-				wallet.account,
-				provider,
-			).then((b) => {
-				setToken0balance(b)
-			})
-		}
-		return () => setToken0balance(0)
-	}, [wallet.account, token0, working])
-
 	return (
 		<>
 			<Flex
@@ -492,7 +483,7 @@ const StakePanel = (props) => {
 										}
 										catch(err) {
 											if (err.code === 'NUMERIC_FAULT') {
-												toast(tokeValueTooSmall)
+												toast(tokenValueTooSmall)
 											}
 										}
 									}
@@ -537,7 +528,10 @@ const StakePanel = (props) => {
 						size='sm'
 						mr='0.4rem'
 						onClick={() => {
-							setInputAmount(ethers.utils.formatUnits(props.balance, token0.decimals))
+							setInputAmount(
+								ethers.utils.formatUnits(props.balance, token0.decimals),
+							)
+							setValue(props.balance)
 						}}>
 							MAX
 					</Button>
@@ -551,6 +545,7 @@ const StakePanel = (props) => {
 									props.balance.div(100).mul(25),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(25))
 						}}>
 							25%
 					</Button>
@@ -564,6 +559,7 @@ const StakePanel = (props) => {
 									props.balance.div(100).mul(50),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(50))
 						}}>
 							50%
 					</Button>
@@ -577,6 +573,7 @@ const StakePanel = (props) => {
 									props.balance.div(100).mul(75),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(75))
 						}}>
 							75%
 					</Button>
@@ -640,7 +637,6 @@ const UnstakePanel = (props) => {
 	const [inputAmount, setInputAmount] = useState('')
 	const [token0] = useState(defaults.unstakeable[0])
 	const [token0Approved, setToken0Approved] = useState(false)
-	const [token0balance, setToken0balance] = useState(0)
 	const [working, setWorking] = useState(false)
 
 	const submit = () => {
@@ -689,7 +685,7 @@ const UnstakePanel = (props) => {
 					})
 			}
 			else if ((value > 0)) {
-				if ((token0balance.gte(value))) {
+				if ((props.balance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					unstakeVader(
@@ -759,20 +755,6 @@ const UnstakePanel = (props) => {
 		}
 	}, [wallet.account, token0])
 
-	useEffect(() => {
-		if (wallet.account && token0) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getERC20BalanceOf(
-				token0.address,
-				wallet.account,
-				provider,
-			).then((b) => {
-				setToken0balance(b)
-			})
-		}
-		return () => setToken0balance(0)
-	}, [wallet.account, token0, working])
-
 	return (
 		<>
 			<Flex
@@ -807,7 +789,7 @@ const UnstakePanel = (props) => {
 										}
 										catch(err) {
 											if (err.code === 'NUMERIC_FAULT') {
-												toast(tokeValueTooSmall)
+												toast(tokenValueTooSmall)
 											}
 										}
 									}
@@ -852,7 +834,10 @@ const UnstakePanel = (props) => {
 						size='sm'
 						mr='0.4rem'
 						onClick={() => {
-							setInputAmount(ethers.utils.formatUnits(props.balance, token0.decimals))
+							setInputAmount(
+								ethers.utils.formatUnits(props.balance, token0.decimals),
+							)
+							setValue(props.balance)
 						}}>
 							MAX
 					</Button>
@@ -866,6 +851,7 @@ const UnstakePanel = (props) => {
 									props.balance.div(100).mul(25),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(25))
 						}}>
 							25%
 					</Button>
@@ -879,6 +865,7 @@ const UnstakePanel = (props) => {
 									props.balance.div(100).mul(50),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(50))
 						}}>
 							50%
 					</Button>
@@ -892,6 +879,7 @@ const UnstakePanel = (props) => {
 									props.balance.div(100).mul(75),
 									token0.decimals),
 							)
+							setValue(props.balance.div(100).mul(75))
 						}}>
 							75%
 					</Button>
