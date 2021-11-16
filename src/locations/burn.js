@@ -5,8 +5,7 @@ import {
 	Flex,
 	Text,
 	Button,
-	NumberInput,
-	NumberInputField,
+	Input,
 	Image,
 	List,
 	ListItem,
@@ -14,19 +13,22 @@ import {
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+// import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { convertVetherToVader } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
-import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount } from '../messages'
+import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
+	tokenValueTooSmall } from '../messages'
 
 const Burn = (props) => {
+
 	const tokens = defaults.redeemables
 	const wallet = useWallet()
 	const toast = useToast()
-	const [showTokenList, setShowTokenList] = useState(false)
+	const [showTokenList] = useState(false)
 	const [tokenSelect, setTokenSelect] = useState(tokens[0])
-	const [amount, setAmount] = useState(0)
+	const [inputAmount, setInputAmount] = useState('')
+	const [value, setValue] = useState(0)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
 	const [working, setWorking] = useState(false)
 
@@ -50,10 +52,17 @@ const Burn = (props) => {
 	}
 
 	const DrawAmount = () => {
-		if (tokenSelect.symbol === 'VETH' && amount >= 1000001) {
+		if (tokenSelect.symbol === 'VETH' && Number(inputAmount) >= 1000001) {
 			return <>👻👻👻</>
 	 	}
-		return <>{prettifyCurrency(amount * conversionFactor.toNumber(), 0, 5, tokenSelect.convertsTo)}</>
+		return <>
+			{prettifyCurrency(
+				Number(inputAmount) * Number(conversionFactor),
+				0,
+				5,
+				tokenSelect.convertsTo,
+			)}
+		</>
 	}
 
 	useEffect(() => {
@@ -91,27 +100,43 @@ const Burn = (props) => {
 				<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Asset amount to burn</Text>
 				<Flex layerStyle='inputLike'>
 					<Box flex='1' pr='0.5rem'>
-						<NumberInput
-						  min={0}
-							variant='transparent'
-							value={amount}
-							clampValueOnBlur={false}
-							onChange={(n) => {
-								if(Number(n) >= 0) {
-									setAmount(n)
+						<Input
+						  variant='transparent'
+							flex='1'
+							fontSize='1.3rem'
+							fontWeight='bold'
+							placeholder='0.0'
+							value={inputAmount}
+							onChange={(e) => {
+								if (isNaN(e.target.value)) {
+									setInputAmount(prev => prev)
 								}
 								else {
-									setAmount(0)
+									setInputAmount(String(e.target.value))
+									if(Number(e.target.value) > 0) {
+										try {
+											setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+										}
+										catch(err) {
+											if (err.code === 'NUMERIC_FAULT') {
+												toast(tokenValueTooSmall)
+											}
+										}
+									}
 								}
-							}}>
-							<NumberInputField placeholder='0.0' border='none' fontSize='1.3rem' />
-						</NumberInput>
+							}}/>
 					</Box>
 					<Flex
+						background='rgba(255, 255, 255, 0.16)'
+						borderRadius='0.375rem'
+						border='1px solid rgba(255, 255, 255, 0.04)'
+						paddingInlineStart='0.5rem'
+						paddingInlineEnd='0.5rem'
 						position='relative'
-						cursor='pointer'
+						cursor='default'
 						zIndex='1'
-						onClick={() => setShowTokenList(!showTokenList)}>
+						// onClick={() => setShowTokenList(!showTokenList)}
+					>
 						<Box d='flex' alignItems='center'>
 							<Image
 								width='24px'
@@ -125,7 +150,7 @@ const Burn = (props) => {
 								fontSize='1.02rem'
 								fontWeight='bold'
 								textTransform='capitalize'>{tokenSelect.symbol}</Box>
-							{!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />}
+							{/* {!showTokenList ? <TriangleDownIcon ml={1} /> : <TriangleUpIcon ml={1} />} */}
 						</Box>
 						<Box {...(showTokenList ? ShowList : HiddenList)}
 							layerStyle='opaque'
@@ -183,10 +208,10 @@ const Burn = (props) => {
 						if(wallet.account) {
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
-							if (amount > 0) {
+							if (value > 0) {
 								if (tokenSelect.symbol === 'VETH') {
 									convertVetherToVader(
-										ethers.utils.parseUnits(String(amount)).toString(),
+										ethers.utils.parseUnits(String(value)).toString(),
 										provider,
 									)
 										.then(() => {
