@@ -263,33 +263,6 @@ const getSwapFee = async (inputAmount, from, to, provider) => {
 	return numerator.div(denominator)
 }
 
-const getUSDVburnRate = async (provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-
-	return ethers.BigNumber.from(await contract.getVADERAmount(1))
-}
-
-const isAddressLiquidityProvider = async (address, poolAddress, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.pools,
-		provider,
-	)
-
-	return ethers.BigNumber.from(await contract.getMemberUnits(poolAddress, address)).gt(0)
-}
-
-const tokenHasPool = async (address, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider,
-	)
-
-	return await contract.isPool(address)
-}
-
 const stakeVader = async (amount, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.xvader,
