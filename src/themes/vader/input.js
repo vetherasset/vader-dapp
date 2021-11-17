@@ -1,5 +1,30 @@
 export default {
 	variants: {
+		transparent: () => ({
+			field: {
+				color: '#fff',
+				_placeholder: {
+					color: '#fff',
+					fontWeight: '400',
+				},
+				paddingInlineStart: '0',
+				paddingInlineEnd: '0',
+				background: 'transparent',
+				_disabled: {
+					opacity: '0.1',
+				},
+				_hover: {
+					background: 'transparent',
+				},
+				_focus: {
+					border: 'none',
+					background: 'transparent',
+				},
+				InputRightAddon: {
+					background: 'red',
+				},
+			},
+		}),
 		filled: () => ({
 			field: {
 				borderRadius: '0.8rem',

@@ -5,6 +5,7 @@ import converterAbi from '../artifacts/abi/converter'
 import poolAbi from '../artifacts/abi/vaderPoolV2'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
+import xVaderAbi from '../artifacts/abi/xvader'
 
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
 
@@ -289,11 +290,29 @@ const tokenHasPool = async (address, provider) => {
 	return await contract.isPool(address)
 }
 
+const stakeVader = async (amount, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.xvader,
+		xVaderAbi,
+		provider.getSigner(0),
+	)
+	return await contract.enter(amount)
+}
+
+const unstakeVader = async (shares, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.xvader,
+		xVaderAbi,
+		provider.getSigner(0),
+	)
+	return await contract.leave(shares)
+}
+
 export {
 	MAX_UINT256,
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
-	estimateGasCost, getERC20Allowance, convertVetherToVader,
-	getSwapEstimate, getSwapRate, getSwapFee,
-	getUSDVburnRate, isAddressLiquidityProvider,
-	tokenHasPool, swapForAsset, setERC20Allowance, addLiquidity,
+	estimateGasCost, getERC20Allowance,
+	convertVetherToVader, getSwapRate, getSwapFee,
+	stakeVader, unstakeVader,
+	swapForAsset, addLiquidity,
 }

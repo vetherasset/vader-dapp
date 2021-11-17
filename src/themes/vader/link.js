@@ -1,5 +1,11 @@
 export default {
 	baseStyle: {
+		borderBottom: '1px solid #fff0',
+		_hover: {
+			textDecoration: 'none',
+			borderBottom: '1px solid #3fa3fa',
+			color: '#3fa3fa',
+		},
 		_focus: {
 			boxShadow: '0 0 0 3px #7b7ce0',
 		},

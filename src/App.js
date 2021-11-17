@@ -4,13 +4,11 @@ import { ChakraProvider, Box } from '@chakra-ui/react'
 import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
-import Swap from './locations/swap'
-import Pool from './locations/pool'
-import Deposit from './locations/deposit'
 import Burn from './locations/burn'
+import Stake from './locations/stake'
 import defaults from './common/defaults'
+import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
-import PositionOverview from './components/PositionOverview'
 
 const App = () => {
 
@@ -29,30 +27,34 @@ const App = () => {
 						zIndex='2'/>
 					<Switch>
 						<Route path='/' exact render={() =>
-							<Swap position='relative' zIndex='1'/>
-						}/>
-						<Route path='/burn' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
 						}/>
-						<Route path='/pool' exact render={() =>
-							<Pool position='relative' zIndex='1'/>
+						<Route path='/acquire' exact render={() =>
+							<Burn position='relative' zIndex='1'/>
 						}/>
-						<Route path='/pool/position/:foreignAsset/:id' exact render={() =>
-							<PositionOverview position='relative' zIndex='1'/>
-						}/>
-						<Route path='/pool/deposit' exact render={() =>
-							<Deposit position='relative' zIndex='1'/>
-						}/>
-						<Route path='/pool/deposit/:tokenAddress' exact render={() =>
-							<Deposit position='relative' zIndex='1'/>
-						}/>
-						<Route path='/pool/deposit/:tokenAddressA/:tokenAddressB' exact render={() =>
-							<Deposit position='relative' zIndex='1'/>
+						<Route path='/stake' exact render={() =>
+							<Stake position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
 						} />
 					</Switch>
+					<Footer
+						width='auto'
+						height='10vh'
+						maxWidth={defaults.layout.container.sm.width}
+						m='0 auto'
+						opacity='0.8'
+						position='relative'
+						zIndex='1'
+						justifyContent='space-between'
+						alignContent='center'
+						flexWrap='wrap'
+						padding='0rem 2rem 3rem'
+						style={{
+							gap: '0 2rem',
+						}}
+					/>
 					<Wave
 						width='100%'
 						height='777.65665px'
@@ -77,7 +79,10 @@ const App = () => {
 
 const maskTransform = () => {
 	const location = useLocation()
-	if(location.pathname.includes('pool')) {
+	if(
+		location.pathname.includes('pool') ||
+		location.pathname.includes('stake')
+	) {
 		return {
 			base: 'scaleX(1.5)',
 			md: 'scaleX(1.4)',

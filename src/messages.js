@@ -118,7 +118,7 @@ const noToken0 = {
 	position: defaults.toast.position,
 }
 
-const tokeValueTooSmall = {
+const tokenValueTooSmall = {
 	title: 'Token amount is too small',
 	description: 'The amount you specified is too small.',
 	status: 'warning',
@@ -136,8 +136,27 @@ const positionOpened = {
 	position: defaults.toast.position,
 }
 
+const staked = {
+	title: 'VADER tokens staked',
+	description: 'Your VADER tokens have been staked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const unstaked = {
+	title: 'xVADER tokens unstaked',
+	description: 'Your xVADER tokens have been unstaked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, swapped, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
-	noAmount, noToken0, tokeValueTooSmall, positionOpened, exception,
+	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
+	staked, unstaked,
 }

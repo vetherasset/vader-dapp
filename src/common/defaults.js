@@ -44,31 +44,10 @@ defaults.api.etherscanUrl = (
 			undefined
 )
 
-defaults.layout = {}
-
-defaults.layout.header = {}
-defaults.layout.header.width = '100%'
-defaults.layout.header.padding = '1.2rem 1rem'
-defaults.layout.header.minHeight = '98.4px'
-
-defaults.layout.container = {}
-defaults.layout.container.lg = {}
-defaults.layout.container.lg.width = '75rem'
-defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
-defaults.layout.container.md = {}
-defaults.layout.container.md.width = '840px'
-defaults.layout.container.sm = {}
-defaults.layout.container.sm.width = '768px'
-
-defaults.toast = {}
-defaults.toast.duration = 5000
-defaults.toast.closable = true
-defaults.toast.position = 'top'
-
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x4ad25191285440992981B5B840F164b026bCE2A8' :
+		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
 			undefined
 )
 defaults.address.vether = (
@@ -76,6 +55,16 @@ defaults.address.vether = (
 		defaults.network.chainId === 42 ? '0x2393409067d2F2e4Ce072aB17e2D55B7f4f36303' :
 			undefined
 )
+defaults.address.xvader = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x8238Fd02096e408E60767F06DE1bB0B3934C5a8A' :
+			undefined
+)
+defaults.address.usdv = (
+	defaults.network.chainId === 1 ? undefined :
+		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+			undefined
+),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
 		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
@@ -106,28 +95,25 @@ defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
 defaults.tokenList.sources = tokenListSources
 
+defaults.vader = {}
+defaults.vader.conversionRate = 10000
+
 defaults.nativeAsset = {
-	'chainId':3,
-	'address': (
-		defaults.network.chainId === 1 ? undefined :
-			defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
-				undefined
-	),
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.usdv,
 	'name':'USDV',
 	'symbol':'USDV',
 	'decimals':18,
-	'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
 }
 
 defaults.tokenDefault = {
-	'chainId': defaults.network.chainId,
-	'address': defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5cb12086536a26eec18e' :
-			undefined,
-	'name': 'USDV',
-	'symbol': 'USDV',
-	'decimals': 18,
-	'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.usdv,
+	'name':'USDV',
+	'symbol':'USDV',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
 }
 
 defaults.redeemables = [
@@ -137,21 +123,54 @@ defaults.redeemables = [
 		'name':'VETHER',
 		'symbol':'VETH',
 		'decimals':18,
-		'logoURI':'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
 	},
 ]
 
-defaults.vader = {}
-defaults.vader.conversionRate = 10000
-defaults.swap = {}
-defaults.swap.slippage = 0.5
-defaults.swap.minSlippage = 0.05
-defaults.swap.maxSlippage = 1
-defaults.swap.deadline = 30
-defaults.swap.minDeadline = 1
-defaults.swap.maxDeadline = 180
+defaults.stakeable = [
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.vader,
+		'name':'VADER',
+		'symbol':'VADER',
+		'decimals':18,
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+	},
+]
 
-defaults.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+defaults.unstakeable = [
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.xvader,
+		'name':'xVADER',
+		'symbol':'xVADER',
+		'decimals':18,
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+	},
+]
+
+defaults.layout = {}
+defaults.layout.header = {}
+defaults.layout.header.width = '100%'
+defaults.layout.header.padding = '1.2rem 1rem'
+defaults.layout.header.minHeight = '98.4px'
+
+defaults.layout.container = {}
+defaults.layout.container.xl = {}
+defaults.layout.container.xl.width = '75rem'
+defaults.layout.container.lg = {}
+defaults.layout.container.lg.width = '65rem'
+defaults.layout.container.lg.padding = { base: '0 1.25rem', md: '0 2.5rem' }
+defaults.layout.container.md = {}
+defaults.layout.container.md.width = '840px'
+defaults.layout.container.sm = {}
+defaults.layout.container.sm.width = '768px'
+
+defaults.toast = {}
+defaults.toast.duration = 5000
+defaults.toast.txHashDuration = 8000
+defaults.toast.closable = true
+defaults.toast.position = 'top'
 
 export default defaults

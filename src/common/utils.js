@@ -1,5 +1,6 @@
 import getTokenList from 'get-token-list'
 import defaults from './defaults'
+import BN from 'bignumber.js'
 
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
@@ -163,8 +164,25 @@ const getTokenByAddress = async (address) => {
 	return tokenObj
 }
 
+const getStartOfTheDayTimeStamp = () => {
+	const today = new Date()
+	const dd = String(today.getUTCDate()).padStart(2, '0')
+	const mm = String(today.getUTCMonth() + 1).padStart(2, '0')
+	const yyyy = today.getUTCFullYear()
+	const currentDate = `${yyyy}-${mm}-${dd}`
+	return Math.floor(new Date(currentDate).getTime() / 1000)
+}
+
+const getCompoundApy = (roi, days) => (
+	roi ?
+		BN(roi).div(days).plus(1).pow(365)
+			.minus(1)
+			.toFixed(8) :
+		null
+)
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
-	getTokenByAddress,
+	getTokenByAddress, getStartOfTheDayTimeStamp, getCompoundApy,
 }
