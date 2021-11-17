@@ -142,11 +142,11 @@ defaults.unstakeable = [
 
 defaults.lpStakingTokens = [
 	{
-		'tokenContractAddress': '0xfd87ba583bd2071713fb5cb12086536a26eec18e',
+		'tokenContractAddress': '0x683a38985c36de7009d25375adec237ee46f603c',
 		'tokenDecimal': 18,
 		'externalLink': 'https://curve.fi/3pool',
 		'externalText': 'From Curve',
-		'stakingContractAddress': '0xfd87ba583bd2071713fb5cb12086536a26eec18e',
+		'stakingContractAddress': '0x53f7e88aAE1879B9Fc166979A836Ae4427ca22e5',
 		'rewardToken': {
 			'symbol': 'VADER',
 			'decimal': 18,

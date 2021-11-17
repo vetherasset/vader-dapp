@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import {
-	Box, Button, Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel, NumberInput, NumberInputField,
-	InputGroup, InputRightElement, Image, Container, Heading, Badge, Link,
+	Box, Button, Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
+	InputGroup, Image, Container, Heading, Badge, Link, useToast, Spinner,
+	Input, InputRightAddon,
 	Accordion,
 	AccordionItem,
 	AccordionButton,
@@ -12,9 +13,13 @@ import {
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { lpTokenStaking, getERC20BalanceOf } from '../common/ethereum'
+import { getERC20Allowance, approveERC20ToSpend, lpTokenStaking, getERC20BalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
 import { prettifyNumber } from '../common/utils'
+import {
+	approved, rejected, failed, walletNotConnected, noAmount, lpTokenStaked,
+	lpTokenUnstaked, tokenValueTooSmall, exception, insufficientBalance,
+} from '../messages'
 
 const getLPToken = (pairTokens) => pairTokens.map(tk => tk.symbol).join('-')
 
@@ -55,7 +60,7 @@ const LPStakingItem = (props) => {
 	const [availableTokenBalance, setAvailableTokenBalance] = useState(ethers.BigNumber.from('0'))
 	const [stakingTokenBalance, setStakingTokenBalance] = useState(ethers.BigNumber.from('0'))
 	const [rewardTokenBalance, setRewardTokenBalance] = useState(ethers.BigNumber.from('0'))
-	const [refreshDataToken] = useState(Date.now())
+	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	useEffect(() => {
 		if (isExpanded && wallet.account) {
@@ -141,7 +146,13 @@ const LPStakingItem = (props) => {
 						paddingRight='2rem'
 						justifyContent='center'
 					>
-						<DetailSection token={token}></DetailSection>
+						<DetailSection
+							token={token}
+							availableTokenBalance={availableTokenBalance}
+							stakingTokenBalance={stakingTokenBalance}
+							rewardTokenBalance={rewardTokenBalance}
+							setRefreshDataToken={setRefreshDataToken}
+						></DetailSection>
 					</Flex>
 					<Flex
 						w='77.777%'
@@ -156,6 +167,7 @@ const LPStakingItem = (props) => {
 							stakingTokenBalance={stakingTokenBalance}
 							rewardTokenBalance={rewardTokenBalance}
 							token={token}
+							setRefreshDataToken={setRefreshDataToken}
 						></StakingSection>
 					</Flex>
 				</Flex>
@@ -169,6 +181,7 @@ const StakingSection = (props) => {
 		stakingTokenBalance: PropTypes.object.isRequired,
 		rewardTokenBalance: PropTypes.object.isRequired,
 		token: PropTypes.object.isRequired,
+		setRefreshDataToken: PropTypes.func,
 	}
 	return (
 		<>
@@ -206,18 +219,21 @@ const StakingSection = (props) => {
 						<StakePanel
 							availableTokenBalance={props.availableTokenBalance}
 							token={props.token}
+							refreshData={props.setRefreshDataToken}
 						/>
 					</TabPanel>
 					<TabPanel p='0'>
 						<UnstakePanel
 							stakingTokenBalance={props.stakingTokenBalance}
 							token={props.token}
+							refreshData={props.setRefreshDataToken}
 						/>
 					</TabPanel>
 					<TabPanel p='0'>
 						<ClaimPanel
 							rewardTokenBalance={props.rewardTokenBalance}
 							token={props.token}
+							refreshData={props.setRefreshDataToken}
 						/>
 					</TabPanel>
 				</TabPanels>
@@ -276,6 +292,9 @@ const LPTokenIconAndSymbol = (props) => {
 const DetailSection = (props) => {
 	DetailSection.propTypes = {
 		token: PropTypes.object.isRequired,
+		availableTokenBalance: PropTypes.object.isRequired,
+		stakingTokenBalance: PropTypes.object.isRequired,
+		rewardTokenBalance: PropTypes.object.isRequired,
 	}
 	const lpToken = props.token.pairTokens.map(tk => tk.symbol).join('-')
 	const rewardToken = props.token.rewardToken
@@ -301,7 +320,7 @@ const DetailSection = (props) => {
 						>APY</Badge>
 					</Box>
 					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-						159%
+						--
 					</Box>
 				</Container>
 				<Container p='0'>
@@ -328,7 +347,19 @@ const DetailSection = (props) => {
 				</Container>
 				<Container p='0'>
 					<Box textAlign='left'>
-						<Box float='left'>10000</Box>
+						<Box float='left'>
+							{
+								props.availableTokenBalance.gt(0) ?
+									prettifyNumber(
+										ethers.utils.formatUnits(
+											props.availableTokenBalance,
+											props.token.tokenDecimal,
+										),
+										0,
+										5) :
+									0
+							}
+						</Box>
 						<LPTokenIconAndSymbol
 							float='left'
 							logoURI1={props.token.pairTokens[0].logoURI}
@@ -343,7 +374,19 @@ const DetailSection = (props) => {
 					TOTAL STAKED
 				</Container>
 				<Container p='0'>
-					<Box float='left'>20000</Box>
+					<Box float='left'>
+						{
+							props.stakingTokenBalance.gt(0) ?
+								prettifyNumber(
+									ethers.utils.formatUnits(
+										props.stakingTokenBalance,
+										props.token.tokenDecimal,
+									),
+									0,
+									5) :
+								0
+						}
+					</Box>
 					<LPTokenIconAndSymbol
 						float='left'
 						logoURI1={props.token.pairTokens[0].logoURI}
@@ -358,7 +401,19 @@ const DetailSection = (props) => {
 				</Container>
 				<Container p='0'>
 					<Box>
-						<Box float='left'>100</Box>
+						<Box float='left'>
+							{
+								props.rewardTokenBalance.gt(0) ?
+									prettifyNumber(
+										ethers.utils.formatUnits(
+											props.rewardTokenBalance,
+											props.token.rewardToken.decimal,
+										),
+										0,
+										5) :
+									0
+							}
+						</Box>
 						<Image
 							width='24px'
 							height='24px'
@@ -378,10 +433,135 @@ const StakePanel = (props) => {
 	StakePanel.propTypes = {
 		availableTokenBalance: PropTypes.object.isRequired,
 		token: PropTypes.object.isRequired,
+		refreshData: PropTypes.func,
 	}
 	const lpToken = getLPToken(props.token.pairTokens)
-	const amount = '100'
-	const handleChange = () => { console.log('handling')}
+	const wallet = useWallet()
+	const toast = useToast()
+	const [value, setValue] = useState(0)
+	const [inputAmount, setInputAmount] = useState('')
+	const [tokenApproved, setTokenApproved] = useState(false)
+	const [working, setWorking] = useState(false)
+	const handleAmountChange = (balance, percentage) => () => {
+		const newAmount = balance.div(100).mul(percentage)
+		setInputAmount(
+			ethers.utils.formatUnits(newAmount, props.token.tokenDecimal),
+		)
+		setValue(newAmount)
+	}
+	const submit = () => {
+		if (!working) {
+			if (!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else if (!tokenApproved) {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+				setWorking(true)
+				approveERC20ToSpend(
+					props.token.tokenContractAddress,
+					props.token.stakingContractAddress,
+					defaults.network.erc20.maxApproval,
+					provider,
+				).then((tx) => {
+					tx.wait(defaults.network.tx.confirmations)
+						.then(() => {
+							setWorking(false)
+							setTokenApproved(true)
+							toast(approved)
+						})
+						.catch(e => {
+							setWorking(false)
+							if (e.code === 4001) toast(rejected)
+							if (e.code === -32016) toast(exception)
+						})
+				})
+					.catch(err => {
+						setWorking(false)
+						if (err.code === 'INSUFFICIENT_FUNDS') {
+							console.log('Insufficient balance: Your account balance is insufficient.')
+							toast(insufficientBalance)
+						}
+						else if (err.code === 4001) {
+							console.log('Transaction rejected: Your have decided to reject the transaction..')
+							toast(rejected)
+						}
+						else {
+							console.log(err)
+							toast(failed)
+						}
+					})
+			}
+			else if ((value > 0)) {
+				if ((props.availableTokenBalance.gte(value))) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					const lpStaking = lpTokenStaking(props.token.stakingContractAddress, provider)
+					setWorking(true)
+					lpStaking.stake(
+						value,
+					)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								props.refreshData(Date.now())
+								toast({
+									...lpTokenStaked,
+									description: <Link
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else if (err.code === -32016) {
+								toast(exception)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(insufficientBalance)
+				}
+			}
+			else {
+				toast(noAmount)
+			}
+		}
+	}
+	useEffect(() => {
+		if (wallet.account) {
+			setWorking(true)
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			getERC20Allowance(
+				props.token.tokenContractAddress,
+				wallet.account,
+				props.token.stakingContractAddress,
+				provider,
+			).then((n) => {
+				console.log('n', n)
+				setWorking(false)
+				if (n.gt(0)) setTokenApproved(true)
+			})
+		}
+		return () => {
+			setWorking(true)
+			setTokenApproved(false)
+		}
+	}, [wallet.account])
 	return (
 		<>
 			<Flex
@@ -389,36 +569,56 @@ const StakePanel = (props) => {
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
 					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text>{
-						props.availableTokenBalance.gt(0) &&
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>{
+						props.availableTokenBalance.gt(0) ?
 							prettifyNumber(
 								ethers.utils.formatUnits(
 									props.availableTokenBalance,
 									props.token.tokenDecimal,
 								),
 								0,
-								5)
+								5) :
+							0
 					}</Text>
 				</Flex>
 				<Flex
 					layerStyle='inputLike'
 				>
 					<InputGroup>
-						<NumberInput
+						<Input
 							variant="transparent"
 							flex="1"
-							value={amount}
-							max={amount}
-							onChange={handleChange}
+							fontSize='1.3rem'
+							fontWeight='bold'
+							placeholder='0.0'
+							value={inputAmount}
+							onChange={(e) => {
+								console.log('e', e)
+								if (isNaN(e.target.value)) {
+									setInputAmount(prev => prev)
+								}
+								else {
+									setInputAmount(String(e.target.value))
+									if(Number(e.target.value) > 0) {
+										try {
+											setValue(ethers.utils.parseUnits(String(e.target.value), props.token.tokenDecimal))
+										}
+										catch(err) {
+											if (err.code === 'NUMERIC_FAULT') {
+												toast(tokenValueTooSmall)
+											}
+										}
+									}
+								}
+							}}
 						>
-							<NumberInputField
-								placeholder="0"
-								fontSize="1.3rem"
-								fontWeight="bold"
-							/>
-						</NumberInput>
-						<InputRightElement
+						</Input>
+						<InputRightAddon
 							width='auto'
+							borderTopLeftRadius='0.375rem'
+							borderBottomLeftRadius='0.375rem'
+							paddingInlineStart='0.5rem'
+							paddingInlineEnd='0.5rem'
 						>
 							<Flex
 								cursor='default'
@@ -433,7 +633,7 @@ const StakePanel = (props) => {
 									></LPTokenIconAndSymbol>
 								</Box>
 							</Flex>
-						</InputRightElement>
+						</InputRightAddon>
 					</InputGroup>
 				</Flex>
 				<Flex
@@ -445,28 +645,28 @@ const StakePanel = (props) => {
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.availableTokenBalance, 100)}>
 						MAX
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.availableTokenBalance, 25)}>
 						25%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.availableTokenBalance, 50)}>
 						50%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.availableTokenBalance, 75)}>
 						75%
 					</Button>
 				</Flex>
@@ -475,11 +675,35 @@ const StakePanel = (props) => {
 						minWidth="230px"
 						size="lg"
 						variant="solidRadial"
-						onClick={handleChange}
-						disabled={false}
+						onClick={submit}
+						disabled={working}
 					>
 						<Text fontWeight="bold">
-							STAKE
+							{wallet.account &&
+								<>
+									{!working &&
+										<>
+											{
+												!tokenApproved ?
+													<>
+														Approve {lpToken}
+													</> :
+													<>Stake</>
+											}
+										</>
+									}
+									{working &&
+										<>
+											<Spinner />
+										</>
+									}
+								</>
+							}
+							{!wallet.account &&
+								<>
+									Stake
+								</>
+							}
 						</Text>
 					</Button>
 				</Flex>
@@ -492,10 +716,78 @@ const UnstakePanel = (props) => {
 	UnstakePanel.propTypes = {
 		stakingTokenBalance: PropTypes.object.isRequired,
 		token: PropTypes.object.isRequired,
+		refreshData: PropTypes.func,
 	}
+	const wallet = useWallet()
+	const toast = useToast()
+	const [value, setValue] = useState(0)
+	const [inputAmount, setInputAmount] = useState('')
 	const lpToken = getLPToken(props.token.pairTokens)
-	const amount = '100'
-	const handleChange = () => { console.log('handling') }
+	const [working, setWorking] = useState(false)
+	const handleAmountChange = (balance, percentage) => () => {
+		const newAmount = balance.div(100).mul(percentage)
+		setInputAmount(
+			ethers.utils.formatUnits(newAmount, props.token.tokenDecimal),
+		)
+		setValue(newAmount)
+	}
+
+	const submit = () => {
+		if (!working) {
+			if (!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else if ((value > 0)) {
+				if ((props.stakingTokenBalance.gte(value))) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					const lpStaking = lpTokenStaking(props.token.stakingContractAddress, provider)
+					setWorking(true)
+					lpStaking.withdraw(
+						value,
+					)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								props.refreshData(Date.now())
+								toast({
+									...lpTokenUnstaked,
+									description: <Link
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else if (err.code === -32016) {
+								toast(exception)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(insufficientBalance)
+				}
+			}
+			else {
+				toast(noAmount)
+			}
+		}
+	}
 	return (
 		<>
 			<Flex
@@ -503,16 +795,17 @@ const UnstakePanel = (props) => {
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
 					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text>
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>
 						{
-							props.stakingTokenBalance.gt(0) &&
-							prettifyNumber(
-								ethers.utils.formatUnits(
-									props.stakingTokenBalance,
-									props.token.tokenDecimal,
-								),
-								0,
-								5)
+							props.stakingTokenBalance.gt(0) ?
+								prettifyNumber(
+									ethers.utils.formatUnits(
+										props.stakingTokenBalance,
+										props.token.tokenDecimal,
+									),
+									0,
+									5) :
+								0
 						}
 					</Text>
 				</Flex>
@@ -520,21 +813,39 @@ const UnstakePanel = (props) => {
 					layerStyle='inputLike'
 				>
 					<InputGroup>
-						<NumberInput
+						<Input
 							variant="transparent"
 							flex="1"
-							value={amount}
-							max={amount}
-							onChange={handleChange}
+							fontSize='1.3rem'
+							fontWeight='bold'
+							placeholder='0.0'
+							value={inputAmount}
+							onChange={(e) => {
+								if (isNaN(e.target.value)) {
+									setInputAmount(prev => prev)
+								}
+								else {
+									setInputAmount(String(e.target.value))
+									if (Number(e.target.value) > 0) {
+										try {
+											setValue(ethers.utils.parseUnits(String(e.target.value), props.token.tokenDecimal))
+										}
+										catch (err) {
+											if (err.code === 'NUMERIC_FAULT') {
+												toast(tokenValueTooSmall)
+											}
+										}
+									}
+								}
+							}}
 						>
-							<NumberInputField
-								placeholder="0"
-								fontSize="1.3rem"
-								fontWeight="bold"
-							/>
-						</NumberInput>
-						<InputRightElement
+						</Input>
+						<InputRightAddon
 							width='auto'
+							borderTopLeftRadius='0.375rem'
+							borderBottomLeftRadius='0.375rem'
+							paddingInlineStart='0.5rem'
+							paddingInlineEnd='0.5rem'
 						>
 							<Flex
 								cursor='default'
@@ -549,7 +860,7 @@ const UnstakePanel = (props) => {
 									></LPTokenIconAndSymbol>
 								</Box>
 							</Flex>
-						</InputRightElement>
+						</InputRightAddon>
 					</InputGroup>
 				</Flex>
 				<Flex
@@ -561,28 +872,28 @@ const UnstakePanel = (props) => {
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.stakingTokenBalance, 100)}>
 						MAX
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.stakingTokenBalance, 25)}>
 						25%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.stakingTokenBalance, 50)}>
 						50%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.stakingTokenBalance, 75)}>
 						75%
 					</Button>
 				</Flex>
@@ -591,11 +902,23 @@ const UnstakePanel = (props) => {
 						minWidth="230px"
 						size="lg"
 						variant="solidRadial"
-						onClick={handleChange}
-						disabled={false}
+						onClick={submit}
+						disabled={working}
 					>
 						<Text fontWeight="bold">
-							UNSTAKE
+							{wallet.account ?
+								<>
+									{!working ?
+										<>
+											Unstake
+										</> :
+										<Spinner />
+									}
+								</> :
+								<>
+									Unstake
+								</>
+							}
 						</Text>
 					</Button>
 				</Flex>
@@ -608,10 +931,76 @@ const ClaimPanel = (props) => {
 	ClaimPanel.propTypes = {
 		rewardTokenBalance: PropTypes.object.isRequired,
 		token: PropTypes.object.isRequired,
+		refreshData: PropTypes.func,
 	}
-	const tokenSelect = defaults.stakeable[0]
-	const amount = '100'
-	const handleChange = () => { console.log('handling') }
+	const wallet = useWallet()
+	const toast = useToast()
+	const [value, setValue] = useState(0)
+	const [working, setWorking] = useState(false)
+	const [inputAmount, setInputAmount] = useState('')
+	const handleAmountChange = (balance, percentage) => () => {
+		const newAmount = balance.div(100).mul(percentage)
+		setInputAmount(
+			ethers.utils.formatUnits(newAmount, props.token.rewardToken.decimal),
+		)
+		setValue(newAmount)
+	}
+	const submit = () => {
+		if (!working) {
+			if (!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else if ((value > 0)) {
+				if ((props.rewardTokenBalance.gte(value))) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					const lpStaking = lpTokenStaking(props.token.stakingContractAddress, provider)
+					setWorking(true)
+					lpStaking.claim(
+						value,
+					)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								props.refreshData(Date.now())
+								toast({
+									...lpTokenUnstaked,
+									description: <Link
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else if (err.code === -32016) {
+								toast(exception)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(insufficientBalance)
+				}
+			}
+			else {
+				toast(noAmount)
+			}
+		}
+	}
 	return (
 		<>
 			<Flex
@@ -619,16 +1008,17 @@ const ClaimPanel = (props) => {
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
 					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text>
+					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>
 						{
-							props.rewardTokenBalance.gt(0) &&
-							prettifyNumber(
-								ethers.utils.formatUnits(
-									props.rewardTokenBalance,
-									props.token.rewardToken.tokenDecimal,
-								),
-								0,
-								5)
+							props.rewardTokenBalance.gt(0) ?
+								prettifyNumber(
+									ethers.utils.formatUnits(
+										props.rewardTokenBalance,
+										props.token.rewardToken.tokenDecimal,
+									),
+									0,
+									5) :
+								0
 						}
 					</Text>
 				</Flex>
@@ -636,21 +1026,39 @@ const ClaimPanel = (props) => {
 					layerStyle='inputLike'
 				>
 					<InputGroup>
-						<NumberInput
+						<Input
 							variant="transparent"
 							flex="1"
-							value={amount}
-							max={amount}
-							onChange={handleChange}
+							fontSize='1.3rem'
+							fontWeight='bold'
+							placeholder='0.0'
+							value={inputAmount}
+							onChange={(e) => {
+								if (isNaN(e.target.value)) {
+									setInputAmount(prev => prev)
+								}
+								else {
+									setInputAmount(String(e.target.value))
+									if (Number(e.target.value) > 0) {
+										try {
+											setValue(ethers.utils.parseUnits(String(e.target.value), props.token.rewardToken.decimal))
+										}
+										catch (err) {
+											if (err.code === 'NUMERIC_FAULT') {
+												toast(tokenValueTooSmall)
+											}
+										}
+									}
+								}
+							}}
 						>
-							<NumberInputField
-								placeholder="0"
-								fontSize="1.3rem"
-								fontWeight="bold"
-							/>
-						</NumberInput>
-						<InputRightElement
+						</Input>
+						<InputRightAddon
 							width='auto'
+							borderTopLeftRadius='0.375rem'
+							borderBottomLeftRadius='0.375rem'
+							paddingInlineStart='0.5rem'
+							paddingInlineEnd='0.5rem'
 						>
 							<Flex
 								cursor='default'
@@ -661,17 +1069,17 @@ const ClaimPanel = (props) => {
 										width='24px'
 										height='24px'
 										mr='10px'
-										src={tokenSelect.logoURI}
+										src={props.token.rewardToken.logoURI}
 									/>
 									<Box
 										as='h3'
 										m='0'
 										fontSize='1.02rem'
 										fontWeight='bold'
-									>{tokenSelect.symbol}</Box>
+									>{props.token.rewardToken.symbol}</Box>
 								</Box>
 							</Flex>
-						</InputRightElement>
+						</InputRightAddon>
 					</InputGroup>
 				</Flex>
 				<Flex
@@ -683,28 +1091,28 @@ const ClaimPanel = (props) => {
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.rewardTokenBalance, 100)}>
 						MAX
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.rewardTokenBalance, 25)}>
 						25%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.rewardTokenBalance, 50)}>
 						50%
 					</Button>
 					<Button
 						variant='outline'
 						size='sm'
 						mr='0.4rem'
-						onClick={handleChange}>
+						onClick={handleAmountChange(props.rewardTokenBalance, 75)}>
 						75%
 					</Button>
 				</Flex>
@@ -713,8 +1121,8 @@ const ClaimPanel = (props) => {
 						minWidth="230px"
 						size="lg"
 						variant="solidRadial"
-						onClick={handleChange}
-						disabled={false}
+						onClick={submit}
+						disabled={working}
 					>
 						<Text fontWeight="bold">
 							CLAIM

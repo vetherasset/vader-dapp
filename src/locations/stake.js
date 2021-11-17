@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel, NumberInput, NumberInputField,
-	Input, InputGroup, InputRightElement, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
+import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
+	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'

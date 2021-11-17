@@ -146,7 +146,7 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
-const lpTokenStaking = (contractAddress, provider) => async () => {
+const lpTokenStaking = (contractAddress, provider) => {
 	const contract = new ethers.Contract(
 		contractAddress,
 		lpStakingAbi,
