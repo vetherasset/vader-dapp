@@ -8,23 +8,6 @@ import defaults from './defaults'
 
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
 
-const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
-	try {
-		const contract = new ethers.Contract(
-			tokenAddress,
-			humanStandardTokenAbi,
-			provider.getSigner(0),
-		)
-
-		const tx = await contract.approve(spenderAddress, amount)
-		await tx.wait()
-		return true
-	}
-	catch (e) {
-		console.log(e)
-		return false
-	}
-
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
@@ -310,7 +293,7 @@ export {
 	MAX_UINT256,
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance, convertVetherToVader,
-	convertVetherToVader, getSwapEstimate, getSwapRate, getSwapFee,
+	getSwapEstimate, getSwapRate, getSwapFee,
 	getUSDVburnRate, isAddressLiquidityProvider,
 	tokenHasPool, swapForAsset, setERC20Allowance, addLiquidity,
 }
