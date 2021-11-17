@@ -278,7 +278,7 @@ const Stake = (props) => {
 
 				<Flex
 					w={{ base: '100%', md: '77%' }}
-					minH='478.65px'
+					minH='482.95px'
 					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
 					p='0 0 2rem'
 					layerStyle='colorful'
