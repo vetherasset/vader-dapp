@@ -215,7 +215,7 @@ const Burn = (props) => {
 
 	return (
 		<Box
-			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
+			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
 			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}

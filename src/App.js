@@ -7,6 +7,7 @@ import { Header } from './components/Header'
 import Burn from './locations/burn'
 import Stake from './locations/stake'
 import defaults from './common/defaults'
+import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
 
 const App = () => {
@@ -38,6 +39,22 @@ const App = () => {
 							<Redirect to={'/'} />
 						} />
 					</Switch>
+					<Footer
+						width='auto'
+						height='10vh'
+						maxWidth={defaults.layout.container.sm.width}
+						m='0 auto'
+						opacity='0.8'
+						position='relative'
+						zIndex='1'
+						justifyContent='space-between'
+						alignContent='center'
+						flexWrap='wrap'
+						padding='0rem 2rem 3rem'
+						style={{
+							gap: '0 2rem',
+						}}
+					/>
 					<Wave
 						width='100%'
 						height='777.65665px'

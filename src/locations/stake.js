@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel, NumberInput, NumberInputField,
-	Input, InputGroup, InputRightElement, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
+import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
+	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -83,7 +82,7 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
+			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 1.2rem 0' }}
@@ -184,13 +183,19 @@ const Stake = (props) => {
 								<Heading
 									as='h2'
 									size='sm'
+									textAlign={{ base: 'center', md: 'left' }}
 								>
 										YOUR BALANCE
 								</Heading>
 							</>
 					}
 
-					{token1balance.gt(0) &&
+					{((token1balance.gt(0)) || (token0balance.gt(0))) &&
+						<Flex
+							flexDir='column'
+							marginBottom='2.33rem'
+						>
+							{token1balance.gt(0) &&
 						<>
 							<Flex mb='0.354rem'>
 								<Container p='0'>
@@ -198,14 +203,11 @@ const Stake = (props) => {
 										textAlign={{ base: 'center', md: 'left' }}
 									>
 										<Flex
-											justifyContent={{ base: 'center', md: '' }}
+											justifyContent={{ base: 'center', md: 'flex-start' }}
 											fontWeight='bolder'>
 											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
+												width='24px'
+												height='24px'
 												mr='10px'
 												src={defaults.unstakeable[0].logoURI}
 											/>
@@ -214,7 +216,9 @@ const Stake = (props) => {
 									</Box>
 								</Container>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										{token1balance.gt(0) &&
 											prettifyNumber(
 												ethers.utils.formatUnits(
@@ -228,23 +232,20 @@ const Stake = (props) => {
 								</Container>
 							</Flex>
 						</>
-					}
-					{token0balance.gt(0) &&
+							}
+							{token0balance.gt(0) &&
 						<>
 							<Flex>
 								<Container p='0'>
 									<Box
 										textAlign={{ base: 'center', md: 'left' }}>
 										<Flex
-											justifyContent={{ base: 'center', md: '' }}
+											justifyContent={{ base: 'center', md: 'flex-start' }}
 											fontWeight='bolder'>
 											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
-												mr='10px'
+												width='24px'
+												height='24px'
+												mr='20px'
 												src={defaults.stakeable[0].logoURI}
 											/>
 												VADER
@@ -252,7 +253,9 @@ const Stake = (props) => {
 									</Box>
 								</Container>
 								<Container p='0'>
-									<Box textAlign='left'>
+									<Box
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										{token0balance.gt(0) &&
 											prettifyNumber(
 												ethers.utils.formatUnits(
@@ -266,7 +269,11 @@ const Stake = (props) => {
 								</Container>
 							</Flex>
 						</>
+							}
+						</Flex>
+
 					}
+
 				</Flex>
 
 				<Flex
