@@ -156,12 +156,12 @@ defaults.lpStakingTokens = [
 			{
 				'name': 'USDV',
 				'symbol': 'USDV',
-				'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+				'logoURI': 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png',
 			},
 			{
 				'name': '3CRV',
 				'symbol': '3CRV',
-				'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+				'logoURI': 'https://assets.coingecko.com/coins/images/12972/thumb/3pool_128.png',
 			},
 		],
 	},

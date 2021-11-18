@@ -330,24 +330,26 @@ const DetailSection = (props) => {
 							colorScheme='accent'
 						>REWARD</Badge>
 					</Box>
-					<Box float='left'>1000</Box>
-					<Image
-						width='24px'
-						height='24px'
-						mr='0px'
-						float='left'
-						src={rewardToken.logoURI}
-					/>
-					{rewardToken.symbol}/WEEK
+					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' float='left'>1000</Box>
+					<Box mt='10px'>
+						<Image
+							width='24px'
+							height='24px'
+							mr='0px'
+							float='left'
+							src={rewardToken.logoURI}
+						/>
+						<strong>{rewardToken.symbol}/WEEK</strong>
+					</Box>
 				</Container>
 			</Flex>
 			<Flex>
-				<Container p='0'>
+				<Container p='0' pb='8px'>
 					AVAILABLE IN WALLET
 				</Container>
 				<Container p='0'>
 					<Box textAlign='left'>
-						<Box float='left'>
+						<Box float='left' mr='5px' fontWeight='bold'>
 							{
 								props.availableTokenBalance.gt(0) ?
 									prettifyNumber(
@@ -370,11 +372,11 @@ const DetailSection = (props) => {
 				</Container>
 			</Flex>
 			<Flex>
-				<Container p='0'>
+				<Container p='0' pb='8px'>
 					TOTAL STAKED
 				</Container>
 				<Container p='0'>
-					<Box float='left'>
+					<Box float='left' mr='5px' fontWeight='bold'>
 						{
 							props.stakingTokenBalance.gt(0) ?
 								prettifyNumber(
@@ -401,7 +403,7 @@ const DetailSection = (props) => {
 				</Container>
 				<Container p='0'>
 					<Box>
-						<Box float='left'>
+						<Box float='left' mr='5px' fontWeight='bold'>
 							{
 								props.rewardTokenBalance.gt(0) ?
 									prettifyNumber(
@@ -552,7 +554,6 @@ const StakePanel = (props) => {
 				props.token.stakingContractAddress,
 				provider,
 			).then((n) => {
-				console.log('n', n)
 				setWorking(false)
 				if (n.gt(0)) setTokenApproved(true)
 			})
