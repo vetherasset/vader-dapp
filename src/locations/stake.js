@@ -133,7 +133,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>7 DAYS APY</Badge>
+										>7 DAYS APR</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
