@@ -180,8 +180,37 @@ const getCompoundApy = (roi, days) => (
 		null
 )
 
+const secondsToStringDuration = (seconds) => {
+	const SECOND_IN_A_DAY = 86400
+	const SECOND_IN_A_WEEK = 7 * 86400
+	const SECOND_IN_A_MONTH = 30 * 86400
+	seconds = Number(seconds)
+	if (seconds === SECOND_IN_A_MONTH) {
+		return 'MONTH'
+	}
+	if (seconds === SECOND_IN_A_WEEK) {
+		return 'WEEK'
+	}
+	if (seconds === SECOND_IN_A_DAY) {
+		return 'DAY'
+	}
+	const m = seconds / SECOND_IN_A_MONTH
+	if (m > 0) {
+		return `${m} MONTHS`
+	}
+	const w = seconds / SECOND_IN_A_WEEK
+	if (w > 0) {
+		return `${w} WEEKS`
+	}
+	const d = seconds / SECOND_IN_A_DAY
+	if (d > 0) {
+		return `${d} DAYS`
+	}
+	return '--'
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
-	getTokenByAddress, getStartOfTheDayTimeStamp, getCompoundApy,
+	getTokenByAddress, getStartOfTheDayTimeStamp, getCompoundApy, secondsToStringDuration,
 }

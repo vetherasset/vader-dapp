@@ -150,13 +150,15 @@ const lpTokenStaking = (contractAddress, provider) => {
 	const contract = new ethers.Contract(
 		contractAddress,
 		lpStakingAbi,
-		provider.getSigner(0),
+		provider ? provider.getSigner(0) : defaults.network.provider,
 	)
 	const balanceOf = (address) => contract.balanceOf(address)
 	const stake = (amount) => contract.stake(amount)
 	const withdraw = (amount) => contract.withdraw(amount)
 	const earned = (address) => contract.earned(address)
 	const claim = () => contract.getReward()
+	const rewardRate = () => contract.rewardRate()
+	const rewardsDuration = () => contract.rewardsDuration()
 
 	return {
 		balanceOf,
@@ -164,6 +166,8 @@ const lpTokenStaking = (contractAddress, provider) => {
 		withdraw,
 		earned,
 		claim,
+		rewardRate,
+		rewardsDuration,
 	}
 }
 

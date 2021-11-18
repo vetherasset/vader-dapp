@@ -15,7 +15,7 @@ import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
 import { getERC20Allowance, approveERC20ToSpend, lpTokenStaking, getERC20BalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
-import { prettifyNumber } from '../common/utils'
+import { prettifyNumber, secondsToStringDuration } from '../common/utils'
 import {
 	approved, rejected, failed, walletNotConnected, noAmount, lpTokenStaked,
 	lpTokenUnstaked, tokenValueTooSmall, exception, insufficientBalance,
@@ -298,6 +298,22 @@ const DetailSection = (props) => {
 	}
 	const lpToken = props.token.pairTokens.map(tk => tk.symbol).join('-')
 	const rewardToken = props.token.rewardToken
+	const [rewardRate, setRewardRate] = useState(ethers.BigNumber.from('0'))
+	const [rewardsDuration, setRewardsDuration] = useState(0)
+
+	useEffect(() => {
+		const stakingContract = lpTokenStaking(props.token.stakingContractAddress)
+		stakingContract.rewardRate()
+			.then(data => {
+				setRewardRate(data)
+			})
+			.catch(console.error)
+		stakingContract.rewardsDuration()
+			.then(data => {
+				setRewardsDuration(data)
+			})
+			.catch(console.error)
+	}, [])
 	return (
 		<>
 			<Flex>
@@ -328,9 +344,21 @@ const DetailSection = (props) => {
 						<Badge
 							fontSize='1rem'
 							colorScheme='accent'
-						>REWARD</Badge>
+						>REWARD DISTRIBUTION</Badge>
 					</Box>
-					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' float='left'>1000</Box>
+					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' float='left'>
+						{
+							rewardRate.gt(0) ?
+								prettifyNumber(
+									ethers.utils.formatUnits(
+										rewardRate,
+										props.token.rewardToken.decimal,
+									),
+									0,
+									5) :
+								0
+						}
+					</Box>
 					<Box mt='10px'>
 						<Image
 							width='24px'
@@ -339,7 +367,7 @@ const DetailSection = (props) => {
 							float='left'
 							src={rewardToken.logoURI}
 						/>
-						<strong>{rewardToken.symbol}/WEEK</strong>
+						<Text fontWeight='bold'>{rewardToken.symbol} / {secondsToStringDuration(rewardsDuration)}</Text>
 					</Box>
 				</Container>
 			</Flex>
@@ -398,7 +426,7 @@ const DetailSection = (props) => {
 				</Container>
 			</Flex>
 			<Flex>
-				<Container p='0'>
+				<Container p='0' mb='8px'>
 					CLAIMABLE REWARDS
 				</Container>
 				<Container p='0'>
@@ -423,7 +451,7 @@ const DetailSection = (props) => {
 							float='left'
 							src={rewardToken.logoURI}
 						/>
-						{rewardToken.symbol}
+						<Text fontWeight='bold'>{rewardToken.symbol}</Text>
 					</Box>
 				</Container>
 			</Flex>
