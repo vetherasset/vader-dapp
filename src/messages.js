@@ -9,6 +9,15 @@ const approved = {
 	position: defaults.toast.position,
 }
 
+const swapped = {
+	title: 'Token succesfully swapped',
+	description: 'You have swapped the token.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const connected = {
 	title: 'Wallet connected',
 	description: 'Your wallet account has been connected.',
@@ -164,7 +173,7 @@ const lpTokenUnstaked = {
 }
 
 export {
-	approved, connected, failed, rejected, insufficientBalance,
+	approved, swapped, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, lpTokenStaked, lpTokenUnstaked,

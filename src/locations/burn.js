@@ -215,28 +215,42 @@ const Burn = (props) => {
 
 	return (
 		<Box
-			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
+			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
-			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
+			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Flex
 				w='100%'
 				maxW='49ch'
-				minH='478.65px'
 				m='0 auto'
-				p='2rem 2.6rem'
+				minH={{ base: 'auto', md: '478.65px' }}
+				p={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
 				layerStyle='colorful'
 				flexDir='column'
 			>
-				<Text align='center' fontSize='1.55rem' fontWeight='bolder'>
-            Asset redemption
+				<Text
+					align='center'
+					fontSize={{ base: '1.25rem', md: '1.55rem' }}
+					fontWeight='bolder'
+				>
+            Acquire assets
 				</Text>
-				<Text align='center' fontSize='1.12rem' display='block' mb='2rem'>
-            Redeem assets by burning your tokens.
+				<Text
+					align='center'
+					fontSize={{ base: '0.91rem', md: '1.12rem' }}
+					display='block'
+					mb='2rem'
+				>
+            Burn tokens to obtain assets.
 				</Text>
-				<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Asset amount to burn</Text>
+				<Text
+					as='h4'
+					fontSize={{ base: '1rem', md: '1.23rem' }}
+					fontWeight='bolder'>
+						Amount to burn
+				</Text>
 				<Flex layerStyle='inputLike'>
 					<Box flex='1' pr='0.5rem'>
 						<Input
@@ -327,11 +341,24 @@ const Burn = (props) => {
 				</Flex>
 
 				<Flex
-					m='1.66rem 0' fontSize='1.5rem' fontWeight='bolder'
+					m='1.66rem 0'
+					fontSize={{ base: '1.35rem', md: '1.5rem' }}
+					fontWeight='bolder'
 					justifyContent='center' alignItems='center' flexDir='column'>
 					{DrawAmount()}
-					<Box as='h3' fontWeight='bold' textAlign='center'>
-						<Badge as='div' background='rgb(214, 188, 250)' color='rgb(128, 41, 251)'>What You Get</Badge>
+					<Box
+						as='h3'
+						fontWeight='bold'
+						textAlign='center'
+						fontSize='1rem'
+					>
+						<Badge
+							as='div'
+							fontSize={{ base: '0.6rem', md: '0.75rem' }}
+							background='rgb(214, 188, 250)'
+							color='rgb(128, 41, 251)'
+						>What You Get
+						</Badge>
 					</Box>
 				</Flex>
 

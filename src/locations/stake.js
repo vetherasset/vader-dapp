@@ -1,8 +1,11 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
+<<<<<<< HEAD
+=======
+	ScaleFade, Fade,
+>>>>>>> development
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -83,175 +86,224 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
+			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
-			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
+			p={{ base: '5rem 1.2rem 0', md: '5rem 1.2rem 0' }}
 			{...props}
 		>
-			<Flex>
+			<Flex
+				pb={{ base: '6rem', md: '0' }}
+				flexDir={{ base: 'column', md: 'row' }}
+			>
 				<Flex
 					flexDir='column'
 					w='100%'
-					paddingRight='2rem'
-					paddingTop='2.33rem'
+					paddingRight={{ base: '0', md: '2rem' }}
+					paddingTop={{ base: '0', md: '2.33rem' }}
 					justifyContent='flex-start'
 				>
-					<Flex>
+					<Flex
+						marginBottom={{ base: '1.2rem', md: '0' }}
+					>
 						<Container mb='23px' p='0'>
 							<>
-								<Heading as='h1' size='md'>EARN ADDITIONAL VADER.</Heading>
-								<Box as='p' mb='0.65rem'>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
-								<Box as='p'><b>xVADER</b> is fully composable that can interact with other protocols and you&lsquo;ll receive voting rights with your <i>xVADER</i>.
+								<Heading
+									as='h1'
+									size='md'
+									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
+								<Box
+									as='p'
+									mb='0.65rem'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
+								>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
+								<Box
+									as='p'
+									fontSize={{ base: '0.9rem', md: '1rem' }}
+								><b>xVADER</b> is fully composable that can interact with other protocols and&nbsp;you&lsquo;ll receive voting rights with your <i>xVADER</i>.
 									Your <i>xVADER</i> will continuously compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.</Box>
 							</>
 						</Container>
 					</Flex>
 
 					<Flex>
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Badge
-									fontSize='1rem'
-									colorScheme='accent'
-								>7 DAYS APY</Badge>
-							</Box>
-							{stakingApy >= 0 &&
-								<Box
-									fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
-									lineHeight='1.2'
-									fontWeight='normal'
-									mb='23px'
-									textAlign='left'>
-									{getPercentage(stakingApy)}
-								</Box>
-							}
-						</Container>
-
-						<Container p='0'>
-							<Box textAlign='left'>
-								<Badge
-									fontSize='1rem'
-									colorScheme='accent'
-								>1 xVADER RATE</Badge>
-							</Box>
-							{xvdrExchangeRate > 0 &&
+						{stakingApy >= 0 &&
+							<Container p='0'>
+								<ScaleFade
+									initialScale={0.9}
+									in={stakingApy >= 0}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
+										<Badge
+											fontSize={{ base: '0.9rem', md: '1rem' }}
+											colorScheme='accent'
+										>7 DAYS APY</Badge>
+									</Box>
 									<Box
-										fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
 										lineHeight='1.2'
 										fontWeight='normal'
 										mb='23px'
-										textAlign='left'>
+										textAlign={{ base: 'center', md: 'left' }}>
+										{getPercentage(stakingApy)}
+									</Box>
+								</ScaleFade>
+							</Container>
+						}
+
+						{xvdrExchangeRate > 0 &&
+							<Container p='0'>
+								<ScaleFade
+									initialScale={0.9}
+									in={xvdrExchangeRate > 0}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
+										<Badge
+											fontSize={{ base: '0.9rem', md: '1rem' }}
+											colorScheme='accent'
+										>1 xVADER RATE</Badge>
+									</Box>
+									<Box
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
+										lineHeight='1.2'
+										fontWeight='normal'
+										mb='23px'
+										textAlign={{ base: 'center', md: 'left' }}>
 										{prettifyNumber(xvdrExchangeRate, 0, 5)}
 									</Box>
-							}
-						</Container>
+								</ScaleFade>
+							</Container>
+						}
 					</Flex>
 
 					{token1balance.gt(0) &&
 							<>
-								<style>
-									{stakedNow}
-								</style>
-								<Heading
-									as='h2'
-									size='sm'
-									animation='5s ease-in-out infinite colorAnimation'
-									transition='all 0.3s ease 0s'>
+								<Fade
+									in={token1balance.gt(0)}>
+									<style>
+										{stakedNow}
+									</style>
+									<Heading
+										as='h2'
+										size='sm'
+										textAlign={{ base: 'center', md: 'left' }}
+										animation='5s ease-in-out infinite colorAnimation'
+										transition='all 0.3s ease 0s'>
 										YOU&#39;RE STAKING NOW
-								</Heading>
+									</Heading>
+								</Fade>
 							</>
 					}
 
 					{((token0balance.gt(0)) && (!token1balance.gt(0))) &&
 							<>
-								<Heading
-									as='h2'
-									size='sm'
-								>
+								<Fade
+									in={((token0balance.gt(0)) && (!token1balance.gt(0)))}>
+									<Heading
+										as='h2'
+										size='sm'
+										textAlign={{ base: 'center', md: 'left' }}
+									>
 										YOUR BALANCE
-								</Heading>
+									</Heading>
+								</Fade>
 							</>
 					}
 
-					{token1balance.gt(0) &&
-						<>
-							<Flex mb='0.354rem'>
-								<Container p='0'>
-									<Box textAlign='left'>
-										<Flex
-											fontWeight='bolder'>
-											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
-												mr='10px'
-												src={defaults.unstakeable[0].logoURI}
-											/>
-												xVADER
+					{((token1balance.gt(0)) || (token0balance.gt(0))) &&
+						<Flex
+							flexDir='column'
+							marginBottom='2.33rem'
+						>
+							{token1balance.gt(0) &&
+								<>
+									<Fade
+										in={token1balance.gt(0)}>
+										<Flex mb='0.354rem'>
+											<Container p='0'>
+												<Box
+													textAlign={{ base: 'center', md: 'left' }}
+												>
+													<Flex
+														justifyContent={{ base: 'center', md: 'flex-start' }}
+														fontWeight='bolder'>
+														<Image
+															width='24px'
+															height='24px'
+															mr='10px'
+															src={defaults.unstakeable[0].logoURI}
+														/>
+														xVADER
+													</Flex>
+												</Box>
+											</Container>
+											<Container p='0'>
+												<Box
+													textAlign={{ base: 'center', md: 'left' }}
+												>
+													{token1balance.gt(0) &&
+													prettifyNumber(
+														ethers.utils.formatUnits(
+															token1balance,
+															defaults.unstakeable[0].decimals,
+														),
+														0,
+														5)
+													}
+												</Box>
+											</Container>
 										</Flex>
-									</Box>
-								</Container>
-								<Container p='0'>
-									<Box textAlign='left'>
-										{token1balance.gt(0) &&
-											prettifyNumber(
-												ethers.utils.formatUnits(
-													token1balance,
-													defaults.unstakeable[0].decimals,
-												),
-												0,
-												5)
-										}
-									</Box>
-								</Container>
-							</Flex>
-						</>
-					}
-					{token0balance.gt(0) &&
-						<>
-							<Flex>
-								<Container p='0'>
-									<Box textAlign='left'>
-										<Flex
-											fontWeight='bolder'>
-											<Image
-												width='23px'
-												height='23px'
-												borderRadius='50%'
-												objectFit='none'
-												background='#fff'
-												mr='10px'
-												src={defaults.stakeable[0].logoURI}
-											/>
-												VADER
+									</Fade>
+								</>
+							}
+							{token0balance.gt(0) &&
+								<>
+									<Fade
+										in={token0balance.gt(0)}>
+										<Flex>
+											<Container p='0'>
+												<Box
+													textAlign={{ base: 'center', md: 'left' }}>
+													<Flex
+														justifyContent={{ base: 'center', md: 'flex-start' }}
+														fontWeight='bolder'>
+														<Image
+															width='24px'
+															height='24px'
+															mr='20px'
+															src={defaults.stakeable[0].logoURI}
+														/>
+														VADER
+													</Flex>
+												</Box>
+											</Container>
+											<Container p='0'>
+												<Box
+													textAlign={{ base: 'center', md: 'left' }}
+												>
+													{token0balance.gt(0) &&
+													prettifyNumber(
+														ethers.utils.formatUnits(
+															token0balance,
+															defaults.stakeable[0].decimals,
+														),
+														0,
+														5)
+													}
+												</Box>
+											</Container>
 										</Flex>
-									</Box>
-								</Container>
-								<Container p='0'>
-									<Box textAlign='left'>
-										{token0balance.gt(0) &&
-											prettifyNumber(
-												ethers.utils.formatUnits(
-													token0balance,
-													defaults.stakeable[0].decimals,
-												),
-												0,
-												5)
-										}
-									</Box>
-								</Container>
-							</Flex>
-						</>
+									</Fade>
+								</>
+							}
+						</Flex>
+
 					}
+
 				</Flex>
 
 				<Flex
-					w='77.777%'
-					minH='478.65px'
-					m='0 auto'
+					w={{ base: '100%', md: '77%' }}
+					minH='482.95px'
+					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
 					p='0 0 2rem'
 					layerStyle='colorful'
 					flexDir='column'
@@ -276,7 +328,7 @@ const Stake = (props) => {
 							</Tab>
 						</TabList>
 						<TabPanels
-							p='0 2.6rem'
+							p={{ base: '0 0.9rem', md: '0 2.6rem' }}
 						>
 							<TabPanel p='0'>
 								<StakePanel
@@ -310,7 +362,10 @@ const ExchangeRate = (props) => {
 		<>
 			{props.rate > 0 &&
 				<>
-					1 xVADER = {prettifyNumber(props.rate, 0, 2)} VADER
+					<Fade
+						in={props.rate > 0}>
+						1 xVADER = {prettifyNumber(props.rate, 0, 2)} VADER
+					</Fade>
 				</>
 			}
 		</>
@@ -455,8 +510,16 @@ const StakePanel = (props) => {
 				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text as='h4'>
+					<Text
+						as='h4'
+						fontSize={{ base: '1rem', md: '1.24rem' }}
+						fontWeight='bolder'>
+							Amount
+					</Text>
+					<Text
+						as='h4'
+						fontSize={{ base: '0.8rem', md: '1rem' }}
+					>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
@@ -761,8 +824,15 @@ const UnstakePanel = (props) => {
 				mt='4.2rem'
 				flexDir='column'>
 				<Flex alignItems="center" justifyContent="space-between">
-					<Text as='h4' fontSize='1.24rem' fontWeight='bolder'>Amount</Text>
-					<Text as='h4'>
+					<Text
+						as='h4'
+						fontSize={{ base: '1rem', md: '1.24rem' }}
+						fontWeight='bolder'>
+							Amount
+					</Text>
+					<Text
+						fontSize={{ base: '0.8rem', md: '1rem' }}
+						as='h4'>
 						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
