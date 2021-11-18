@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
-<<<<<<< HEAD
-=======
 	ScaleFade, Fade,
->>>>>>> development
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
