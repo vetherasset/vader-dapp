@@ -154,6 +154,7 @@ defaults.lpStakingTokens = [
 	{
 		'tokenContractAddress': '0x683a38985c36de7009d25375adec237ee46f603c',
 		'tokenDecimal': 18,
+		'type': 'CURVE_POOL',
 		'externalLink': 'https://curve.fi/3pool',
 		'externalText': 'From Curve',
 		'stakingContractAddress': '0x53f7e88aAE1879B9Fc166979A836Ae4427ca22e5',

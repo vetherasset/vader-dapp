@@ -7,6 +7,7 @@ import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import lpStakingAbi from '../artifacts/abi/lpStaking'
+import curvePoolAbi from '../artifacts/abi/curvePool'
 
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
 
@@ -295,6 +296,7 @@ const lpTokenStaking = (contractAddress, provider) => {
 	const claim = () => contract.getReward()
 	const rewardRate = () => contract.rewardRate()
 	const rewardsDuration = () => contract.rewardsDuration()
+	const rewardPerToken = () => contract.rewardPerToken()
 
 	return {
 		balanceOf,
@@ -304,7 +306,17 @@ const lpTokenStaking = (contractAddress, provider) => {
 		claim,
 		rewardRate,
 		rewardsDuration,
+		rewardPerToken,
 	}
+}
+
+const getLPVirtualPrice = (contractAddress) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		curvePoolAbi,
+		defaults.network.provider,
+	)
+	return contract.get_virtual_price()
 }
 
 export {
@@ -314,5 +326,5 @@ export {
 	convertVetherToVader, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
-	lpTokenStaking,
+	lpTokenStaking, getLPVirtualPrice,
 }

@@ -15,18 +15,19 @@ import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
 import { getERC20Allowance, approveERC20ToSpend, lpTokenStaking, getERC20BalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
-import { prettifyNumber, secondsToStringDuration } from '../common/utils'
+import { prettifyNumber, secondsToStringDuration, getPercentage } from '../common/utils'
 import {
 	approved, rejected, failed, walletNotConnected, noAmount, lpTokenStaked,
 	lpTokenUnstaked, tokenValueTooSmall, exception, insufficientBalance,
 } from '../messages'
+import { calculateLPTokenAPR } from '../common/calculation'
 
 const getLPToken = (pairTokens) => pairTokens.map(tk => tk.symbol).join('-')
 
 const Farm = props => {
 	return (
 		<Box
-			height={`calc(100vh - ${defaults.layout.header.minHeight})`}
+			height={`calc(120vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 0 0' }}
@@ -298,22 +299,29 @@ const DetailSection = (props) => {
 	}
 	const lpToken = props.token.pairTokens.map(tk => tk.symbol).join('-')
 	const rewardToken = props.token.rewardToken
-	const [rewardRate, setRewardRate] = useState(ethers.BigNumber.from('0'))
-	const [rewardsDuration, setRewardsDuration] = useState(0)
+	const [rewardsDistribution, setRewardsDistribution] = useState(ethers.BigNumber.from('0'))
+	const [rewardsDurationStr, setRewardsDurationStr] = useState('')
+	const [apr, setAPR] = useState(0)
+
+	useEffect(async () => {
+		const stakingContract = lpTokenStaking(props.token.stakingContractAddress)
+		const [rewardRate, rewardsDuration] = await Promise.all([
+			stakingContract.rewardRate(),
+			stakingContract.rewardsDuration(),
+		]).catch(console.error)
+		const rewards = ethers.BigNumber.from(rewardRate).mul(rewardsDuration)
+		setRewardsDistribution(rewards)
+		setRewardsDurationStr(secondsToStringDuration(rewardsDuration))
+	}, [])
 
 	useEffect(() => {
-		const stakingContract = lpTokenStaking(props.token.stakingContractAddress)
-		stakingContract.rewardRate()
+		calculateLPTokenAPR(props.token)
 			.then(data => {
-				setRewardRate(data)
-			})
-			.catch(console.error)
-		stakingContract.rewardsDuration()
-			.then(data => {
-				setRewardsDuration(data)
+				setAPR(data)
 			})
 			.catch(console.error)
 	}, [])
+
 	return (
 		<>
 			<Flex>
@@ -336,7 +344,11 @@ const DetailSection = (props) => {
 						>APY</Badge>
 					</Box>
 					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
-						--
+						{
+							apr ?
+								<> {getPercentage(apr)} </> :
+								<>--</>
+						}
 					</Box>
 				</Container>
 				<Container p='0'>
@@ -348,10 +360,10 @@ const DetailSection = (props) => {
 					</Box>
 					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' float='left'>
 						{
-							rewardRate.gt(0) ?
+							rewardsDistribution.gt(0) ?
 								prettifyNumber(
 									ethers.utils.formatUnits(
-										rewardRate,
+										rewardsDistribution,
 										props.token.rewardToken.decimal,
 									),
 									0,
@@ -367,7 +379,7 @@ const DetailSection = (props) => {
 							float='left'
 							src={rewardToken.logoURI}
 						/>
-						<Text fontWeight='bold'>{rewardToken.symbol} / {secondsToStringDuration(rewardsDuration)}</Text>
+						<Text fontWeight='bold'>{rewardToken.symbol} / {rewardsDurationStr}</Text>
 					</Box>
 				</Container>
 			</Flex>
