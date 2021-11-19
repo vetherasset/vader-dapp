@@ -136,7 +136,7 @@ defaults.unstakeable = [
 		'name':'xVADER',
 		'symbol':'xVADER',
 		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/add-xvader/xvader/xvader-symbol-w-ring.png',
 	},
 ]
 
