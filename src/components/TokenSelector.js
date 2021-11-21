@@ -44,7 +44,6 @@ const TokenSelectButton = ({ data, index, style }) => {
 							height='24px'
 							borderRadius='50%'
 							background='white'
-							objectFit='none'
 							mr='10px'
 							src={data.tokenList[index].logoURI}
 						/>
@@ -213,7 +212,9 @@ export const TokenSelector = (props) => {
 	TokenSelector.propTypes = {
 		isSelect: PropTypes.number.isRequired,
 		setToken0: PropTypes.func.isRequired,
-		setToken1: PropTypes.func.isRequired,
+		setToken1: PropTypes.func,
+		disableManage: PropTypes.bool,
+		tokenList: PropTypes.array,
 		isOpen: PropTypes.bool.isRequired,
 		onOpen: PropTypes.func.isRequired,
 		onClose: PropTypes.func.isRequired,
@@ -231,17 +232,22 @@ export const TokenSelector = (props) => {
 	}, [props.isOpen])
 
 	useEffect(() => {
-		getCombinedTokenListFromSources(
-			tokenListSources,
-		)
-			.then(data => {
-				setTokenListCombined(data)
-			})
-			.catch(err => {
-				setTokenListCombined(false)
-				console.log(err)
-			})
-	}, [tokenListSources])
+		if (!Array.isArray(props.tokenList)) {
+			getCombinedTokenListFromSources(
+				tokenListSources,
+			)
+				.then(data => {
+					setTokenListCombined(data)
+				})
+				.catch(err => {
+					setTokenListCombined(false)
+					console.log(err)
+				})
+		}
+		else {
+			setTokenListCombined(props.tokenList)
+		}
+	}, [tokenListSources, props.tokenList])
 
 	return (
 		<>
@@ -276,15 +282,20 @@ export const TokenSelector = (props) => {
 						<ModalFooter
 							borderTop='1px solid #00000017'
 							justifyContent='center'>
-							<Button
-								variant='link'
-								fontWeight='bold'
-								fontSize='1.1rem'
-								onClick={() => setDialog(1)}
-							>
+							{!typeof props.disableManage === 'boolean' &&
+								!props.disableManage === false &&
+									<>
+										<Button
+											variant='link'
+											fontWeight='bold'
+											fontSize='1.1rem'
+											onClick={() => setDialog(1)}
+										>
 
-								<EditIcon mr='6px'/> Manage Token Lists
-							</Button>
+											<EditIcon mr='6px'/> Manage Token Lists
+										</Button>
+									</>
+							}
 						</ModalFooter>
 					}
 				</ModalContent>

@@ -52,7 +52,7 @@ defaults.address.vader = (
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x2393409067d2F2e4Ce072aB17e2D55B7f4f36303' :
+		defaults.network.chainId === 42 ? '0x4402a7c8829489705852e54da50ebec60c8c86a8' :
 			undefined
 )
 defaults.address.xvader = (
