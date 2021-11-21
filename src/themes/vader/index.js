@@ -2,6 +2,7 @@ import { mode } from '@chakra-ui/theme-tools'
 import fonts from './fonts'
 import typography from './typography'
 import colors from './colors'
+import alert from './alert'
 import badge from './badge'
 import button from './button'
 import tooltip from './tooltip'
@@ -63,6 +64,7 @@ const overrides = {
 	textStyles: typography,
 	colors: colors,
 	components: {
+		Alert: alert,
 		Button: button,
 		Input: input,
 		NumberInput: numberInput,

@@ -60,7 +60,9 @@ const Stake = (props) => {
 				.then(data => {
 					setToken1balance(data)
 				})
-				.catch(console.error)
+				.catch((err) => {
+					console.log(err)
+				})
 		}
 		return () => setToken1balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
@@ -76,7 +78,9 @@ const Stake = (props) => {
 				.then(data => {
 					setToken0balance(data)
 				})
-				.catch(console.error)
+				.catch((err) => {
+					console.log(err)
+				})
 		}
 		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
@@ -496,7 +500,7 @@ const StakePanel = (props) => {
 			})
 		}
 		return () => {
-			setWorking(true)
+			setWorking(false)
 			setToken0Approved(false)
 		}
 	}, [wallet.account, token0])
