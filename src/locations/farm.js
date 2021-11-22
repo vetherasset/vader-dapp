@@ -18,7 +18,7 @@ import defaults from '../common/defaults'
 import { prettifyNumber, secondsToStringDuration, getPercentage } from '../common/utils'
 import {
 	approved, rejected, failed, walletNotConnected, noAmount, lpTokenStaked,
-	lpTokenUnstaked, tokenValueTooSmall, exception, insufficientBalance,
+	lpTokenUnstaked, lpTokenClaimed, tokenValueTooSmall, exception, insufficientBalance,
 } from '../messages'
 import { calculateLPTokenAPR } from '../common/calculation'
 
@@ -341,7 +341,7 @@ const DetailSection = (props) => {
 						<Badge
 							fontSize='1rem'
 							colorScheme='accent'
-						>APY</Badge>
+						>APR</Badge>
 					</Box>
 					<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }} lineHeight='1.2' fontWeight='normal' mb='19px' textAlign='left'>
 						{
@@ -1006,7 +1006,7 @@ const ClaimPanel = (props) => {
 								setWorking(false)
 								props.refreshData(Date.now())
 								toast({
-									...lpTokenUnstaked,
+									...lpTokenClaimed,
 									description: <Link
 										_focus={{
 											boxShadow: '0',

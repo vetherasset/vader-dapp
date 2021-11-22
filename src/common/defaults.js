@@ -157,7 +157,7 @@ defaults.lpStakingTokens = [
 		'type': 'CURVE_POOL',
 		'externalLink': 'https://curve.fi/3pool',
 		'externalText': 'From Curve',
-		'stakingContractAddress': '0x53f7e88aAE1879B9Fc166979A836Ae4427ca22e5',
+		'stakingContractAddress': '0x0eBc7B7096E77E96f3C9381C976c02DC8ca1760C',
 		'rewardToken': {
 			'symbol': 'VADER',
 			'decimal': 18,
