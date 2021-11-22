@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import PropTypes from 'prop-types'
 import {
 	Box,
 	Badge,
@@ -19,6 +20,13 @@ import {
 	AlertIcon,
 	AlertTitle,
 	AlertDescription,
+	AlertDialog,
+	AlertDialogOverlay,
+	AlertDialogContent,
+	AlertDialogHeader,
+	AlertDialogBody,
+	AlertDialogFooter,
+	useBreakpointValue,
 } from '@chakra-ui/react'
 import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
@@ -389,7 +397,7 @@ const Burn = (props) => {
 						fontWeight='bolder'
 						mr='0.66rem'
 						opacity={ tokenSelect ? '' : '0.5' }>
-								Amount to burn
+								Amount
 					</Text>
 					<Flex
 						layerStyle='inputLike'
@@ -464,14 +472,9 @@ const Burn = (props) => {
 					</Flex>
 
 					{tokenSelect && tokenSelect.symbol === 'VETH' &&
-						<Checkbox
-							size='lg'
-							mt='0.7rem'
-							onChange={() => {
-								setVethAllowLess(!vethAllowLess)
-							}}>
-							Allow me to adjust amount
-						</Checkbox>
+							<VethAllowLessOption
+								allow={vethAllowLess}
+								setAllow={setVethAllowLess}/>
 					}
 
 					<Flex
@@ -548,6 +551,95 @@ const Burn = (props) => {
 				onOpen={onOpen}
 				onClose={onClose}
 			/>
+		</>
+	)
+}
+
+const VethAllowLessOption = (props) => {
+
+	VethAllowLessOption.propTypes = {
+		allow: PropTypes.bool.isRequired,
+		setAllow: PropTypes.func.isRequired,
+	}
+
+	const [isOpen, setIsOpen] = useState(false)
+	const onClose = () => setIsOpen(false)
+	const cancelRef = useRef()
+
+	return (
+		<>
+
+			<Checkbox
+				maxW='236.95px'
+				colorScheme='pink'
+				size='lg'
+				mt='0.7rem'
+				isChecked={props.allow}
+				onChange={() => {
+					if(props.allow === true) {
+						props.setAllow(false)
+					}
+				}}
+				onClick={() => {
+					if(!props.allow) {
+						setIsOpen(true)
+					}
+				}}
+			>
+				Allow me to adjust amount
+			</Checkbox>
+
+			<AlertDialog
+				isCentered={useBreakpointValue({ base: true, md: false })}
+				isOpen={isOpen}
+				leastDestructiveRef={cancelRef}
+				onClose={onClose}
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              Allow to adjust amount
+						</AlertDialogHeader>
+						<AlertDialogBody
+							padding='0 1.5rem'>
+              Are you sure? You can&apos;t burn more of this token afterwards.
+							This&nbsp;might result in loss of potentional claim portion.
+						</AlertDialogBody>
+						<AlertDialogFooter>
+							<Flex
+								borderRadius='12px'
+								bg='#a68da6'
+								border='1px solid #3425352e'
+							>
+								<Button
+									variant='outline'
+									ref={cancelRef}
+									onClick={onClose}
+									color='#fff'
+								>
+                Cancel
+								</Button>
+							</Flex>
+							<Flex
+								borderRadius='12px'
+								border='1px solid #3425352e'
+								bg='green.500'
+								ml={3}
+							>
+								<Button
+									variant='outline'
+									onClick={() => {
+										props.setAllow(true)
+										setIsOpen(false)
+									}}
+								>
+									Allow
+								</Button>
+							</Flex>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 		</>
 	)
 }
