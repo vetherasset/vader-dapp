@@ -69,7 +69,7 @@ const TokenSelectDialog = (props) => {
 		tokenList: PropTypes.any.isRequired,
 		isSelect: PropTypes.number.isRequired,
 		setToken0: PropTypes.func.isRequired,
-		setToken1: PropTypes.func.isRequired,
+		setToken1: PropTypes.func,
 		onClose: PropTypes.func.isRequired,
 	}
 
