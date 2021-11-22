@@ -1,7 +1,6 @@
-import BN from 'bignumber.js'
 import EthDater from 'ethereum-block-by-date'
 import { getXVaderPriceByBlock } from './graphql'
-import { getStartOfTheDayTimeStamp, getCompoundApy } from './utils'
+import { getStartOfTheDayTimeStamp } from './utils'
 import defaults from './defaults'
 import { getLPVirtualPrice, getERC20BalanceOf, lpTokenStaking } from './ethereum'
 import { ethers } from 'ethers'
@@ -42,8 +41,16 @@ const getXVaderApy = async (numberOfDays = 7) => {
 		getXVaderPrice(),
 		getXVaderPrice(sevenDaysAgoBlockNumber),
 	])
-	const roi = BN(currentPrice).minus(sevenDaysAgoPrice)
-	return getCompoundApy(roi, numberOfDays)
+	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
+	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(sevenDaysAgoPrice)
+	const apr = currentPriceBN
+		.sub(sevenDaysAgoPriceBN)
+		.mul(ethers.utils.parseUnits('1'))
+		.div(sevenDaysAgoPriceBN)
+		.mul(365)
+		.div(numberOfDays)
+		.toString()
+	return ethers.utils.formatUnits(apr)
 }
 
 const getVaderPrice = async () => {

@@ -60,7 +60,9 @@ const Stake = (props) => {
 				.then(data => {
 					setToken1balance(data)
 				})
-				.catch(console.error)
+				.catch((err) => {
+					console.log(err)
+				})
 		}
 		return () => setToken1balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
@@ -76,7 +78,9 @@ const Stake = (props) => {
 				.then(data => {
 					setToken0balance(data)
 				})
-				.catch(console.error)
+				.catch((err) => {
+					console.log(err)
+				})
 		}
 		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
@@ -133,7 +137,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>7 DAYS APY</Badge>
+										>7 DAYS APR</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
@@ -496,7 +500,7 @@ const StakePanel = (props) => {
 			})
 		}
 		return () => {
-			setWorking(true)
+			setWorking(false)
 			setToken0Approved(false)
 		}
 	}, [wallet.account, token0])
