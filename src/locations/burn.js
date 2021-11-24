@@ -336,7 +336,7 @@ const Burn = (props) => {
 										status='info'>
 										<AlertIcon />
 										<Box flex='1'>
-											<AlertDescription>Vested portion&apos;s linearly released for 1&nbsp;year. Claiming has no limit, can be also done at&nbsp;any time.</AlertDescription>
+											<AlertDescription>Vested portion&apos;s linearly released for 1&nbsp;year. Claiming has no limits. Can be done regurarly at&nbsp;any time.</AlertDescription>
 										</Box>
 									</Alert>
 									<Text
@@ -660,7 +660,7 @@ const VethAllowLessOption = (props) => {
 						<AlertDialogBody
 							padding='0 1.5rem'>
               Are you sure? You can&apos;t burn more of this token afterwards.
-							This&nbsp;might result in loss of potentional claim portion.
+							This&nbsp;might result in loss of potential claim portion.
 						</AlertDialogBody>
 						<AlertDialogFooter>
 							<Flex
