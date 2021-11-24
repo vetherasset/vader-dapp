@@ -32,8 +32,8 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convertVetherToVader, approveERC20ToSpend, getERC20BalanceOf } from '../common/ethereum'
-import { prettifyCurrency } from '../common/utils'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf } from '../common/ethereum'
+import { getMerkleProofForAccount, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
 	tokenValueTooSmall,
@@ -118,7 +118,7 @@ const Burn = (props) => {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					if (tokenSelect.symbol === 'VETH') {
-						convertVetherToVader(
+						convert(
 							value,
 							provider)
 							.then((tx) => {
@@ -215,6 +215,12 @@ const Burn = (props) => {
 		}
 		return () => setTokenBalance(ethers.BigNumber.from('0'))
 	}, [wallet.account, tokenSelect])
+
+	useEffect(() => {
+		if (wallet.account) {
+			console.log(getMerkleProofForAccount(wallet.account))
+		}
+	}, [wallet.account])
 
 	return (
 		<>
@@ -510,7 +516,6 @@ const Burn = (props) => {
 						minWidth='230px'
 						textTransform='uppercase'
 						disabled={working}
-						onClick={() => submit()}
 					>
 						{wallet.account &&
 								<>

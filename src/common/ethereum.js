@@ -85,13 +85,22 @@ const estimateGasCost = async (contractAddress, abi, callName, data, provider) =
 	return await execute(callName, contract.estimateGas, data)
 }
 
-const convertVetherToVader = async (amount, provider) => {
+const convert = async (proof, amount, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.converter,
 		converterAbi,
 		provider.getSigner(0),
 	)
-	return await contract.convert(amount)
+	return await contract.convert(proof, amount)
+}
+
+const getSalt = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.converter,
+		converterAbi,
+		provider.getSigner(0),
+	)
+	return await contract.salt()
 }
 
 const getSwapRate = async (from, to, provider) => {
@@ -148,7 +157,8 @@ const unstakeVader = async (shares, provider) => {
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
-	convertVetherToVader, getSwapRate, getSwapFee,
+	convert, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
+	getSalt,
 }

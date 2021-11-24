@@ -67,7 +67,7 @@ defaults.address.usdv = (
 ),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+		defaults.network.chainId === 42 ? '0x0886Bc7CFB73C912130a4A425b12336227A96723' :
 			undefined
 )
 defaults.address.pool = (
