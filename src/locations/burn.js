@@ -33,7 +33,7 @@ import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf } from '../common/ethereum'
-import { getMerkleProofForAccount, prettifyCurrency } from '../common/utils'
+import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
 	tokenValueTooSmall,
@@ -53,8 +53,10 @@ const Burn = (props) => {
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
-	const [vethAllowLess, setVethAllowLess] = useState(false)
 	const [working, setWorking] = useState(false)
+
+	const [vethAllowLess, setVethAllowLess] = useState(false)
+	const [vethAccountLeafClaimed, setVethAccountLeafClaimed] = useState(false)
 
 	const DrawAmount = () => {
 		return <>
@@ -76,49 +78,59 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved) {
+			else if (tokenSelect && !tokenApproved && tokenBalance) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				setWorking(true)
-				approveERC20ToSpend(
-					tokenSelect.address,
-					defaults.address.xvader,
-					defaults.network.erc20.maxApproval,
-					provider,
-				).then((tx) => {
-					tx.wait(defaults.network.tx.confirmations)
-						.then(() => {
-							setWorking(false)
-							setTokenApproved(true)
-							toast(approved)
-						})
-						.catch(e => {
-							setWorking(false)
-							if (e.code === 4001) toast(rejected)
-							if (e.code === -32016) toast(exception)
-						})
-				})
-					.catch(err => {
-						setWorking(false)
-						if(err.code === 'INSUFFICIENT_FUNDS') {
-							console.log('Insufficient balance: Your account balance is insufficient.')
-							toast(insufficientBalance)
-						}
-						else if(err.code === 4001) {
-							console.log('Transaction rejected: Your have decided to reject the transaction..')
-							toast(rejected)
-						}
-						else {
-							console.log(err)
-							toast(failed)
-						}
+				if ((tokenBalance > 0 && value > 0)) {
+					setWorking(true)
+					approveERC20ToSpend(
+						'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+						defaults.address.converter,
+						vethAllowLess ? value : tokenBalance,
+						provider,
+					).then((tx) => {
+						tx.wait(defaults.network.tx.confirmations)
+							.then(() => {
+								setWorking(false)
+								setTokenApproved(true)
+								toast(approved)
+							})
+							.catch(e => {
+								setWorking(false)
+								if (e.code === 4001) toast(rejected)
+								if (e.code === -32016) toast(exception)
+							})
 					})
+						.catch(err => {
+							setWorking(false)
+							if(err.code === 'INSUFFICIENT_FUNDS') {
+								console.log('Insufficient balance: Your account balance is insufficient.')
+								toast(insufficientBalance)
+							}
+							else if(err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else if (vethAllowLess) {
+					toast(noAmount)
+				}
+				else {
+					toast(insufficientBalance)
+				}
 			}
 			else if ((value > 0)) {
 				if ((tokenBalance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					if (tokenSelect.symbol === 'VETH') {
+						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 						convert(
+							proof,
 							value,
 							provider)
 							.then((tx) => {
@@ -167,36 +179,41 @@ const Burn = (props) => {
 			setConversionFactor(
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
+			if (wallet.account) {
+				const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
+				if (leaf) setVethAccountLeafClaimed(true)
+			}
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
-	}, [tokenSelect])
+	}, [tokenSelect, wallet.account])
 
 	useEffect(() => {
 		if(wallet.account && tokenSelect) {
 			setWorking(true)
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
-				tokenSelect.address,
+				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
 				wallet.account,
 				defaults.address.converter,
 				provider,
 			).then((n) => {
 				setWorking(false)
-				if(n.gt(0))	setTokenApproved(true)
+				if(n.gt(0) && n.gte(value))	setTokenApproved(true)
+				console.log(n)
 			})
 		}
 		return () => {
 			setWorking(false)
 			setTokenApproved(false)
 		}
-	}, [wallet.account, tokenSelect])
+	}, [wallet.account, tokenSelect, value])
 
 	useEffect(() => {
 		if (wallet.account && tokenSelect) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			setWorking(true)
 			getERC20BalanceOf(
-				tokenSelect.address,
+				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
 				wallet.account,
 				provider,
 			)
@@ -204,7 +221,7 @@ const Burn = (props) => {
 					setTokenBalance(data)
 					if (tokenSelect.symbol === 'VETH') {
 						setWorking(false)
-						setValue(data)
+						if (!vethAllowLess) setValue(data)
 						setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
 					}
 				})
@@ -214,13 +231,7 @@ const Burn = (props) => {
 				})
 		}
 		return () => setTokenBalance(ethers.BigNumber.from('0'))
-	}, [wallet.account, tokenSelect])
-
-	useEffect(() => {
-		if (wallet.account) {
-			console.log(getMerkleProofForAccount(wallet.account))
-		}
-	}, [wallet.account])
+	}, [wallet.account, tokenSelect, vethAllowLess])
 
 	return (
 		<>
@@ -297,15 +308,19 @@ const Burn = (props) => {
 						<>
 							{tokenSelect.symbol === 'VETH' &&
 								<>
-									<Alert
-										m='1rem 0 1rem'
-										status='warning'>
-										<AlertIcon />
-										<Box flex='1'>
-											<AlertTitle mr={2}>No way to burn multiple times</AlertTitle>
-											<AlertDescription>This token can be burned by eligible account only once. If you decide to burn less than you&apos;re entitled to, you&apos;ll be not able to burn more afterwards and so claim the maximal amount.</AlertDescription>
-										</Box>
-									</Alert>
+									{!vethAccountLeafClaimed &&
+										<>
+											<Alert
+												m='1rem 0 1rem'
+												status='warning'>
+												<AlertIcon />
+												<Box flex='1'>
+													<AlertTitle mr={2}>No way to burn multiple times</AlertTitle>
+													<AlertDescription>This token can be burned by eligible account only once. If you decide to burn less than you&apos;re entitled to, you&apos;ll be not able to burn more afterwards and so claim the maximal amount.</AlertDescription>
+												</Box>
+											</Alert>
+										</>
+									}
 									<Alert
 										m='0 0 1rem'
 										status='info'>
@@ -357,7 +372,7 @@ const Burn = (props) => {
 											<Container p='0'>
 												<Box
 													textAlign='right'>
-														49999.5&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
+														0&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
 												</Box>
 											</Container>
 										</Flex>
@@ -387,7 +402,7 @@ const Burn = (props) => {
 											<Container p='0'>
 												<Box
 													textAlign='right'>
-														432&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
+														49999.5&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
 												</Box>
 											</Container>
 										</Flex>
@@ -397,54 +412,59 @@ const Burn = (props) => {
 						</>
 					}
 
-					<Text
-						as='h4'
-						fontSize='1.1rem'
-						fontWeight='bolder'
-						mr='0.66rem'
-						opacity={ tokenSelect ? '' : '0.5' }>
+					{!vethAccountLeafClaimed &&
+						<>
+							<Text
+								as='h4'
+								fontSize='1.1rem'
+								fontWeight='bolder'
+								mr='0.66rem'
+								opacity={ tokenSelect ? '' : '0.5' }>
 								Amount
-					</Text>
-					<Flex
-						layerStyle='inputLike'
-						cursor={ tokenSelect ? '' : 'not-allowed' }
-					>
-						<Box flex='1' pr='0.5rem'>
-							<InputGroup>
-								<Input
+							</Text>
+							<Flex
+								layerStyle='inputLike'
+								cursor={ tokenSelect ? '' : 'not-allowed' }
+							>
+								<Box flex='1' pr='0.5rem'>
+									<InputGroup>
+										<Input
 						  		variant='transparent'
-									flex='1'
-									cursor={ tokenSelect ? '' : 'not-allowed' }
-									disabled={
-										tokenSelect.symbol === 'VETH' && !vethAllowLess ? true : false
-									}
-									_disabled={
-										tokenSelect.symbol === 'VETH' ? {
-											opacity: 1,
-										} : '' }
-									fontSize='1.3rem'
-									fontWeight='bold'
-									placeholder='0.0'
-									value={inputAmount}
-									onChange={(e) => {
-										if (isNaN(e.target.value)) {
-											setInputAmount(prev => prev)
-										}
-										else {
-											setInputAmount(String(e.target.value))
-											if(Number(e.target.value) > 0) {
-												try {
-													setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+											flex='1'
+											cursor={ tokenSelect ? '' : 'not-allowed' }
+											disabled={
+												tokenSelect.symbol === 'VETH' && !vethAllowLess ? true : false
+											}
+											_disabled={
+												tokenSelect.symbol === 'VETH' ? {
+													opacity: 1,
+												} : '' }
+											fontSize='1.3rem'
+											fontWeight='bold'
+											placeholder='0.0'
+											value={inputAmount}
+											onChange={(e) => {
+												if (isNaN(e.target.value)) {
+													setInputAmount(prev => prev)
 												}
-												catch(err) {
-													if (err.code === 'NUMERIC_FAULT') {
-														toast(tokenValueTooSmall)
+												else {
+													setInputAmount(String(e.target.value))
+													if(Number(e.target.value) > 0) {
+														try {
+															setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+														}
+														catch(err) {
+															if (err.code === 'NUMERIC_FAULT') {
+																toast(tokenValueTooSmall)
+															}
+														}
+													}
+													else {
+														setValue(ethers.BigNumber.from('0'))
 													}
 												}
-											}
-										}
-									}}/>
-								{tokenSelect &&
+											}}/>
+										{tokenSelect &&
 									<InputRightAddon
 										width='auto'
 										borderTopLeftRadius='0.375rem'
@@ -472,15 +492,16 @@ const Burn = (props) => {
 											</Box>
 										</Flex>
 									</InputRightAddon>
-								}
-							</InputGroup>
-						</Box>
-					</Flex>
-
-					{tokenSelect && tokenSelect.symbol === 'VETH' &&
+										}
+									</InputGroup>
+								</Box>
+							</Flex>
+							{tokenSelect && tokenSelect.symbol === 'VETH' &&
 							<VethAllowLessOption
 								allow={vethAllowLess}
 								setAllow={setVethAllowLess}/>
+							}
+						</>
 					}
 
 					<Flex
@@ -490,7 +511,16 @@ const Burn = (props) => {
 						justifyContent='center' alignItems='center' flexDir='column'>
 						{inputAmount &&
 								<>
-									{DrawAmount()}
+									{!vethAccountLeafClaimed &&
+										<>
+											<DrawAmount/>
+										</>
+									}
+									{vethAccountLeafClaimed &&
+										<>
+											49999.5 VADER
+										</>
+									}
 									<Box
 										as='h3'
 										fontWeight='bold'
@@ -516,21 +546,32 @@ const Burn = (props) => {
 						minWidth='230px'
 						textTransform='uppercase'
 						disabled={working}
+						onClick={() => submit()}
 					>
 						{wallet.account &&
 								<>
-									{!working &&
+									{!working && tokenSelect && !vethAccountLeafClaimed &&
 										<>
-											{tokenSelect && !tokenApproved &&
+											{!tokenApproved &&
 												<>
 													Approve {tokenSelect.symbol}
 												</>
 											}
-											{tokenSelect && tokenApproved &&
+											{tokenApproved &&
 												<>
 													Burn
 												</>
 											}
+										</>
+									}
+									{!working && tokenSelect && vethAccountLeafClaimed &&
+										<>
+											Claim
+										</>
+									}
+									{!working && !tokenSelect &&
+										<>
+											Burn
 										</>
 									}
 									{working &&

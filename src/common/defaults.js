@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources.json'
+import snapshot from '../artifacts/snapshot.json'
 
 const defaults = {}
 
@@ -67,7 +68,7 @@ defaults.address.usdv = (
 ),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x0886Bc7CFB73C912130a4A425b12336227A96723' :
+		defaults.network.chainId === 42 ? '0x0886bc7cfb73c912130a4a425b12336227a96723' :
 			undefined
 )
 defaults.address.pool = (
@@ -115,6 +116,7 @@ defaults.redeemables = [
 		'decimals':18,
 		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
+		'snapshot':snapshot,
 	},
 ]
 

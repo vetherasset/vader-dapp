@@ -205,5 +205,5 @@ const getMerkleProofForAccount = (account, snapshot) => {
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
-	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount,
+	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
 }
