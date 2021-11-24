@@ -94,11 +94,20 @@ const convert = async (proof, amount, provider) => {
 	return await contract.convert(proof, amount)
 }
 
-const getSalt = async (provider) => {
+const getClaimed = async (leaf) => {
 	const contract = new ethers.Contract(
 		defaults.address.converter,
 		converterAbi,
-		provider.getSigner(0),
+		defaults.network.provider,
+	)
+	return await contract.claimed(leaf)
+}
+
+const getSalt = async () => {
+	const contract = new ethers.Contract(
+		defaults.address.converter,
+		converterAbi,
+		defaults.network.provider,
 	)
 	return await contract.salt()
 }
@@ -160,5 +169,5 @@ export {
 	convert, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
-	getSalt,
+	getSalt, getClaimed,
 }

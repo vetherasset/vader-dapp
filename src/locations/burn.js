@@ -32,7 +32,7 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -138,6 +138,7 @@ const Burn = (props) => {
 									defaults.network.tx.confirmations,
 								).then((r) => {
 									setWorking(false)
+									setVethAccountLeafClaimed(true)
 									toast({
 										...vethupgraded,
 										description: <Link
@@ -180,11 +181,19 @@ const Burn = (props) => {
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
 			if (wallet.account) {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
-				if (leaf) setVethAccountLeafClaimed(true)
+				getClaimed(leaf, provider)
+					.then(r => {
+						if(r) setVethAccountLeafClaimed(true)
+					})
+					.catch(err => console.log(err))
 			}
 		}
-		return () => setConversionFactor(ethers.BigNumber.from('0'))
+		return () => {
+			setConversionFactor(ethers.BigNumber.from('0'))
+			setVethAccountLeafClaimed(false)
+		}
 	}, [tokenSelect, wallet.account])
 
 	useEffect(() => {
@@ -335,12 +344,12 @@ const Burn = (props) => {
 										fontWeight='bolder'
 										mr='0.66rem'
 										opacity={ tokenSelect ? '' : '0.5' }>
-										Current breakdown
+										Breakdown
 									</Text>
 
 									<Flex
 										flexDir='column'
-										p='0 2rem'
+										p='0 0.3rem'
 										marginBottom='.7rem'
 										opacity='0.87'
 									>
@@ -426,7 +435,7 @@ const Burn = (props) => {
 								layerStyle='inputLike'
 								cursor={ tokenSelect ? '' : 'not-allowed' }
 							>
-								<Box flex='1' pr='0.5rem'>
+								<Box flex='1'>
 									<InputGroup>
 										<Input
 						  		variant='transparent'
