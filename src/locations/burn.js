@@ -176,24 +176,25 @@ const Burn = (props) => {
 	}
 
 	useEffect(() => {
+		if (wallet.account) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
+			getClaimed(leaf, provider)
+				.then(r => {
+					if(r) setVethAccountLeafClaimed(true)
+				})
+				.catch(err => console.log(err))
+		}
+		return () => setVethAccountLeafClaimed(false)
+	}, [wallet.account])
+
+	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
 			setConversionFactor(
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
-			if (wallet.account) {
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
-				getClaimed(leaf, provider)
-					.then(r => {
-						if(r) setVethAccountLeafClaimed(true)
-					})
-					.catch(err => console.log(err))
-			}
 		}
-		return () => {
-			setConversionFactor(ethers.BigNumber.from('0'))
-			setVethAccountLeafClaimed(false)
-		}
+		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect, wallet.account])
 
 	useEffect(() => {
@@ -274,7 +275,7 @@ const Burn = (props) => {
 						display='block'
 						mb='2rem'
 					>
-            Make claim or burn to obtain assets.
+            Burn or claim to obtain assets.
 					</Text>
 
 					<Text
@@ -421,7 +422,8 @@ const Burn = (props) => {
 						</>
 					}
 
-					{!vethAccountLeafClaimed &&
+					{((!tokenSelect) ||
+					(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed)) &&
 						<>
 							<Text
 								as='h4'
