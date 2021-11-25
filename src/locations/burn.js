@@ -41,7 +41,8 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	approved,
 	exception,
 	vaderclaimed,
-	notBurnEligible } from '../messages'
+	notBurnEligible,
+	nothingtoclaim } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 
 const Burn = (props) => {
@@ -61,6 +62,7 @@ const Burn = (props) => {
 	const [vethAllowLess, setVethAllowLess] = useState(false)
 	const [vethAccountLeafClaimed, setVethAccountLeafClaimed] = useState(false)
 	const claimableVeth = useClaimableVeth()
+	const [vester, setVester] = useState([])
 
 	const DrawAmount = () => {
 		return (
@@ -158,40 +160,45 @@ const Burn = (props) => {
 			}
 			else if (vethAccountLeafClaimed) {
 				if (tokenSelect.symbol === 'VETH') {
-					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					setWorking(true)
-					claim(provider)
-						.then((tx) => {
-							tx.wait(
-								defaults.network.tx.confirmations,
-							).then((r) => {
-								setWorking(false)
-								setVethAccountLeafClaimed(true)
-								toast({
-									...vaderclaimed,
-									description: <Link
-										variant='underline'
-										_focus={{
-											boxShadow: '0',
-										}}
-										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-										isExternal>
-										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-									duration: defaults.toast.txHashDuration,
+					if(vester?.[0]?.gt(0)) {
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						setWorking(true)
+						claim(provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setWorking(false)
+									setVethAccountLeafClaimed(true)
+									toast({
+										...vaderclaimed,
+										description: <Link
+											variant='underline'
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+										duration: defaults.toast.txHashDuration,
+									})
 								})
 							})
-						})
-						.catch(err => {
-							setWorking(false)
-							if (err.code === 4001) {
-								console.log('Transaction rejected: Your have decided to reject the transaction..')
-								toast(rejected)
-							}
-							else {
-								console.log(err)
-								toast(failed)
-							}
-						})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
+					else {
+						toast(nothingtoclaim)
+					}
 				}
 			}
 			else if ((value > 0)) {
@@ -312,6 +319,16 @@ const Burn = (props) => {
 		}
 		return () => setTokenBalance(ethers.BigNumber.from('0'))
 	}, [wallet.account, tokenSelect, vethAllowLess])
+
+	useEffect(() => {
+		if (wallet.account) {
+			getVester(wallet.account)
+				.then((n) => {
+					setVester(n)
+				})
+				.catch(err => console.log(err))
+		}
+	}, [wallet.account])
 
 	return (
 		<>

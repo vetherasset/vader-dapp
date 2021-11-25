@@ -127,6 +127,15 @@ const noToken0 = {
 	position: defaults.toast.position,
 }
 
+const nothingtoclaim = {
+	title: 'Everything already claimed',
+	description: 'There\'s no claim left. Everything was already claimed.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const tokenValueTooSmall = {
 	title: 'Token amount is too small',
 	description: 'The amount you specified is too small.',
@@ -167,5 +176,5 @@ export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
-	staked, unstaked, vaderclaimed, notBurnEligible,
+	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 }
