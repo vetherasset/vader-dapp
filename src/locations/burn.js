@@ -114,7 +114,7 @@ const Burn = (props) => {
 					else {
 						setWorking(true)
 						approveERC20ToSpend(
-							'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+							tokenSelect.address,
 							defaults.address.converter,
 							vethAllowLess ? value : tokenBalance,
 							provider,
@@ -210,6 +210,7 @@ const Burn = (props) => {
 						convert(
 							proof,
 							value,
+							value.mul(conversionFactor),
 							provider)
 							.then((tx) => {
 								tx.wait(
@@ -280,7 +281,7 @@ const Burn = (props) => {
 			setWorking(true)
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
-				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+				tokenSelect.address,
 				wallet.account,
 				defaults.address.converter,
 				provider,
@@ -300,7 +301,7 @@ const Burn = (props) => {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			setWorking(true)
 			getERC20BalanceOf(
-				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+				tokenSelect.address,
 				wallet.account,
 				provider,
 			)
