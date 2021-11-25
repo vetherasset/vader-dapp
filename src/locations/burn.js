@@ -67,12 +67,28 @@ const Burn = (props) => {
 			<>
 				{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
 					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
-					prettifyCurrency(
-						(Number(inputAmount) * Number(conversionFactor)) / 2,
-						0,
-						5,
-						tokenSelect.convertsTo,
-					)
+					<>
+						{prettifyCurrency(
+							(Number(inputAmount) * Number(conversionFactor)) / 2,
+							0,
+							5,
+							tokenSelect.convertsTo,
+						)}
+						<Box
+							as='h3'
+							fontWeight='bold'
+							textAlign='center'
+							fontSize='1rem'
+						>
+							<Badge
+								as='div'
+								fontSize={{ base: '0.6rem', md: '0.75rem' }}
+								background='rgb(214, 188, 250)'
+								color='rgb(128, 41, 251)'
+							>What You Get
+							</Badge>
+						</Box>
+					</>
 				}
 			</>
 		)
@@ -86,7 +102,7 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved && tokenBalance) {
+			else if (tokenSelect && !tokenApproved && tokenBalance && !vethAccountLeafClaimed) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if ((tokenBalance > 0 && value > 0)) {
 					if(tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
@@ -233,8 +249,7 @@ const Burn = (props) => {
 		if (wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 			Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			const salt = getSalt()
-			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account], salt?.toNumber())
+			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account], '13662469')
 			getClaimed(leaf, provider)
 				.then(r => {
 					if(r) setVethAccountLeafClaimed(true)
@@ -413,7 +428,7 @@ const Burn = (props) => {
 											<AlertIcon />
 											<Box flex='1'>
 												<AlertTitle mr={2}>No eligible account</AlertTitle>
-												<AlertDescription>Sorry, your account is not eligible to burn this token.</AlertDescription>
+												<AlertDescription>Sorry, your account can not burn this token.</AlertDescription>
 											</Box>
 										</Alert>
 									}
@@ -556,22 +571,22 @@ const Burn = (props) => {
 												5,
 												'VADER',
 											)}
+											<Box
+												as='h3'
+												fontWeight='bold'
+												textAlign='center'
+												fontSize='1rem'
+											>
+												<Badge
+													as='div'
+													fontSize={{ base: '0.6rem', md: '0.75rem' }}
+													background='rgb(214, 188, 250)'
+													color='rgb(128, 41, 251)'
+												>What You Get
+												</Badge>
+											</Box>
 										</>
 									}
-									<Box
-										as='h3'
-										fontWeight='bold'
-										textAlign='center'
-										fontSize='1rem'
-									>
-										<Badge
-											as='div'
-											fontSize={{ base: '0.6rem', md: '0.75rem' }}
-											background='rgb(214, 188, 250)'
-											color='rgb(128, 41, 251)'
-										>What You Get
-										</Badge>
-									</Box>
 								</>
 						}
 					</Flex>
