@@ -213,7 +213,7 @@ const Burn = (props) => {
 						convert(
 							proof,
 							defaults.redeemables[0].snapshot[wallet.account],
-							value.mul(ethers.BigNumber.from(10000)),
+							value.mul(ethers.BigNumber.from(conversionFactor)),
 							provider)
 							.then((tx) => {
 								tx.wait(
@@ -758,29 +758,31 @@ const VethBreakdown = (props) => {
 				opacity='0.87'
 			>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
+				{!props.vethAccountLeafClaimed &&
+					<Flex>
+						<Container p='0'>
+							<Box
+								textAlign='left'
+							>
 							Total eligible
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							{wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box
+								textAlign='right'
+							>
+								{wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
 								<>
 									{prettifyCurrency(
 										(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate), 0, 5, 'VADER')
 									}
 								</>
-							}
-						</Box>
-					</Container>
-				</Flex>
+								}
+							</Box>
+						</Container>
+					</Flex>
+				}
 
 				{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
 							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 && props.vethAccountLeafClaimed &&

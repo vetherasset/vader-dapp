@@ -63,7 +63,7 @@ defaults.address.converter = (
 )
 defaults.address.linearVesting = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x09750166d8f3c1e6f5ff762fa58e831fe3bc46b1' :
+		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
 defaults.address.pool = (
