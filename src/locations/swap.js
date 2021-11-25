@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import BigNumber from 'bignumber.js'
 import {
 	Box,
 	Flex,
@@ -70,6 +69,12 @@ const Swap = (props) => {
 	const [ratio, setRatio] = useState('')
 	const [timeoutId, setTimeoutId] = useState(null)
 
+	const formatValue = (value, decimals = 0) => {
+		const precision = Math.pow(10, decimals)
+		const strValue = Math.round(Number(value) * precision) / precision
+		return strValue
+	}
+
 	const getAllowance0 = async () => {
 		if (wallet.account && token0) {
 			getERC20Allowance(token0.address, wallet.account, defaults.address.router, defaults.network.provider)
@@ -124,11 +129,11 @@ const Swap = (props) => {
 	const swap = async () => {
 		setInAction(true)
 		const swapSlippage = auto ? defaults.swap.slippage : slippage
-		const amountOutMin = BigNumber(input1).times(100 - swapSlippage).div(100).toFixed()
+		const amountOutMin = (Number(input1) * (100 - swapSlippage) / 100).toString()
 		swapForAsset(
 			token0,
 			token1,
-			amount0,
+			input0,
 			amountOutMin,
 			deadline,
 			wallet,
@@ -194,13 +199,19 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, amount0, wallet)
-					.then(output => {
-						const estimate = output.times(Number(amount0) || 0)
-						setInput1(estimate.isZero() ? '0' : estimate.toFixed(8))
-						const unit = BigNumber(1).div(estimate)
-						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
-					})
+				if (Number(amount0) == 0) {
+					setInput1('0')
+				}
+				else {
+					getSwapEstimate(token0, token1, amount0, wallet)
+						.then(output => {
+							const estimate = output * amount0
+							setInput1(formatValue(estimate, 8))
+							const unit = 1 / output
+							const precision = unit < 1 ? 1000000 : 1000
+							setRatio(`1 ${token1.symbol} = ${Math.round(unit * precision) / precision} ${token0.symbol}`)
+						})
+				}
 			}, 500))
 		}
 	}, [amount0, token0, token1])
@@ -220,13 +231,19 @@ const Swap = (props) => {
 			}
 
 			setTimeoutId(setTimeout(() => {
-				getSwapEstimate(token0, token1, amount1, wallet)
-					.then(output => {
-						const estimate = BigNumber(1).div(output).times(Number(amount1) || 0)
-						setInput0(estimate.isZero() ? '0' : estimate.toFixed(8))
-						const unit = BigNumber(1).div(output)
-						setRatio(`1 ${token1.symbol} = ${unit.toFormat(unit.isGreaterThan(1) ? 3 : 6)} ${token0.symbol}`)
-					})
+				if (Number(amount1) == 0) {
+					setInput0('0')
+				}
+				else {
+					getSwapEstimate(token0, token1, amount1, wallet, true)
+						.then(output => {
+							const estimate = amount1 / output
+							setInput0(formatValue(estimate, 8))
+							const unit = 1 / output
+							const precision = unit < 1 ? 1000000 : 1000
+							setRatio(`1 ${token1.symbol} = ${Math.round(unit * precision) / precision} ${token0.symbol}`)
+						})
+				}
 			}, 500))
 		}
 	}, [amount1, token0, token1])
@@ -388,21 +405,21 @@ const Swap = (props) => {
 					</Flex>
 					<Flex {...flex}></Flex>
 					<Flex ml='auto' mr='12px'>
-						{ !BigNumber(amount0).isZero() ? ratio : null}
+						{ !Number(amount0) == 0 ? ratio : null}
 					</Flex>
 					<Button
 						minWidth='230px'
 						m='2rem auto'
 						size='lg'
 						variant='solidRadial'
-						disabled={inAction || BigNumber(amount0).isZero()}
-						onClick={ BigNumber(allowance0).isLessThan(amount0) ? approve : swap}
+						disabled={inAction || Number(input0) == 0}
+						onClick={ Number(allowance0) < Number(amount0) ? approve : swap}
 					>
 						<Box
 							fontWeight='1000'
 						>
 							{
-								BigNumber(allowance0).isLessThan(amount0)
+								Number(allowance0) < Number(input0)
 									? (inAction ? 'APPROVING' : 'APPROVE')
 									: (inAction ? 'SWAPPING' : 'SWAP')
 							}
