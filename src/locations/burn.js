@@ -462,7 +462,7 @@ const Burn = (props) => {
 											status='error'>
 											<AlertIcon />
 											<Box flex='1'>
-												<AlertTitle mr={2}>No eligible account</AlertTitle>
+												<AlertTitle mr={2}>Not eligible account</AlertTitle>
 												<AlertDescription>Sorry, your account can not burn this token.</AlertDescription>
 											</Box>
 										</Alert>
