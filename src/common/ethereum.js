@@ -1,5 +1,4 @@
-import { ethers } from 'ethers'
-import BigNumber from 'bignumber.js'
+import { ethers, BigNumber } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
 import converterAbi from '../artifacts/abi/converter'
 import poolAbi from '../artifacts/abi/vaderPoolV2'
@@ -10,6 +9,23 @@ import lpStakingAbi from '../artifacts/abi/lpStaking'
 import curvePoolAbi from '../artifacts/abi/curvePool'
 
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
+
+const toWei = (value, decimals = 0) => {
+	let strValue = value.toString()
+	const len = strValue.length
+	let pointIndex = strValue.indexOf('.')
+	pointIndex = pointIndex >= 0 ? pointIndex : len
+	strValue = strValue.replace('.', '')
+	return BigNumber.from(strValue.padEnd(pointIndex + decimals, '0'))
+}
+
+const fromWei = (value, decimals = 0) => {
+	const strValue = value.toString()
+	const len = strValue.length
+	const integer = strValue.substring(0, len - decimals)
+	const fractional = strValue.substring(len - decimals, len)
+	return Number(integer.padStart(1, '0') + '.' + fractional.padStart(decimals, '0'))
+}
 
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
@@ -37,18 +53,6 @@ const getERC20Allowance = async (tokenAddress, ownerAddress, spenderAddress, pro
 		provider,
 	)
 	return await contract.allowance(ownerAddress, spenderAddress)
-}
-
-const setERC20Allowance = async (tokenAddress, spenderAddress, wallet) => {
-	const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-	const contract = new ethers.Contract(
-		tokenAddress,
-		humanStandardTokenAbi,
-		provider.getSigner(0),
-	)
-
-	const tx = await contract.approve(spenderAddress, MAX_UINT256)
-	await tx.wait()
 }
 
 const getERC20BalanceOf = async (tokenAddress, address, provider) => {
@@ -117,7 +121,12 @@ const getSwapEstimate = async (
 	to,
 	amount,
 	wallet,
+	isToInput = false,
 ) => {
+	if (Number(amount) == 0) {
+		return 0
+	}
+
 	const fromNativeAsset = from.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const toNativeAsset = to.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const doubleSwap = !fromNativeAsset && !toNativeAsset
@@ -131,55 +140,63 @@ const getSwapEstimate = async (
 
 	let fromAssetInfo
 	let toAssetInfo
-	let deReserve0 = 0
+	let deReserve0 = BigNumber.from(0)
 	if (!fromNativeAsset) {
 		fromAssetInfo = await poolContract.pairInfo(from.address)
-		deReserve0 = BigNumber(fromAssetInfo.reserveForeign).toString()
-		const amountInWei = BigNumber(amount).times(10 ** from.decimals).integerValue()
-
-		if (amountInWei.isLessThan(deReserve0)) {
-			deReserve0 = amountInWei.toString()
+		deReserve0 = BigNumber.from(fromAssetInfo.reserveForeign)
+		let amountInWei = toWei(amount, from.decimals)
+		if (isToInput) {
+			amountInWei = toWei(amount, to.decimals)
+				.mul(deReserve0)
+				.div(fromAssetInfo.reserveNative)
+		}
+		if (amountInWei.lt(deReserve0)) {
+			deReserve0 = amountInWei
 		}
 	}
 	if (!toNativeAsset) {
 		toAssetInfo = await poolContract.pairInfo(to.address)
 		if (fromNativeAsset) {
-			deReserve0 = BigNumber(toAssetInfo.reserveNative).toString()
-			const amountInWei = BigNumber(amount).times(10 ** to.decimals).integerValue()
-			if (amountInWei.isLessThan(deReserve0)) {
-				deReserve0 = amountInWei.toString()
+			deReserve0 = BigNumber.from(toAssetInfo.reserveNative)
+			let amountInWei = toWei(amount, to.decimals)
+			if (isToInput) {
+				amountInWei = toWei(amount, to.decimals)
+					.mul(deReserve0)
+					.div(toAssetInfo.reserveForeign)
+			}
+			if (amountInWei.lt(deReserve0)) {
+				deReserve0 = amountInWei
 			}
 		}
 	}
 
 	try {
 		if (doubleSwap) {
-			return BigNumber(
+			return fromWei(
 				await poolContract.callStatic.doubleSwap(
 					from.address,
 					to.address,
-					deReserve0,
+					deReserve0.toString(),
 					wallet.account,
-				),
-			).div(deReserve0).times(10 ** from.decimals).div(10 ** to.decimals)
+				), to.decimals,
+			) / (isToInput ? fromWei(deReserve0, from.decimals) : amount)
 		}
 		else {
-			const nativeAmount = fromNativeAsset ? deReserve0 : 0
-			const foreignAmount = toNativeAsset ? deReserve0 : 0
-
-			return BigNumber(
+			const nativeAmount = fromNativeAsset ? deReserve0.toString() : 0
+			const foreignAmount = toNativeAsset ? deReserve0.toString() : 0
+			return fromWei(
 				await poolContract.callStatic.swap(
 					toNativeAsset ? from.address : to.address,
 					nativeAmount,
 					foreignAmount,
 					wallet.account,
-				),
-			).div(deReserve0).times(10 ** from.decimals).div(10 ** to.decimals)
+				), to.decimals,
+			) / (isToInput ? fromWei(deReserve0, from.decimals) : amount)
 		}
 	}
 	catch (e) {
 		console.log(e)
-		return BigNumber(0)
+		return 0
 	}
 }
 
@@ -194,8 +211,8 @@ const swapForAsset = async (
 	const fromNativeAsset = from.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const toNativeAsset = to.address.toLowerCase() == defaults.tokenDefault.address.toLowerCase()
 	const doubleSwap = !fromNativeAsset && !toNativeAsset
-	const amountInWei =	BigNumber(amount).times(10 ** from.decimals).toFixed()
-	const amountOutMinInWei =	BigNumber(amountOutMin).times(10 ** to.decimals).toFixed()
+	const amountInWei = toWei(amount, from.decimals).toString()
+	const amountOutMinInWei =	toWei(amountOutMin, to.decimals).toString()
 	const deadlineTimeStamp = Math.round(Date.now() / 1000 + deadline * 60)
 
 	const provider = new ethers.providers.Web3Provider(wallet.ethereum)
@@ -248,7 +265,7 @@ const getSwapRate = async (from, to, provider) => {
 		provider.getSigner(0),
 	)
 
-	return ethers.BigNumber.from(await contract.callStatic.swap(1, from, to))
+	return BigNumber.from(await contract.callStatic.swap(1, from, to))
 }
 
 const getSwapFee = async (inputAmount, from, to, provider) => {
@@ -257,9 +274,9 @@ const getSwapFee = async (inputAmount, from, to, provider) => {
 		provider,
 	)
 
-	const baseAmount = ethers.BigNumber.from(await contract.getBaseAmount(to))
-	const tokenAmount = ethers.BigNumber.from(await contract.getTokenAmount(to))
-	const numerator = tokenAmount.mul(ethers.BigNumber.from(inputAmount).pow(2))
+	const baseAmount = BigNumber.from(await contract.getBaseAmount(to))
+	const tokenAmount = BigNumber.from(await contract.getTokenAmount(to))
+	const numerator = tokenAmount.mul(BigNumber.from(inputAmount).pow(2))
 	const denominator = baseAmount.add(1).pow(2)
 
 	return numerator.div(denominator)
@@ -322,7 +339,7 @@ const getLPVirtualPrice = (contractAddress) => {
 export {
 	MAX_UINT256,
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
-	estimateGasCost, getERC20Allowance,
+	estimateGasCost, getERC20Allowance, getSwapEstimate,
 	convertVetherToVader, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,

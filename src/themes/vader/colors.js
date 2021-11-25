@@ -27,4 +27,8 @@ export default {
 		200: '#ffba00',
 		500: '#ffba00',
 	},
+	pink: {
+		200: '#FE9DDB',
+		300: '#F296D1',
+	},
 }
