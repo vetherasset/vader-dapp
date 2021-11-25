@@ -42,7 +42,9 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	exception,
 	vaderclaimed,
 	notBurnEligible,
-	nothingtoclaim } from '../messages'
+	nothingtoclaim,
+	nomorethaneligible,
+} from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 
 const Burn = (props) => {
@@ -209,8 +211,8 @@ const Burn = (props) => {
 						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 						convert(
 							proof,
-							value,
-							value.mul(conversionFactor),
+							defaults.redeemables[0].snapshot[wallet.account],
+							value.mul(ethers.BigNumber.from(10000)),
 							provider)
 							.then((tx) => {
 								tx.wait(
@@ -235,7 +237,7 @@ const Burn = (props) => {
 							.catch(err => {
 								setWorking(false)
 								if (err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									console.log('Transaction rejected: You have decided to reject the transaction..')
 									toast(rejected)
 								}
 								else {
@@ -287,7 +289,17 @@ const Burn = (props) => {
 				provider,
 			).then((n) => {
 				setWorking(false)
-				if(n.gt(0) && n.gte(value))	setTokenApproved(true)
+				if(!tokenSelect.symbol === 'VETH') {
+					if (n.gt(0) && n.gte(value))	setTokenApproved(true)
+				}
+				if (tokenSelect.symbol === 'VETH') {
+					if (n.eq(value)) {
+						setTokenApproved(true)
+					}
+					else {
+						setTokenApproved(false)
+					}
+				}
 			})
 		}
 		return () => {
@@ -517,7 +529,15 @@ const Burn = (props) => {
 													setInputAmount(String(e.target.value))
 													if(Number(e.target.value) > 0) {
 														try {
-															setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+															if (tokenSelect.symbol === 'VETH' &&
+															ethers.utils.parseUnits(String(e.target.value), 18).gt(defaults.redeemables?.[0].snapshot?.[wallet.account])) {
+																setInputAmount(ethers.utils.formatUnits(defaults.redeemables?.[0].snapshot?.[wallet.account], 18))
+																setValue(ethers.utils.parseUnits(defaults.redeemables?.[0].snapshot?.[wallet.account], 18))
+																toast(nomorethaneligible)
+															}
+															else {
+																setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+															}
 														}
 														catch(err) {
 															if (err.code === 'NUMERIC_FAULT') {
@@ -898,6 +918,7 @@ const VethAllowLessOption = (props) => {
 							padding='0 1.5rem'>
               Are you sure? You can&apos;t burn more of this token afterwards.
 							This&nbsp;might result in loss of potential claim portion.
+							Please note that it&apos;s neccesary to re-approve if you already did so.
 						</AlertDialogBody>
 						<AlertDialogFooter>
 							<Flex
