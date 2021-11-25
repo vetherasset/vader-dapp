@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources.json'
-import snapshot from '../artifacts/snapshot.json'
+import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
 
