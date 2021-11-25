@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources.json'
+import snapshot from '../artifacts/snapshot.json'
 
 const defaults = {}
 
@@ -17,17 +18,7 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
 	],
-	1,
 )
 
 defaults.network.tx = {}
@@ -67,7 +58,12 @@ defaults.address.usdv = (
 ),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+		defaults.network.chainId === 42 ? '0x0886Bc7CFB73C912130a4A425b12336227A96723' :
+			undefined
+)
+defaults.address.linearVesting = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x09750166d8f3c1e6f5ff762fa58e831fe3bc46b1' :
 			undefined
 )
 defaults.address.pool = (
@@ -115,6 +111,12 @@ defaults.redeemables = [
 		'decimals':18,
 		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
+		'snapshot':snapshot,
+		'salt':(
+			defaults.network.chainId === 1 ? '13662469' :
+				defaults.network.chainId === 42 ? '13662469' :
+					undefined
+		),
 	},
 ]
 

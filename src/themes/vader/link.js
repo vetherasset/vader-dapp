@@ -10,4 +10,13 @@ export default {
 			boxShadow: '0 0 0 3px #7b7ce0',
 		},
 	},
+	variants: {
+		underline: () => ({
+			_hover: {
+				textDecoration: 'underline',
+				color: '#000',
+				borderBottom: 'none',
+			},
+		}),
+	},
 }

@@ -9,6 +9,15 @@ const approved = {
 	position: defaults.toast.position,
 }
 
+const notBurnEligible = {
+	title: 'Account not eligible',
+	description: 'Your account is not eligible to burn this token.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const connected = {
 	title: 'Wallet connected',
 	description: 'Your wallet account has been connected.',
@@ -73,6 +82,15 @@ const vaderconverted = {
 	position: defaults.toast.position,
 }
 
+const vaderclaimed = {
+	title: 'Vader succesfully claimed',
+	description: 'Your tokens have been claimed.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const usdvredeemed = {
 	title: 'USDV burnt for Vader Token',
 	description: 'Your tokens were burnt succesfully.',
@@ -104,6 +122,15 @@ const noToken0 = {
 	title: 'No token selected',
 	description: 'You didn\'t select a token.',
 	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const nothingtoclaim = {
+	title: 'Everything already claimed',
+	description: 'There\'s no claim left. Everything was already claimed.',
+	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
 	position: defaults.toast.position,
@@ -149,5 +176,5 @@ export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
-	staked, unstaked,
+	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 }
