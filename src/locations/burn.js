@@ -63,15 +63,19 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 
 	const DrawAmount = () => {
-		return <>
-			{inputAmount &&
-				prettifyCurrency(
-					(Number(inputAmount) * Number(conversionFactor)) / 2,
-					0,
-					5,
-					tokenSelect.convertsTo,
-				)}
-		</>
+		return (
+			<>
+				{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
+					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
+					prettifyCurrency(
+						(Number(inputAmount) * Number(conversionFactor)) / 2,
+						0,
+						5,
+						tokenSelect.convertsTo,
+					)
+				}
+			</>
+		)
 	}
 
 	const submit = () => {
@@ -565,7 +569,7 @@ const Burn = (props) => {
 											fontSize={{ base: '0.6rem', md: '0.75rem' }}
 											background='rgb(214, 188, 250)'
 											color='rgb(128, 41, 251)'
-										>What You Get Now
+										>What You Get
 										</Badge>
 									</Box>
 								</>
