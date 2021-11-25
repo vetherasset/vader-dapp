@@ -18,14 +18,14 @@ export const BurgerMenu = (props) => {
 				variant='solid'
 			/>
 			<MenuList>
-				{props.pages.map(p => <Link
+				{/* {props.pages.map(p => <Link
 					key={p.name}
 					to={p.link}
 				>
 					<MenuItem key={p.name} pb='1rem'>
 						{p.text}
 					</MenuItem>
-				</Link>)}
+				</Link>)} */}
 				<WalletConnectionToggle w='100%' />
 			</MenuList>
 		</Menu>

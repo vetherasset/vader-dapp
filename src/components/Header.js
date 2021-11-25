@@ -16,11 +16,6 @@ export const Header = (props) => {
 			text: 'Acquire',
 			link: '/acquire',
 		},
-		{
-			name: 'Stake',
-			text: 'Stake',
-			link: '/stake',
-		},
 	]
 
 	const current = {
@@ -42,12 +37,12 @@ export const Header = (props) => {
 				alignItems='center'
 				justifyContent='space-around'
 				textTransform='capitalize'
-				layerStyle='colorful'
+				// layerStyle='colorful'
 				borderRadius='12px'
 				p='0.3rem 0.2rem'
 				display={{ base: 'none', md: 'flex' }}
 			>
-				{pages.map(p =>
+				{/* {pages.map(p =>
 					<Link
 						key={p.name}
 						to={p.link}
@@ -61,7 +56,7 @@ export const Header = (props) => {
 					>
 						{p.text}
 					</Link>)
-				}
+				} */}
 			</Flex>
 			<Flex w='20%' justifyContent='flex-end'>
 				{useBreakpointValue({
