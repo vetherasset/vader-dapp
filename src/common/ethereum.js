@@ -86,13 +86,13 @@ const estimateGasCost = async (contractAddress, abi, callName, data, provider) =
 	return await execute(callName, contract.estimateGas, data)
 }
 
-const convert = async (proof, amount, provider) => {
+const convert = async (proof, amount, minVader, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.converter,
 		converterAbi,
 		provider.getSigner(0),
 	)
-	return await contract.convert(proof, amount)
+	return await contract.convert(proof, amount, minVader)
 }
 
 const getClaimed = async (leaf) => {
