@@ -173,11 +173,11 @@ const getStartOfTheDayTimeStamp = () => {
 	return Math.floor(new Date(currentDate).getTime() / 1000)
 }
 
-const getMerkleLeaf = (account, amount) => {
+const getMerkleLeaf = (account, amount, salt) => {
 	if (account && amount) {
 		const digest = ethers.utils.solidityKeccak256(
 			[ 'address', 'uint256', 'uint256', 'uint256' ],
-			[ account, amount, '13662469', defaults.network.chainId ],
+			[ account, amount, salt, defaults.network.chainId ],
 		)
 		return digest
 	}

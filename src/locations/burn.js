@@ -32,7 +32,7 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim, getSalt } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -82,48 +82,54 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved && tokenBalance && !vethAccountLeafClaimed) {
+			else if (tokenSelect && !tokenApproved && tokenBalance) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if ((tokenBalance > 0 && value > 0)) {
-					setWorking(true)
-					approveERC20ToSpend(
-						'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
-						defaults.address.converter,
-						vethAllowLess ? value : tokenBalance,
-						provider,
-					).then((tx) => {
-						tx.wait(defaults.network.tx.confirmations)
-							.then(() => {
-								setWorking(false)
-								setTokenApproved(true)
-								toast(approved)
-							})
-							.catch(e => {
-								setWorking(false)
-								if (e.code === 4001) toast(rejected)
-								if (e.code === -32016) toast(exception)
-							})
-					})
-						.catch(err => {
-							setWorking(false)
-							if(err.code === 'INSUFFICIENT_FUNDS') {
-								console.log('Insufficient balance: Your account balance is insufficient.')
-								toast(insufficientBalance)
-							}
-							else if(err.code === 4001) {
-								console.log('Transaction rejected: Your have decided to reject the transaction..')
-								toast(rejected)
-							}
-							else {
-								console.log(err)
-								toast(failed)
-							}
+					if(tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
+					(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+						toast(notBurnEligible)
+					}
+					else {
+						setWorking(true)
+						approveERC20ToSpend(
+							'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+							defaults.address.converter,
+							vethAllowLess ? value : tokenBalance,
+							provider,
+						).then((tx) => {
+							tx.wait(defaults.network.tx.confirmations)
+								.then(() => {
+									setWorking(false)
+									setTokenApproved(true)
+									toast(approved)
+								})
+								.catch(e => {
+									setWorking(false)
+									if (e.code === 4001) toast(rejected)
+									if (e.code === -32016) toast(exception)
+								})
 						})
+							.catch(err => {
+								setWorking(false)
+								if(err.code === 'INSUFFICIENT_FUNDS') {
+									console.log('Insufficient balance: Your account balance is insufficient.')
+									toast(insufficientBalance)
+								}
+								else if(err.code === 4001) {
+									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
 				}
 				else if (vethAllowLess) {
 					toast(noAmount)
 				}
-				else if ((!defaults.redeemables[0].snapshot[wallet.account]) || !Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+				else if ((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
 					toast(notBurnEligible)
 				}
 				else {
@@ -223,7 +229,8 @@ const Burn = (props) => {
 		if (wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 			Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
+			const salt = getSalt()
+			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account], salt?.toNumber())
 			getClaimed(leaf, provider)
 				.then(r => {
 					if(r) setVethAccountLeafClaimed(true)
