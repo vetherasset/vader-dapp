@@ -18,17 +18,7 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
 	],
-	1,
 )
 
 defaults.network.tx = {}
@@ -68,7 +58,7 @@ defaults.address.usdv = (
 ),
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x0886bc7cfb73c912130a4a425b12336227a96723' :
+		defaults.network.chainId === 42 ? '0x0886Bc7CFB73C912130a4A425b12336227A96723' :
 			undefined
 )
 defaults.address.linearVesting = (
