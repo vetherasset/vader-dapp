@@ -129,7 +129,7 @@ const Burn = (props) => {
 				else if (vethAllowLess) {
 					toast(noAmount)
 				}
-				else if ((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
+				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
 					toast(notBurnEligible)
 				}
 				else {
@@ -401,8 +401,8 @@ const Burn = (props) => {
 										</Alert>
 									}
 
-									{(!defaults.redeemables[0].snapshot[wallet.account]) ||
-										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) &&
+									{((!defaults.redeemables[0].snapshot[wallet.account]) ||
+										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) &&
 										<Alert
 											m='0 0 1rem'
 											status='error'>
