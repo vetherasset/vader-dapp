@@ -197,7 +197,6 @@ const getMerkleProofForAccount = (account, snapshot) => {
 		sortPairs: true,
 	})
 	const leaf = getMerkleLeaf(account, snapshot[account])
-	console.log(tree.getHexRoot())
 	const proof = tree.getHexProof(leaf)
 	return proof
 }

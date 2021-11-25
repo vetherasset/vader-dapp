@@ -42,7 +42,9 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	exception,
 	vaderclaimed,
 	notBurnEligible,
-	nothingtoclaim } from '../messages'
+	nothingtoclaim,
+	nomorethaneligible,
+} from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 
 const Burn = (props) => {
@@ -114,7 +116,7 @@ const Burn = (props) => {
 					else {
 						setWorking(true)
 						approveERC20ToSpend(
-							'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+							tokenSelect.address,
 							defaults.address.converter,
 							vethAllowLess ? value : tokenBalance,
 							provider,
@@ -204,12 +206,14 @@ const Burn = (props) => {
 			else if ((value > 0)) {
 				if ((tokenBalance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					setWorking(true)
-					if (tokenSelect.symbol === 'VETH') {
+					if (tokenSelect.symbol === 'VETH' && defaults.redeemables[0].snapshot[wallet.account] &&
+					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+						setWorking(true)
 						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 						convert(
 							proof,
-							value,
+							defaults.redeemables[0].snapshot[wallet.account],
+							value.mul(ethers.BigNumber.from(conversionFactor)),
 							provider)
 							.then((tx) => {
 								tx.wait(
@@ -234,7 +238,7 @@ const Burn = (props) => {
 							.catch(err => {
 								setWorking(false)
 								if (err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									console.log('Transaction rejected: You have decided to reject the transaction..')
 									toast(rejected)
 								}
 								else {
@@ -242,6 +246,9 @@ const Burn = (props) => {
 									toast(failed)
 								}
 							})
+					}
+					else {
+						toast(notBurnEligible)
 					}
 				}
 				else {
@@ -280,13 +287,23 @@ const Burn = (props) => {
 			setWorking(true)
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
-				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+				tokenSelect.address,
 				wallet.account,
 				defaults.address.converter,
 				provider,
 			).then((n) => {
 				setWorking(false)
-				if(n.gt(0) && n.gte(value))	setTokenApproved(true)
+				if(!tokenSelect.symbol === 'VETH') {
+					if (n.gt(0) && n.gte(value))	setTokenApproved(true)
+				}
+				if (tokenSelect.symbol === 'VETH') {
+					if (n.eq(value)) {
+						setTokenApproved(true)
+					}
+					else {
+						setTokenApproved(false)
+					}
+				}
 			})
 		}
 		return () => {
@@ -300,7 +317,7 @@ const Burn = (props) => {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			setWorking(true)
 			getERC20BalanceOf(
-				'0x35D61D5e7fbEA90625A4C0fCC1c39D8c4d81818B',
+				tokenSelect.address,
 				wallet.account,
 				provider,
 			)
@@ -516,7 +533,15 @@ const Burn = (props) => {
 													setInputAmount(String(e.target.value))
 													if(Number(e.target.value) > 0) {
 														try {
-															setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+															if (tokenSelect.symbol === 'VETH' &&
+															ethers.utils.parseUnits(String(e.target.value), 18).gt(defaults.redeemables?.[0].snapshot?.[wallet.account])) {
+																setInputAmount(ethers.utils.formatUnits(defaults.redeemables?.[0].snapshot?.[wallet.account], 18))
+																setValue(ethers.utils.parseUnits(defaults.redeemables?.[0].snapshot?.[wallet.account], 18))
+																toast(nomorethaneligible)
+															}
+															else {
+																setValue(ethers.utils.parseUnits(String(e.target.value), 18))
+															}
 														}
 														catch(err) {
 															if (err.code === 'NUMERIC_FAULT') {
@@ -728,34 +753,36 @@ const VethBreakdown = (props) => {
 
 			<Flex
 				flexDir='column'
-				p='0 0.3rem'
+				p='0 0.15rem'
 				marginBottom='.7rem'
 				opacity='0.87'
 			>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
+				{!props.vethAccountLeafClaimed &&
+					<Flex>
+						<Container p='0'>
+							<Box
+								textAlign='left'
+							>
 							Total eligible
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							{wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box
+								textAlign='right'
+							>
+								{wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
 								<>
 									{prettifyCurrency(
 										(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate), 0, 5, 'VADER')
 									}
 								</>
-							}
-						</Box>
-					</Container>
-				</Flex>
+								}
+							</Box>
+						</Container>
+					</Flex>
+				}
 
 				{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
 							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 && props.vethAccountLeafClaimed &&
@@ -897,6 +924,7 @@ const VethAllowLessOption = (props) => {
 							padding='0 1.5rem'>
               Are you sure? You can&apos;t burn more of this token afterwards.
 							This&nbsp;might result in loss of potential claim portion.
+							Please note that it&apos;s neccesary to re-approve if you already did so.
 						</AlertDialogBody>
 						<AlertDialogFooter>
 							<Flex

@@ -136,6 +136,15 @@ const nothingtoclaim = {
 	position: defaults.toast.position,
 }
 
+const nomorethaneligible = {
+	title: 'Can not burn more than eligible',
+	description: 'You can\'t burn more than you\'re eligible.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const tokenValueTooSmall = {
 	title: 'Token amount is too small',
 	description: 'The amount you specified is too small.',
@@ -177,4 +186,5 @@ export {
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
+	nomorethaneligible,
 }
