@@ -32,7 +32,7 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim, getSalt } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -170,6 +170,7 @@ const Burn = (props) => {
 								toast({
 									...vaderclaimed,
 									description: <Link
+										variant='underline'
 										_focus={{
 											boxShadow: '0',
 										}}
@@ -212,6 +213,7 @@ const Burn = (props) => {
 									toast({
 										...vethupgraded,
 										description: <Link
+											variant='underline'
 											_focus={{
 												boxShadow: '0',
 											}}
@@ -255,7 +257,6 @@ const Burn = (props) => {
 					if(r) setVethAccountLeafClaimed(true)
 				})
 		}
-		return () => setVethAccountLeafClaimed(false)
 	}, [wallet.account])
 
 	useEffect(() => {
@@ -746,7 +747,7 @@ const VethBreakdown = (props) => {
 										<Container p='0'>
 											<Box
 												textAlign='left'>
-								Claimed
+												Claimed
 											</Box>
 										</Container>
 										<Container p='0'>
@@ -772,7 +773,7 @@ const VethBreakdown = (props) => {
 										<Container p='0'>
 											<Box
 												textAlign='left'>
-								Remains vested
+												Remains vested
 											</Box>
 										</Container>
 										<Container p='0'>
