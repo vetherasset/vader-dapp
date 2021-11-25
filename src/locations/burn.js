@@ -32,14 +32,16 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
 	tokenValueTooSmall,
 	noToken0,
 	approved,
-	exception } from '../messages'
+	exception,
+	vaderclaimed } from '../messages'
+import { useClaimableVeth } from '../hooks/useClaimableVeth'
 
 const Burn = (props) => {
 
@@ -57,6 +59,7 @@ const Burn = (props) => {
 
 	const [vethAllowLess, setVethAllowLess] = useState(false)
 	const [vethAccountLeafClaimed, setVethAccountLeafClaimed] = useState(false)
+	const claimableVeth = useClaimableVeth()
 
 	const DrawAmount = () => {
 		return <>
@@ -78,7 +81,7 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved && tokenBalance) {
+			else if (tokenSelect && !tokenApproved && tokenBalance && !vethAccountLeafClaimed) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if ((tokenBalance > 0 && value > 0)) {
 					setWorking(true)
@@ -121,6 +124,43 @@ const Burn = (props) => {
 				}
 				else {
 					toast(insufficientBalance)
+				}
+			}
+			else if (vethAccountLeafClaimed) {
+				if (tokenSelect.symbol === 'VETH') {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					setWorking(true)
+					claim(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								setVethAccountLeafClaimed(true)
+								toast({
+									...vaderclaimed,
+									description: <Link
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
 				}
 			}
 			else if ((value > 0)) {
@@ -209,7 +249,6 @@ const Burn = (props) => {
 			).then((n) => {
 				setWorking(false)
 				if(n.gt(0) && n.gte(value))	setTokenApproved(true)
-				console.log(n)
 			})
 		}
 		return () => {
@@ -298,8 +337,13 @@ const Burn = (props) => {
 							/> : '' }
 							rightIcon={<ChevronDownIcon />}
 							onClick={() => {
-								onOpen()
-								setIsSelect(0)
+								if (wallet.account) {
+									onOpen()
+									setIsSelect(0)
+								}
+								else {
+									toast(walletNotConnected)
+								}
 							}}>
 							{tokenSelect &&
 											<>
@@ -339,84 +383,10 @@ const Burn = (props) => {
 											<AlertDescription>Vested portion&apos;s linearly released for 1&nbsp;year. Claiming has no limits. Can be done regurarly at&nbsp;any time.</AlertDescription>
 										</Box>
 									</Alert>
-									<Text
-										as='h4'
-										fontSize='1.1rem'
-										fontWeight='bolder'
-										mr='0.66rem'
-										opacity={ tokenSelect ? '' : '0.5' }>
-										Breakdown
-									</Text>
 
-									<Flex
-										flexDir='column'
-										p='0 0.3rem'
-										marginBottom='.7rem'
-										opacity='0.87'
-									>
-
-										<Flex>
-											<Container p='0'>
-												<Box
-													textAlign='left'
-												>
-													Total entitled
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign='right'
-												>
-													99999&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
-												</Box>
-											</Container>
-										</Flex>
-
-										<Flex>
-											<Container p='0'>
-												<Box
-													textAlign='left'>
-													Claimed
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign='right'>
-														0&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
-												</Box>
-											</Container>
-										</Flex>
-
-										<Flex>
-											<Container p='0'>
-												<Box
-													textAlign='left'>
-													Remains vested
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign='right'>
-														49999.5&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
-												</Box>
-											</Container>
-										</Flex>
-
-										<Flex>
-											<Container p='0'>
-												<Box
-													textAlign='left'>
-													Claimable now
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign='right'>
-														49999.5&nbsp;<span style={{ fontSize: '0.8rem' }}>VADER</span>
-												</Box>
-											</Container>
-										</Flex>
-									</Flex>
+									{wallet.account &&
+										<VethBreakdown claimable={claimableVeth} />
+									}
 								</>
 							}
 						</>
@@ -444,7 +414,10 @@ const Burn = (props) => {
 											flex='1'
 											cursor={ tokenSelect ? '' : 'not-allowed' }
 											disabled={
-												tokenSelect.symbol === 'VETH' && !vethAllowLess ? true : false
+												!tokenSelect ? true :
+													tokenSelect ? false :
+														tokenSelect.symbol === 'VETH' && !vethAllowLess ? true :
+															false
 											}
 											_disabled={
 												tokenSelect.symbol === 'VETH' ? {
@@ -529,7 +502,12 @@ const Burn = (props) => {
 									}
 									{vethAccountLeafClaimed &&
 										<>
-											49999.5 VADER
+											{prettifyCurrency(
+												ethers.utils.formatUnits(claimableVeth, 18),
+												0,
+												5,
+												'VADER',
+											)}
 										</>
 									}
 									<Box
@@ -543,7 +521,7 @@ const Burn = (props) => {
 											fontSize={{ base: '0.6rem', md: '0.75rem' }}
 											background='rgb(214, 188, 250)'
 											color='rgb(128, 41, 251)'
-										>What You Receive Now
+										>What You Get Now
 										</Badge>
 									</Box>
 								</>
@@ -608,6 +586,136 @@ const Burn = (props) => {
 				onOpen={onOpen}
 				onClose={onClose}
 			/>
+		</>
+	)
+}
+
+const VethBreakdown = (props) => {
+
+	VethBreakdown.propTypes = {
+		claimable: PropTypes.object.isRequired,
+	}
+
+	const wallet = useWallet()
+
+	const [vester, setVester] = useState([])
+
+	useEffect(() => {
+		if (wallet.account) {
+			getVester(wallet.account)
+				.then((n) => {
+					setVester(n)
+				})
+				.catch(err => console.log(err))
+		}
+	}, [wallet.account])
+
+	return (
+		<>
+			<Text
+				as='h4'
+				fontSize='1.1rem'
+				fontWeight='bolder'
+				mr='0.66rem'
+			>
+				Breakdown
+			</Text>
+
+			<Flex
+				flexDir='column'
+				p='0 0.3rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+			>
+
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							Total eligible
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+							{wallet.account &&
+								<>
+									{prettifyCurrency(
+										(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate), 0, 5, 'VADER')
+									}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Claimed
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot &&
+								<>
+									{prettifyCurrency(
+										Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)
+											- Number(ethers.utils.formatUnits(vester?.[0], 18)),
+										0,
+										5,
+								 		'VADER',
+									)}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Remains vested
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{vester?.[0] &&
+									<>
+										{prettifyCurrency(ethers.utils.formatUnits(vester?.[0], 18), 0, 4, 'VADER')}
+									</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Claimable now
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{props.claimable.gt(0) &&
+								prettifyCurrency(
+									ethers.utils.formatUnits(props.claimable, 18),
+									0,
+									5,
+									'VADER',
+								)}
+						</Box>
+					</Container>
+				</Flex>
+			</Flex>
 		</>
 	)
 }

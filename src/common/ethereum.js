@@ -4,6 +4,7 @@ import converterAbi from '../artifacts/abi/converter'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
+import linearVestingAbi from '../artifacts/abi/linearVesting'
 
 const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
 	const contract = new ethers.Contract(
@@ -112,6 +113,34 @@ const getSalt = async () => {
 	return await contract.salt()
 }
 
+const getClaim = async (account) => {
+	const contract = new ethers.Contract(
+		defaults.address.linearVesting,
+		linearVestingAbi,
+		defaults.network.provider,
+	)
+	return await contract.getClaim(account)
+}
+
+const getVester = async (account) => {
+	const contract = new ethers.Contract(
+		defaults.address.linearVesting,
+		linearVestingAbi,
+		defaults.network.provider,
+	)
+	return await contract.vest(account)
+}
+
+const claim = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.linearVesting,
+		linearVestingAbi,
+		provider.getSigner(0),
+	)
+	return await contract.claim()
+}
+
+
 const getSwapRate = async (from, to, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.router,
@@ -144,7 +173,6 @@ const swapForAsset = async (amount, from, to, provider) => {
 	return ethers.BigNumber.from(await contract.swap(amount, from, to))
 }
 
-
 const stakeVader = async (amount, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.xvader,
@@ -169,5 +197,6 @@ export {
 	convert, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
-	getSalt, getClaimed,
+	getSalt, getClaimed, getClaim, getVester,
+	claim,
 }

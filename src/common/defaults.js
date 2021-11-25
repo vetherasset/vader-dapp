@@ -71,6 +71,11 @@ defaults.address.converter = (
 		defaults.network.chainId === 42 ? '0x0886bc7cfb73c912130a4a425b12336227a96723' :
 			undefined
 )
+defaults.address.linearVesting = (
+	defaults.network.chainId === 1 ? '' :
+		defaults.network.chainId === 42 ? '0x09750166d8f3c1e6f5ff762fa58e831fe3bc46b1' :
+			undefined
+)
 defaults.address.pool = (
 	defaults.network.chainId === 1 ? '' :
 		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
