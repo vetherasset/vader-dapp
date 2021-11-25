@@ -5,6 +5,8 @@ import poolAbi from '../artifacts/abi/vaderPoolV2'
 import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
+import lpStakingAbi from '../artifacts/abi/lpStaking'
+import curvePoolAbi from '../artifacts/abi/curvePool'
 
 const MAX_UINT256 = '115792089237316195423570985008687907853269984665640564039458'
 
@@ -298,6 +300,42 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
+const lpTokenStaking = (contractAddress, provider) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		lpStakingAbi,
+		provider ? provider.getSigner(0) : defaults.network.provider,
+	)
+	const balanceOf = (address) => contract.balanceOf(address)
+	const stake = (amount) => contract.stake(amount)
+	const withdraw = (amount) => contract.withdraw(amount)
+	const earned = (address) => contract.earned(address)
+	const claim = () => contract.getReward()
+	const rewardRate = () => contract.rewardRate()
+	const rewardsDuration = () => contract.rewardsDuration()
+	const rewardPerToken = () => contract.rewardPerToken()
+
+	return {
+		balanceOf,
+		stake,
+		withdraw,
+		earned,
+		claim,
+		rewardRate,
+		rewardsDuration,
+		rewardPerToken,
+	}
+}
+
+const getLPVirtualPrice = (contractAddress) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		curvePoolAbi,
+		defaults.network.provider,
+	)
+	return contract.get_virtual_price()
+}
+
 export {
 	MAX_UINT256,
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
@@ -305,4 +343,5 @@ export {
 	convertVetherToVader, getSwapRate, getSwapFee,
 	stakeVader, unstakeVader,
 	swapForAsset, addLiquidity,
+	lpTokenStaking, getLPVirtualPrice,
 }

@@ -6,6 +6,7 @@ import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
 import Stake from './locations/stake'
+import Farm from './locations/farm'
 import Swap from './locations/swap'
 import defaults from './common/defaults'
 import { Footer } from './components/Footer'
@@ -36,6 +37,9 @@ const App = () => {
 						<Route path='/stake' exact render={() =>
 							<Stake position='relative' zIndex='1'/>
 						}/>
+						<Route path='/farm' exact render={() =>
+							<Farm position='relative' zIndex='1' />
+						} />
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
 						} />

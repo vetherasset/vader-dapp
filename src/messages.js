@@ -154,9 +154,36 @@ const unstaked = {
 	position: defaults.toast.position,
 }
 
+const lpTokenStaked = {
+	title: 'LPToken tokens staked',
+	description: 'Your lp tokens have been staked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const lpTokenUnstaked = {
+	title: 'LPToken tokens unstaked',
+	description: 'Your lp tokens have been unstaked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const lpTokenClaimed = {
+	title: 'LPToken tokens claimed',
+	description: 'Your lp tokens have been claimed succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, swapped, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
-	staked, unstaked,
+	staked, unstaked, lpTokenStaked, lpTokenUnstaked, lpTokenClaimed,
 }
