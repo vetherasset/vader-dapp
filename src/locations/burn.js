@@ -753,7 +753,7 @@ const VethBreakdown = (props) => {
 
 			<Flex
 				flexDir='column'
-				p='0 0.3rem'
+				p='0 0.15rem'
 				marginBottom='.7rem'
 				opacity='0.87'
 			>
