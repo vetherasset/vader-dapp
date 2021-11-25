@@ -249,17 +249,10 @@ const Burn = (props) => {
 		if (wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 			Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			getSalt()
-				.then(n => {
-					const leaf = getMerkleLeaf(
-						wallet.account,
-						defaults.redeemables[0].snapshot[wallet.account],
-						n.toString(),
-					)
-					getClaimed(leaf, provider)
-						.then(r => {
-							if(r) setVethAccountLeafClaimed(true)
-						})
+			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
+			getClaimed(leaf, provider)
+				.then(r => {
+					if(r) setVethAccountLeafClaimed(true)
 				})
 		}
 		return () => setVethAccountLeafClaimed(false)
@@ -634,22 +627,21 @@ const Burn = (props) => {
 											}
 											{!tokenApproved && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 													(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) &&
+														<>
+															Burn
+														</>
+											}
+											{vethAccountLeafClaimed && defaults.redeemables[0].snapshot[wallet.account] &&
+												Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
+													<>
+														Claim
+													</>
+											}
+											{tokenApproved && !vethAccountLeafClaimed &&
 												<>
 													Burn
 												</>
 											}
-											{tokenApproved &&
-												<>
-													Burn
-												</>
-											}
-										</>
-									}
-									{!working && tokenSelect && tokenSelect.symbol === 'VETH' &&
-									vethAccountLeafClaimed && defaults.redeemables[0].snapshot[wallet.account] &&
-									Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
-										<>
-											Claim
 										</>
 									}
 									{!working && !tokenSelect &&
@@ -807,14 +799,17 @@ const VethBreakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='right'>
-							{props.claimable.gt(0) &&
-								prettifyCurrency(
-									ethers.utils.formatUnits(props.claimable, 18),
-									0,
-									5,
-									'VADER',
-								)}
-							{props.claimable.lte(0) &&
+							{props.claimable.gte(0) && props.vethAccountLeafClaimed &&
+								<>
+									{prettifyCurrency(
+										ethers.utils.formatUnits(props.claimable, 18),
+										0,
+										5,
+										'VADER',
+									)}
+								</>
+							}
+							{props.claimable.lte(0) && !props.vethAccountLeafClaimed &&
 								<>
 									{prettifyCurrency(
 										((Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)) / 2),

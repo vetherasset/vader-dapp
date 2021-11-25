@@ -112,6 +112,11 @@ defaults.redeemables = [
 		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
 		'snapshot':snapshot,
+		'salt':(
+			defaults.network.chainId === 1 ? '13662469' :
+				defaults.network.chainId === 42 ? '13662469' :
+					undefined
+		),
 	},
 ]
 
