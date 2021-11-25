@@ -249,10 +249,17 @@ const Burn = (props) => {
 		if (wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 			Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account], '13662469')
-			getClaimed(leaf, provider)
-				.then(r => {
-					if(r) setVethAccountLeafClaimed(true)
+			getSalt()
+				.then(n => {
+					const leaf = getMerkleLeaf(
+						wallet.account,
+						defaults.redeemables[0].snapshot[wallet.account],
+						n.toString(),
+					)
+					getClaimed(leaf, provider)
+						.then(r => {
+							if(r) setVethAccountLeafClaimed(true)
+						})
 				})
 		}
 		return () => setVethAccountLeafClaimed(false)
@@ -436,7 +443,7 @@ const Burn = (props) => {
 									{wallet.account &&
 										defaults.redeemables[0].snapshot[wallet.account] &&
 										Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
-										<VethBreakdown claimable={claimableVeth} />
+										<VethBreakdown claimable={claimableVeth} vethAccountLeafClaimed={vethAccountLeafClaimed} />
 									}
 								</>
 							}
@@ -681,6 +688,7 @@ const VethBreakdown = (props) => {
 
 	VethBreakdown.propTypes = {
 		claimable: PropTypes.object.isRequired,
+		vethAccountLeafClaimed: PropTypes.bool.isRequired,
 	}
 
 	const wallet = useWallet()
@@ -739,50 +747,55 @@ const VethBreakdown = (props) => {
 					</Container>
 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
-								Claimed
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-							{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
-							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
+				{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
+							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 && props.vethAccountLeafClaimed &&
 								<>
-									{prettifyCurrency(
-										Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)
+									<Flex>
+										<Container p='0'>
+											<Box
+												textAlign='left'>
+								Claimed
+											</Box>
+										</Container>
+										<Container p='0'>
+											<Box
+												textAlign='right'>
+												{prettifyCurrency(
+													Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)
 											- Number(ethers.utils.formatUnits(vester?.[0], 18)),
-										0,
-										5,
+													0,
+													5,
 								 		'VADER',
-									)}
+												)}
+											</Box>
+										</Container>
+									</Flex>
 								</>
-							}
-						</Box>
-					</Container>
-				</Flex>
+				}
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
+				{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
+							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 && props.vethAccountLeafClaimed &&
+								<>
+									<Flex>
+										<Container p='0'>
+											<Box
+												textAlign='left'>
 								Remains vested
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-							{vester?.[0] &&
+											</Box>
+										</Container>
+										<Container p='0'>
+											<Box
+												textAlign='right'>
+												{vester?.[0] &&
 									<>
 										{prettifyCurrency(ethers.utils.formatUnits(vester?.[0], 18), 0, 4, 'VADER')}
 									</>
-							}
-						</Box>
-					</Container>
-				</Flex>
+												}
+											</Box>
+										</Container>
+									</Flex>
+								</>
+				}
 
 				<Flex>
 					<Container p='0'>
@@ -801,6 +814,16 @@ const VethBreakdown = (props) => {
 									5,
 									'VADER',
 								)}
+							{props.claimable.lte(0) &&
+								<>
+									{prettifyCurrency(
+										((Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)) / 2),
+										0,
+										5,
+										'VADER',
+									)}
+								</>
+							}
 						</Box>
 					</Container>
 				</Flex>
