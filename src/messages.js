@@ -9,6 +9,15 @@ const approved = {
 	position: defaults.toast.position,
 }
 
+const notBurnEligible = {
+	title: 'Account not eligible',
+	description: 'Your account is not eligible to burn this token.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const connected = {
 	title: 'Wallet connected',
 	description: 'Your wallet account has been connected.',
@@ -158,5 +167,5 @@ export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
-	staked, unstaked, vaderclaimed,
+	staked, unstaked, vaderclaimed, notBurnEligible,
 }
