@@ -104,7 +104,8 @@ const TokenSelectDialog = (props) => {
 				{props.tokenList &&
 							<>
 								<List
-									width={448}
+									width='100%'
+									maxWidth={448}
 									height={600}
 									itemCount={tokenListModified ? tokenListModified.length : props.tokenList.length}
 									itemSize={64}
