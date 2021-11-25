@@ -206,8 +206,9 @@ const Burn = (props) => {
 			else if ((value > 0)) {
 				if ((tokenBalance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					setWorking(true)
-					if (tokenSelect.symbol === 'VETH') {
+					if (tokenSelect.symbol === 'VETH' && defaults.redeemables[0].snapshot[wallet.account] &&
+					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+						setWorking(true)
 						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 						convert(
 							proof,
@@ -245,6 +246,9 @@ const Burn = (props) => {
 									toast(failed)
 								}
 							})
+					}
+					else {
+						toast(notBurnEligible)
 					}
 				}
 				else {
