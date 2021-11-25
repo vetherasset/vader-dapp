@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Menu, MenuButton, IconButton, MenuItem, MenuList } from '@chakra-ui/react'
-import { Link } from 'react-router-dom'
+import { Menu, MenuButton, IconButton, MenuList } from '@chakra-ui/react'
+// import { Link } from 'react-router-dom'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 
-export const BurgerMenu = (props) => {
+export const BurgerMenu = () => {
 	BurgerMenu.propTypes = {
 		pages: PropTypes.array.isRequired,
 	}

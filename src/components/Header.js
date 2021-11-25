@@ -1,15 +1,15 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+// import { useLocation } from 'react-router-dom'
 import { Flex, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import { Logotype } from './Logotype'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 import { BurgerMenu } from './BurgerMenu'
 
 export const Header = (props) => {
 
-	const location = useLocation()
+	// const location = useLocation()
 	const pages = [
 		{
 			name: 'Acquire',
@@ -18,12 +18,12 @@ export const Header = (props) => {
 		},
 	]
 
-	const current = {
-		background: '#835a81',
-		borderRadius: '10px',
-		fontWeight: '1000',
-		color: '#fff',
-	}
+	// const current = {
+	// 	background: '#835a81',
+	// 	borderRadius: '10px',
+	// 	fontWeight: '1000',
+	// 	color: '#fff',
+	// }
 
 	return (
 		<Flex
