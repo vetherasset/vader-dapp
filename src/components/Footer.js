@@ -4,6 +4,7 @@ import { FaDiscord, FaTelegramPlane, FaGithub } from 'react-icons/fa'
 import { IoIosPaper } from 'react-icons/io'
 import { MdHelp } from 'react-icons/md'
 import UniswapIcon from '../assets/svg/uniswap.svg'
+import defaults from '../common/defaults'
 
 export const Footer = (props) => {
 
@@ -24,7 +25,7 @@ export const Footer = (props) => {
 				<IoIosPaper style={iconStyle}/>
 				Whitepaper
 			</Link>
-			<Link {...linkStyle} isExternal>
+			<Link {...linkStyle} isExternal href={`https://uniswap.exchange/swap/${defaults.address.vader}`}>
 				<Image src={UniswapIcon} display='inline-block' marginInlineEnd='0.5rem' width='14.4px' verticalAlign='baseline' />
 				Uniswap
 			</Link>
