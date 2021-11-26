@@ -150,11 +150,11 @@ const Burn = (props) => {
 							})
 					}
 				}
-				else if (vethAllowLess) {
-					toast(noAmount)
-				}
-				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) && !vethAllowLess) {
 					toast(notBurnEligible)
+				}
+				else if (vethAllowLess && !value > 0) {
+					toast(noAmount)
 				}
 				else {
 					toast(insufficientBalance)
@@ -254,6 +254,9 @@ const Burn = (props) => {
 				else {
 					toast(insufficientBalance)
 				}
+			}
+			else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				toast(notBurnEligible)
 			}
 			else {
 				toast(noAmount)
