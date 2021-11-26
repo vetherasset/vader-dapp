@@ -37,7 +37,7 @@ defaults.api.etherscanUrl = (
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
 		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
 			undefined
 )
@@ -57,12 +57,12 @@ defaults.address.usdv = (
 			undefined
 ),
 defaults.address.converter = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
 		defaults.network.chainId === 42 ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
 			undefined
 )
 defaults.address.linearVesting = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0xb3C600C04AaF603b0f422b73Db244216C2e491f6' :
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
