@@ -329,13 +329,15 @@ const Burn = (props) => {
 					if (tokenSelect.symbol === 'VETH') {
 						setWorking(false)
 						if (!vethAllowLess) {
-							if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
-								setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
-								setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
-							}
-							else {
-								setValue(data)
-								setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
+							if(defaults.redeemables[0].snapshot[wallet.account]) {
+								if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
+									setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
+									setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
+								}
+								else {
+									setValue(data)
+									setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
+								}
 							}
 						}
 					}
