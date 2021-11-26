@@ -328,8 +328,8 @@ const Burn = (props) => {
 					setTokenBalance(data)
 					if (tokenSelect.symbol === 'VETH') {
 						setWorking(false)
-						if (!vethAllowLess) {
-							if(defaults.redeemables[0].snapshot[wallet.account]) {
+						if (defaults.redeemables[0].snapshot[wallet.account]) {
+							if(!vethAllowLess) {
 								if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
 									setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
 									setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
