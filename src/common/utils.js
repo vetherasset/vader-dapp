@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+import { MerkleTree } from 'merkletreejs'
 import getTokenList from 'get-token-list'
 import defaults from './defaults'
 
@@ -172,6 +174,34 @@ const getStartOfTheDayTimeStamp = () => {
 	return Math.floor(new Date(currentDate).getTime() / 1000)
 }
 
+const getMerkleLeaf = (account, amount) => {
+	if (account && amount) {
+		const digest = ethers.utils.solidityKeccak256(
+			[ 'address', 'uint256', 'uint256', 'uint256' ],
+			[ account, amount, defaults.redeemables[0].salt, defaults.network.chainId ],
+		)
+		return digest
+	}
+}
+
+const getMerkleProofForAccount = (account, snapshot) => {
+	const keccak256 = require('keccak256')
+	const leaves = []
+	for (const [acc, amt] of Object.entries(snapshot)) {
+		if (amt != '0') {
+			const digest = getMerkleLeaf(acc, amt)
+			leaves.push(digest)
+		}
+	}
+	const tree = new MerkleTree(leaves, keccak256, {
+		hashLeaves: false,
+		sortPairs: true,
+	})
+	const leaf = getMerkleLeaf(account, snapshot[account])
+	const proof = tree.getHexProof(leaf)
+	return proof
+}
+
 const secondsToStringDuration = (seconds) => {
 	const SECOND_IN_A_DAY = 86400
 	const SECOND_IN_A_WEEK = 7 * 86400
@@ -204,5 +234,6 @@ const secondsToStringDuration = (seconds) => {
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
-	getTokenByAddress, getStartOfTheDayTimeStamp, secondsToStringDuration,
+	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
+	secondsToStringDuration,
 }

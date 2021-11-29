@@ -9,6 +9,15 @@ const approved = {
 	position: defaults.toast.position,
 }
 
+const notBurnEligible = {
+	title: 'Account not eligible',
+	description: 'Your account is not eligible to burn this token.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const swapped = {
 	title: 'Token succesfully swapped',
 	description: 'You have swapped the token.',
@@ -82,6 +91,15 @@ const vaderconverted = {
 	position: defaults.toast.position,
 }
 
+const vaderclaimed = {
+	title: 'Vader succesfully claimed',
+	description: 'Your tokens have been claimed.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const usdvredeemed = {
 	title: 'USDV burnt for Vader Token',
 	description: 'Your tokens were burnt succesfully.',
@@ -113,6 +131,24 @@ const noToken0 = {
 	title: 'No token selected',
 	description: 'You didn\'t select a token.',
 	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const nothingtoclaim = {
+	title: 'Everything already claimed',
+	description: 'There\'s no claim left. Everything was already claimed.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const nomorethaneligible = {
+	title: 'Can not burn more than eligible',
+	description: 'You can\'t burn more than you\'re eligible.',
+	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
 	position: defaults.toast.position,
@@ -185,5 +221,6 @@ export {
 	approved, swapped, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
-	staked, unstaked, lpTokenStaked, lpTokenUnstaked, lpTokenClaimed,
+	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
+	nomorethaneligible, lpTokenStaked, lpTokenUnstaked, lpTokenClaimed,
 }

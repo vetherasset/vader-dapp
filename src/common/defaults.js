@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources.json'
+import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
 
@@ -17,17 +18,7 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
 	],
-	1,
 )
 
 defaults.network.tx = {}
@@ -46,13 +37,13 @@ defaults.api.etherscanUrl = (
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
 		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
 			undefined
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x4402a7c8829489705852e54da50ebec60c8c86a8' :
+		defaults.network.chainId === 42 ? '0x87D96b9f386d70C72fD7DBcE5a3d2a7D3321446d' :
 			undefined
 )
 defaults.address.xvader = (
@@ -66,8 +57,13 @@ defaults.address.usdv = (
 			undefined
 ),
 defaults.address.converter = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5' :
+	defaults.network.chainId === 1 ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
+		defaults.network.chainId === 42 ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
+			undefined
+)
+defaults.address.linearVesting = (
+	defaults.network.chainId === 1 ? '0xb3C600C04AaF603b0f422b73Db244216C2e491f6' :
+		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
 defaults.address.pool = (
@@ -115,6 +111,12 @@ defaults.redeemables = [
 		'decimals':18,
 		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 		'convertsTo':'VADER',
+		'snapshot':snapshot,
+		'salt':(
+			defaults.network.chainId === 1 ? '13662469' :
+				defaults.network.chainId === 42 ? '13662469' :
+					undefined
+		),
 	},
 ]
 

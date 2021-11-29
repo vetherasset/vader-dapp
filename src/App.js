@@ -29,7 +29,7 @@ const App = () => {
 						zIndex='2'/>
 					<Switch>
 						<Route path='/' exact render={() =>
-							<Burn position='relative' zIndex='1'/>
+							<Swap position='relative' zIndex='1'/>
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
