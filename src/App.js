@@ -5,6 +5,9 @@ import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
+import Stake from './locations/stake'
+import Farm from './locations/farm'
+import Swap from './locations/swap'
 import defaults from './common/defaults'
 import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
@@ -26,11 +29,17 @@ const App = () => {
 						zIndex='2'/>
 					<Switch>
 						<Route path='/' exact render={() =>
-							<Burn position='relative' zIndex='1'/>
+							<Swap position='relative' zIndex='1'/>
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
 						}/>
+						<Route path='/stake' exact render={() =>
+							<Stake position='relative' zIndex='1'/>
+						}/>
+						<Route path='/farm' exact render={() =>
+							<Farm position='relative' zIndex='1' />
+						} />
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
 						} />

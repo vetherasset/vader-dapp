@@ -76,16 +76,6 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
-defaults.address.pool = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
-			undefined
-)
-defaults.address.router = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
-			undefined
-)
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
@@ -152,6 +142,34 @@ defaults.unstakeable = [
 	},
 ]
 
+defaults.lpStakingTokens = [
+	{
+		'tokenContractAddress': '0x683a38985c36de7009d25375adec237ee46f603c',
+		'tokenDecimal': 18,
+		'type': 'CURVE_POOL',
+		'externalLink': 'https://curve.fi/3pool',
+		'externalText': 'From Curve',
+		'stakingContractAddress': '0x0eBc7B7096E77E96f3C9381C976c02DC8ca1760C',
+		'rewardToken': {
+			'symbol': 'VADER',
+			'decimal': 18,
+			'logoURI': 'https://assets.coingecko.com/coins/images/11375/thumb/vether-symbol-coingecko.png?1622341592',
+		},
+		'pairTokens': [
+			{
+				'name': 'USDV',
+				'symbol': 'USDV',
+				'logoURI': 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png',
+			},
+			{
+				'name': '3CRV',
+				'symbol': '3CRV',
+				'logoURI': 'https://assets.coingecko.com/coins/images/12972/thumb/3pool_128.png',
+			},
+		],
+	},
+]
+
 defaults.layout = {}
 defaults.layout.header = {}
 defaults.layout.header.width = '100%'
@@ -174,5 +192,15 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
+
+defaults.swap = {}
+defaults.swap.slippage = 0.5
+defaults.swap.minSlippage = 0.05
+defaults.swap.maxSlippage = 1
+defaults.swap.deadline = 30
+defaults.swap.minDeadline = 1
+defaults.swap.maxDeadline = 180
+
+defaults.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
 
 export default defaults
