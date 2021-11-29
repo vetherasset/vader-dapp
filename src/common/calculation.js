@@ -32,21 +32,21 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 	}
 }
 
-const getXVaderApy = async (numberOfDays = 7) => {
-	const sevenDaysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
-	if (!sevenDaysAgoBlockNumber) {
+const getXVaderAprByNumberOfDays = async (numberOfDays = 7) => {
+	const daysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
+	if (!daysAgoBlockNumber) {
 		return null
 	}
-	const [currentPrice, sevenDaysAgoPrice] = await Promise.all([
+	const [currentPrice, daysAgoPrice] = await Promise.all([
 		getXVaderPrice(),
-		getXVaderPrice(sevenDaysAgoBlockNumber),
+		getXVaderPrice(daysAgoBlockNumber),
 	])
 	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
-	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(sevenDaysAgoPrice)
+	const daysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice)
 	const apr = currentPriceBN
-		.sub(sevenDaysAgoPriceBN)
+		.sub(daysAgoPriceBN)
 		.mul(ethers.utils.parseUnits('1'))
-		.div(sevenDaysAgoPriceBN)
+		.div(daysAgoPriceBN)
 		.mul(365)
 		.div(numberOfDays)
 		.toString()
@@ -112,8 +112,21 @@ const calculateLPTokenAPR = async ({
 	return ethers.utils.formatUnits(apr)
 }
 
+const getXVaderApr = async (maxNumberOfDays = 7) => {
+	if (maxNumberOfDays === 0) {
+		return null
+	}
+	console.log('GETTING_APR', maxNumberOfDays)
+	const apr = await getXVaderAprByNumberOfDays(maxNumberOfDays)
+	if (+apr > 0) {
+		console.log('FOUND', apr, maxNumberOfDays)
+		return apr
+	}
+	return getXVaderApr(maxNumberOfDays - 1)
+}
+
 export {
 	getXVaderPrice,
-	getXVaderApy,
+	getXVaderApr,
 	calculateLPTokenAPR,
 }
