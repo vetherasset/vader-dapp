@@ -356,7 +356,7 @@ const lpTokenStaking = (contractAddress, provider) => {
 	const stake = (amount) => contract.stake(amount)
 	const withdraw = (amount) => contract.withdraw(amount)
 	const earned = (address) => contract.earned(address)
-	const claim = () => contract.getReward()
+	const claimReward = () => contract.getReward()
 	const rewardRate = () => contract.rewardRate()
 	const rewardsDuration = () => contract.rewardsDuration()
 	const rewardPerToken = () => contract.rewardPerToken()
@@ -366,7 +366,7 @@ const lpTokenStaking = (contractAddress, provider) => {
 		stake,
 		withdraw,
 		earned,
-		claim,
+		claimReward,
 		rewardRate,
 		rewardsDuration,
 		rewardPerToken,
