@@ -150,11 +150,11 @@ const Burn = (props) => {
 							})
 					}
 				}
-				else if (vethAllowLess) {
-					toast(noAmount)
-				}
-				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) && !vethAllowLess) {
 					toast(notBurnEligible)
+				}
+				else if (vethAllowLess && !value > 0) {
+					toast(noAmount)
 				}
 				else {
 					toast(insufficientBalance)
@@ -255,6 +255,9 @@ const Burn = (props) => {
 					toast(insufficientBalance)
 				}
 			}
+			else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				toast(notBurnEligible)
+			}
 			else {
 				toast(noAmount)
 			}
@@ -325,8 +328,16 @@ const Burn = (props) => {
 					setTokenBalance(data)
 					if (tokenSelect.symbol === 'VETH') {
 						setWorking(false)
-						if (!vethAllowLess) setValue(data)
-						setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
+						if (!vethAllowLess) {
+							if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
+								setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
+								setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
+							}
+							else {
+								setValue(data)
+								setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
+							}
+						}
 					}
 				})
 				.catch((err) => {
@@ -450,7 +461,7 @@ const Burn = (props) => {
 											status='info'>
 											<AlertIcon />
 											<Box flex='1'>
-												<AlertDescription>Vested portion&apos;s linearly released for 1&nbsp;year. Claiming has no limits. Can be done regurarly at&nbsp;any time.</AlertDescription>
+												<AlertDescription>Vested portion&apos;s linearly released for 1&nbsp;year. Claiming has no limits. Can be done regularly at&nbsp;any time.</AlertDescription>
 											</Box>
 										</Alert>
 									}
