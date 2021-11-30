@@ -28,7 +28,7 @@ const featureNotAvailable = {
 }
 
 const tokenNotAvailableToelect = {
-	title: 'This token can not be selected yet',
+	title: 'This token cannot be selected yet',
 	description: 'Sorry, this action will be rolled out later.',
 	status: 'error',
 	duration: defaults.toast.duration,
