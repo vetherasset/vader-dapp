@@ -2,7 +2,7 @@ import EthDater from 'ethereum-block-by-date'
 import { getXVaderPriceByBlock } from './graphql'
 import { getStartOfTheDayTimeStamp } from './utils'
 import defaults from './defaults'
-import { getLPVirtualPrice, getERC20BalanceOf, lpTokenStaking } from './ethereum'
+import { getLPVirtualPrice, lpTokenStaking } from './ethereum'
 import { ethers } from 'ethers'
 import axios from 'axios'
 
