@@ -2,13 +2,13 @@ import React, { useRef, useMemo, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import defaults from '../common/defaults'
 import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay, ModalContent, ModalBody,
-	ModalFooter, Input, Switch, Flex, toast,
+	ModalFooter, Input, Switch, Flex, useToast,
 } from '@chakra-ui/react'
 import useLocalStorageState from 'use-local-storage-state'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
 import { getCombinedTokenListFromSources, searchFor } from '../common/utils'
-import { notBurnEligible } from '../messages'
+import { tokenNotAvailableToelect } from '../messages'
 
 const TokenSelectButton = ({ data, index, style }) => {
 	TokenSelectButton.propTypes = {
@@ -16,6 +16,7 @@ const TokenSelectButton = ({ data, index, style }) => {
 		style: PropTypes.object.isRequired,
 		data: PropTypes.any.isRequired,
 	}
+	const toast = useToast()
 	return (
 		<Button
 			variant='ghostSelectable'
@@ -25,7 +26,12 @@ const TokenSelectButton = ({ data, index, style }) => {
 			flexWrap='wrap'
 			alignContent='center'
 			p='2rem 1.5rem'
-			isDisabled={data.tokenList[index].disabled}
+			style={data.tokenList[index].disabled ? {
+				...style,
+				opacity: '0.4',
+				cursor: 'not-allowed',
+				boxShadow: 'none',
+			} : style}
 			onClick={() => {
 				if (data.tokenList) {
 					if (!data.tokenList[index].disabled) {
@@ -33,12 +39,11 @@ const TokenSelectButton = ({ data, index, style }) => {
 						if (data.isSelect === 1) data.setToken1(data.tokenList[index])
 					}
 					else {
-						toast(notBurnEligible)
+						toast(tokenNotAvailableToelect)
 					}
 				}
 				data.onClose()
 			}}
-			style={style}
 			key={index}>
 			{data.tokenList &&
 				<>
