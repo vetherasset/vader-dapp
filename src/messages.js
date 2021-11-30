@@ -20,7 +20,7 @@ const notBurnEligible = {
 
 const featureNotAvailable = {
 	title: 'This feature\'s not yet available',
-	description: 'Sorry, this is something we will roll out later.',
+	description: 'This option will be implemented in the near future.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -28,7 +28,7 @@ const featureNotAvailable = {
 }
 
 const tokenNotAvailableToelect = {
-	title: 'This token cannot be selected yet',
+	title: 'This token cannot be selected',
 	description: 'Sorry, this action will be rolled out later.',
 	status: 'error',
 	duration: defaults.toast.duration,
