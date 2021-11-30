@@ -723,7 +723,8 @@ const Burn = (props) => {
 			<TokenSelector
 				isSelect={isSelect}
 				setToken0={setTokenSelect}
-				tokenList={defaults.redeemables}
+				tokenList={(((!defaults.redeemables[0].snapshot[wallet.account]) ||
+					(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? defaults.redeemables.slice(1) : defaults.redeemables)}
 				isOpen={isOpen}
 				onOpen={onOpen}
 				onClose={onClose}
