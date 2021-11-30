@@ -38,6 +38,7 @@ defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 defaults.api = {}
 defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+defaults.api.uniswapV2GraphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
 defaults.api.etherscanUrl = (
 	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
 		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
@@ -80,6 +81,11 @@ defaults.address.router = (
 		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
 			undefined
 )
+
+defaults.address.uniswapV2Pools = {
+	usdcEthPool: defaults.network.chainId === 1 ? '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' : null,
+	vaderEthPool: defaults.network.chainId === 1 ? '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa' : null,
+}
 
 defaults.tokenList = {}
 defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'

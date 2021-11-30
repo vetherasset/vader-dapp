@@ -4,7 +4,7 @@ import { getStartOfTheDayTimeStamp } from './utils'
 import defaults from './defaults'
 import { getLPVirtualPrice, lpTokenStaking } from './ethereum'
 import { ethers } from 'ethers'
-import axios from 'axios'
+import { getVaderPrice } from './pricing'
 
 const getXVaderPrice = () => getXVaderPriceByBlock()
 
@@ -51,19 +51,6 @@ const getXVaderAprByNumberOfDays = async (numberOfDays = 7) => {
 		.div(numberOfDays)
 		.toString()
 	return ethers.utils.formatUnits(apr)
-}
-
-const getVaderPrice = async () => {
-	const VADER_ID = 'vader'
-	const url = `https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=${VADER_ID}`
-	try {
-		const res = await axios.get(url)
-		return res && res.data && res.data[VADER_ID] && res.data[VADER_ID].usd
-	}
-	catch (err) {
-		console.error('GET_VADER_PRICE', err)
-		return null
-	}
 }
 
 const calculateLPTokenAPR = async ({
