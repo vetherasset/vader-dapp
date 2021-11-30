@@ -28,6 +28,8 @@ defaults.network.tx.confirmations = 1
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
+defaults.network.blocks_per_hour = 262
+
 defaults.api = {}
 defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
 defaults.api.etherscanUrl = (

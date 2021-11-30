@@ -2,7 +2,6 @@ import { ethers } from 'ethers'
 import { MerkleTree } from 'merkletreejs'
 import getTokenList from 'get-token-list'
 import defaults from './defaults'
-const EST_BLOCKS_PER_HOURS = 262
 
 const prettifyAddress = (address) => {
 	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
@@ -203,7 +202,7 @@ const getMerkleProofForAccount = (account, snapshot) => {
 }
 
 const convertBlocksToDays = (blocks) => {
-	return blocks / (EST_BLOCKS_PER_HOURS * 24)
+	return blocks / (defaults.network.blocks_per_hour * 24)
 }
 
 const getTokenPrice = (tokenId) => {
