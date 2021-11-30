@@ -2,13 +2,13 @@ import React, { useRef, useMemo, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import defaults from '../common/defaults'
 import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay, ModalContent, ModalBody,
-	ModalFooter, Input, Switch, Flex,
+	ModalFooter, Input, Switch, Flex, toast,
 } from '@chakra-ui/react'
 import useLocalStorageState from 'use-local-storage-state'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
-import { resolveUnknownERC20 } from '../common/ethereum'
-import { getCombinedTokenListFromSources, isEthereumAddress, searchFor } from '../common/utils'
+import { getCombinedTokenListFromSources, searchFor } from '../common/utils'
+import { notBurnEligible } from '../messages'
 
 const TokenSelectButton = ({ data, index, style }) => {
 	TokenSelectButton.propTypes = {
@@ -25,10 +25,16 @@ const TokenSelectButton = ({ data, index, style }) => {
 			flexWrap='wrap'
 			alignContent='center'
 			p='2rem 1.5rem'
+			isDisabled={data.tokenList[index].disabled}
 			onClick={() => {
 				if (data.tokenList) {
-					if (data.isSelect === 0) data.setToken0(data.tokenList[index])
-					if (data.isSelect === 1) data.setToken1(data.tokenList[index])
+					if (!data.tokenList[index].disabled) {
+						if (data.isSelect === 0) data.setToken0(data.tokenList[index])
+						if (data.isSelect === 1) data.setToken1(data.tokenList[index])
+					}
+					else {
+						toast(notBurnEligible)
+					}
 				}
 				data.onClose()
 			}}
@@ -94,10 +100,10 @@ const TokenSelectDialog = (props) => {
 						variant='blank'
 						onChange={e => {
 							const result = searchFor(props.tokenList, e.target.value)
-							if (result) setTokenListModified(result)
-							if (result.length === 0 &&
-										isEthereumAddress(e.target.value)
-							) console.log(resolveUnknownERC20(e.target.value, defaults.network.provider))
+							if (result && result.length !== 0) setTokenListModified(result)
+							// if (result.length === 0 &&
+							// 			isEthereumAddress(e.target.value)
+							// ) console.log(resolveUnknownERC20(e.target.value, defaults.network.provider))
 						}}
 					/>
 				</Box>
