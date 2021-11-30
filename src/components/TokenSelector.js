@@ -270,7 +270,7 @@ export const TokenSelector = (props) => {
 				isCentered
 				initialFocusRef={initialRef}>
 				<ModalOverlay />
-				<ModalContent minHeight='801px'>
+				<ModalContent>
 					<Box height='736px'>
 						{dialog === 0 &&
 							<TokenSelectDialog
