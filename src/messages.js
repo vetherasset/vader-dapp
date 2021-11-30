@@ -18,6 +18,24 @@ const notBurnEligible = {
 	position: defaults.toast.position,
 }
 
+const featureNotAvailable = {
+	title: 'This feature\'s not yet available',
+	description: 'This option will be implemented in the near future.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const tokenNotAvailableToelect = {
+	title: 'This token cannot be selected',
+	description: 'Sorry, this action will be rolled out later.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const connected = {
 	title: 'Wallet connected',
 	description: 'Your wallet account has been connected.',
@@ -186,5 +204,5 @@ export {
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
-	nomorethaneligible,
+	nomorethaneligible, featureNotAvailable, tokenNotAvailableToelect,
 }
