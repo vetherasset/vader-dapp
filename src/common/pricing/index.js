@@ -3,9 +3,7 @@ import coingecko from './coingecko'
 import defaults from '../defaults'
 
 const getVaderPrice = async () => {
-	const price = defaults.network.chainId === 1 ?
-		await uniswap.getVaderPriceInUSD() :
-		await coingecko.getVaderPrice()
+	const price = defaults.network.chainId === 1 && await uniswap.getVaderPriceInUSD()
 	if (!price) {
 		return coingecko.getVaderPrice()
 	}
