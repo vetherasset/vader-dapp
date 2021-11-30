@@ -27,9 +27,9 @@ const featureNotAvailable = {
 	position: defaults.toast.position,
 }
 
-const tokenNotAvailableToelect = {
+const tokenNotAvailableToselect = {
 	title: 'This token cannot be selected',
-	description: 'Sorry, this action will be rolled out later.',
+	description: 'This option will be implemented in the near future.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -204,5 +204,5 @@ export {
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
-	nomorethaneligible, featureNotAvailable, tokenNotAvailableToelect,
+	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 }

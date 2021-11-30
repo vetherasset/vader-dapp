@@ -8,7 +8,7 @@ import useLocalStorageState from 'use-local-storage-state'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
 import { getCombinedTokenListFromSources, searchFor } from '../common/utils'
-import { tokenNotAvailableToelect } from '../messages'
+import { tokenNotAvailableToselect } from '../messages'
 
 const TokenSelectButton = ({ data, index, style }) => {
 	TokenSelectButton.propTypes = {
@@ -39,7 +39,7 @@ const TokenSelectButton = ({ data, index, style }) => {
 						if (data.isSelect === 1) data.setToken1(data.tokenList[index])
 					}
 					else {
-						toast(tokenNotAvailableToelect)
+						toast(tokenNotAvailableToselect)
 					}
 				}
 				data.onClose()
