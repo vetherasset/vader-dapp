@@ -118,6 +118,26 @@ defaults.redeemables = [
 					undefined
 		),
 	},
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.usdv,
+		'name':'USDV',
+		'symbol':'USDV',
+		'decimals':18,
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+		'convertsTo':'VADER',
+		'disabled': true,
+	},
+	{
+		'chainId':defaults.network.chainId,
+		'address':defaults.address.vader,
+		'name':'VADER',
+		'symbol':'VADER',
+		'decimals':18,
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		'convertsTo':'USDV',
+		'disabled': true,
+	},
 ]
 
 defaults.stakeable = [
