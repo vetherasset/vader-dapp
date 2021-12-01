@@ -128,7 +128,7 @@ const Stake = (props) => {
 					</Flex>
 
 					<Flex>
-						{stakingApy >= 0 &&
+						{Number(stakingApy) > 0 &&
 							<Container p='0'>
 								<ScaleFade
 									initialScale={0.9}
@@ -450,6 +450,7 @@ const StakePanel = (props) => {
 								toast({
 									...staked,
 									description: <Link
+										variant='underline'
 										_focus={{
 											boxShadow: '0',
 										}}

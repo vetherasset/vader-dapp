@@ -10,8 +10,8 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 	const dater = new EthDater(defaults.network.provider)
 	const SECOND_IN_A_DAY = 86400
 	const startOfDayTs = getStartOfTheDayTimeStamp()
-	const sevenDaysAgoTs = startOfDayTs - SECOND_IN_A_DAY * numberOfDays
-	const timestampInMs = sevenDaysAgoTs * 1000
+	const daysAgoTs = startOfDayTs - SECOND_IN_A_DAY * numberOfDays
+	const timestampInMs = daysAgoTs * 1000
 	const cachedHits = localStorage.getItem('BLOCK_NUMBER_BY_TIMESTAMP')
 	if (cachedHits) {
 		const data = JSON.parse(cachedHits)
@@ -25,26 +25,26 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 		return response && response.block
 	}
 	catch (err) {
-		console.log('getBlockNumberPriorDaysAgo', err)
+		console.log(err)
 		return null
 	}
 }
 
-const getXVaderApy = async (numberOfDays = 7) => {
-	const sevenDaysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
-	if (!sevenDaysAgoBlockNumber) {
+const getXVaderApy = async (numberOfDays = 1) => {
+	const daysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
+	if (!daysAgoBlockNumber) {
 		return null
 	}
-	const [currentPrice, sevenDaysAgoPrice] = await Promise.all([
+	const [currentPrice, daysAgoPrice] = await Promise.all([
 		getXVaderPrice(),
-		getXVaderPrice(sevenDaysAgoBlockNumber),
+		getXVaderPrice(daysAgoBlockNumber),
 	])
-	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
-	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(sevenDaysAgoPrice)
+	const currentPriceBN = ethers.utils.parseUnits(currentPrice, 18)
+	const daysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice, 18)
 	const apr = currentPriceBN
-		.sub(sevenDaysAgoPriceBN)
+		.sub(daysAgoPriceBN)
 		.mul(ethers.utils.parseUnits('1'))
-		.div(sevenDaysAgoPriceBN)
+		.div(daysAgoPriceBN)
 		.mul(365)
 		.div(numberOfDays)
 		.toString()
