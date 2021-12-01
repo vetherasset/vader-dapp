@@ -43,12 +43,12 @@ defaults.address.vader = (
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x87D96b9f386d70C72fD7DBcE5a3d2a7D3321446d' :
+		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
 			undefined
 )
 defaults.address.xvader = (
 	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x8238Fd02096e408E60767F06DE1bB0B3934C5a8A' :
+		defaults.network.chainId === 42 ? '0x0AA1056Ee563C14484fCC530625cA74575C97512' :
 			undefined
 )
 defaults.address.usdv = (

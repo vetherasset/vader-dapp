@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Menu, MenuButton, IconButton, MenuList } from '@chakra-ui/react'
-// import { Link } from 'react-router-dom'
+import { Menu, MenuItem, MenuButton, IconButton, MenuList } from '@chakra-ui/react'
+import { Link } from 'react-router-dom'
 import { HamburgerIcon } from '@chakra-ui/icons'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 
-export const BurgerMenu = () => {
+export const BurgerMenu = (props) => {
 	BurgerMenu.propTypes = {
 		pages: PropTypes.array.isRequired,
 	}
@@ -18,14 +18,14 @@ export const BurgerMenu = () => {
 				variant='solid'
 			/>
 			<MenuList>
-				{/* {props.pages.map(p => <Link
+				{props.pages.map(p => <Link
 					key={p.name}
 					to={p.link}
 				>
 					<MenuItem key={p.name} pb='1rem'>
 						{p.text}
 					</MenuItem>
-				</Link>)} */}
+				</Link>)}
 				<WalletConnectionToggle w='100%' />
 			</MenuList>
 		</Menu>
