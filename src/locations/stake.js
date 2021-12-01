@@ -45,7 +45,6 @@ const Stake = (props) => {
 	useEffect(() => {
 		getXVaderApy()
 			.then((apy) => {
-				console.log(apy)
 				setStakingApy(Number(apy))
 			})
 	}, [wallet.account, refreshDataToken])
@@ -129,7 +128,7 @@ const Stake = (props) => {
 					</Flex>
 
 					<Flex>
-						{stakingApy >= 0 &&
+						{Number(stakingApy) > 0 &&
 							<Container p='0'>
 								<ScaleFade
 									initialScale={0.9}
