@@ -1,43 +1,61 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import defaults from './defaults'
 
-const client = new ApolloClient({
-	uri: defaults.api.graphUrl,
-	cache: new InMemoryCache(),
-})
-
-const getXVaderPriceByBlock = async (block) => {
-	const tokensQuery = block ? `
-		query {
-			globals(block: { number: ${block} }) {
-				id
-				name
-				value
-			}
+const getXVaderPrice = async (type = 'Hour', skip = 0, first = 1, uri = defaults.api.graphql.uri.vaderProtocol) => {
+	const query = skip > 0 ? `
+	{
+		globals(
+			first: ${first}
+			skip: ${skip},
+			orderBy: timestamp,
+			orderDirection: desc,
+			where:{ 
+				name: "XVADER_PRICE",
+				type: "${type}"
+			}) {
+			id
+			name
+			value
+			type
+			timestamp
 		}
-	` : `
-		query {
-			globals {
-				id
-				name
-				value
-			}
+	}
+	` :	`
+	{
+		global(id: "XVADER_PRICE") {
+			id
+			name
+			value
 		}
+	}
 	`
 	try {
-		const result = await client.query({ query: gql(tokensQuery) })
-		if (!result || !result.data || !result.data.globals) {
-			return null
+		const result = await queryGraphQL(query, uri)
+		if (result) {
+			return result
 		}
-		const xvaderPrice = result.data.globals.find(r => r.id === 'XVADER_PRICE')
-		return xvaderPrice && xvaderPrice.value
 	}
 	catch (err) {
-		console.error('getXVaderPriceByBlock', err)
-		return null
+		console.log(err)
+	}
+}
+
+const queryGraphQL = async (query, uri) => {
+	try {
+		const client = new ApolloClient({
+			uri: uri,
+			cache: new InMemoryCache(),
+		})
+		const result = await client.query({ query: gql(query) })
+		if (result && result.data) {
+			return result.data
+		}
+	}
+	catch (err) {
+		console.log(`Failed to get data from GraphQL: ${err}`)
 	}
 }
 
 export {
-	getXVaderPriceByBlock,
+	getXVaderPrice,
 }

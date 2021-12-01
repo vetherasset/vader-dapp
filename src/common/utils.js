@@ -151,7 +151,8 @@ const getCombinedTokenListFromSources = (sources) => {
 	return Promise.all(
 		sources.filter((source) => source.enabled === true)
 			.map((source) => {
-				const p = getTokenList(source.url).then(d => d.tokens)
+				const p = getTokenList(source.url)
+					.then(d => d.tokens.filter(token => token.chainId == defaults.network.chainId))
 				return p
 			})).then(data => {
 		return data.flat()

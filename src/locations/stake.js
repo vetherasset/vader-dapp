@@ -14,7 +14,7 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderPrice, getXVaderApy } from '../common/calculation'
+import { getXVaderPrice } from '../common/graphql'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
@@ -25,7 +25,7 @@ const Stake = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakingApy, setStakingApy] = useState(0)
+	const [stakingApr, setStakingApr] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const stakedNow = `
@@ -38,16 +38,13 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		getXVaderPrice().then(price => {
-			setXvdrExchangeRate(Number(price))
+			setXvdrExchangeRate(ethers.BigNumber.from(price.global.value))
 		})
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApy()
-			.then((apy) => {
-				setStakingApy(Number(apy))
-			})
-	}, [wallet.account, refreshDataToken])
+		setStakingApr(0)
+	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -128,11 +125,11 @@ const Stake = (props) => {
 					</Flex>
 
 					<Flex>
-						{Number(stakingApy) > 0 &&
+						{Number(stakingApr) > 0 &&
 							<Container p='0'>
 								<ScaleFade
 									initialScale={0.9}
-									in={stakingApy >= 0}>
+									in={stakingApr >= 0}>
 									<Box textAlign={{ base: 'center', md: 'left' }}>
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
@@ -145,7 +142,7 @@ const Stake = (props) => {
 										fontWeight='normal'
 										mb='23px'
 										textAlign={{ base: 'center', md: 'left' }}>
-										{getPercentage(stakingApy)}
+										{getPercentage(stakingApr)}
 									</Box>
 								</ScaleFade>
 							</Container>
@@ -168,7 +165,7 @@ const Stake = (props) => {
 										fontWeight='normal'
 										mb='23px'
 										textAlign={{ base: 'center', md: 'left' }}>
-										{prettifyNumber(xvdrExchangeRate, 0, 5)}
+										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
 							</Container>
@@ -365,7 +362,7 @@ const ExchangeRate = (props) => {
 				<>
 					<Fade
 						in={props.rate > 0}>
-						1 xVADER = {prettifyNumber(props.rate, 0, 2)} VADER
+						1 xVADER = {prettifyNumber(ethers.utils.formatUnits(props.rate, 18), 0, 5)} VADER
 					</Fade>
 				</>
 			}
