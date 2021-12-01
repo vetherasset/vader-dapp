@@ -38,7 +38,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
+		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
 			undefined
 )
 defaults.address.vether = (
