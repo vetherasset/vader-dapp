@@ -4,7 +4,7 @@ import { getStartOfTheDayTimeStamp } from './utils'
 import defaults from './defaults'
 import { getLPVirtualPrice, lpTokenStaking } from './ethereum'
 import { ethers } from 'ethers'
-import axios from 'axios'
+import { getVaderPrice } from './pricing'
 
 const getXVaderPrice = () => getXVaderPriceByBlock()
 
@@ -32,38 +32,25 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 	}
 }
 
-const getXVaderApy = async (numberOfDays = 7) => {
-	const sevenDaysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
-	if (!sevenDaysAgoBlockNumber) {
+const getXVaderAprByNumberOfDays = async (numberOfDays = 7) => {
+	const daysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
+	if (!daysAgoBlockNumber) {
 		return null
 	}
-	const [currentPrice, sevenDaysAgoPrice] = await Promise.all([
+	const [currentPrice, daysAgoPrice] = await Promise.all([
 		getXVaderPrice(),
-		getXVaderPrice(sevenDaysAgoBlockNumber),
+		getXVaderPrice(daysAgoBlockNumber),
 	])
 	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
-	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(sevenDaysAgoPrice)
+	const daysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice)
 	const apr = currentPriceBN
-		.sub(sevenDaysAgoPriceBN)
+		.sub(daysAgoPriceBN)
 		.mul(ethers.utils.parseUnits('1'))
-		.div(sevenDaysAgoPriceBN)
+		.div(daysAgoPriceBN)
 		.mul(365)
 		.div(numberOfDays)
 		.toString()
 	return ethers.utils.formatUnits(apr)
-}
-
-const getVaderPrice = async () => {
-	const VADER_ID = 'vader'
-	const url = `https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=${VADER_ID}`
-	try {
-		const res = await axios.get(url)
-		return res && res.data && res.data[VADER_ID] && res.data[VADER_ID].usd
-	}
-	catch (err) {
-		console.error('GET_VADER_PRICE', err)
-		return null
-	}
 }
 
 const calculateLPTokenAPR = async ({
@@ -112,8 +99,21 @@ const calculateLPTokenAPR = async ({
 	return ethers.utils.formatUnits(apr)
 }
 
+const getXVaderApr = async (maxNumberOfDays = 7) => {
+	if (maxNumberOfDays === 0) {
+		return null
+	}
+	console.log('GETTING_APR', maxNumberOfDays)
+	const apr = await getXVaderAprByNumberOfDays(maxNumberOfDays)
+	if (+apr > 0) {
+		console.log('FOUND', apr, maxNumberOfDays)
+		return apr
+	}
+	return getXVaderApr(maxNumberOfDays - 1)
+}
+
 export {
 	getXVaderPrice,
-	getXVaderApy,
+	getXVaderApr,
 	calculateLPTokenAPR,
 }
