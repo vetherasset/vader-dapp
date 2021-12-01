@@ -25,22 +25,22 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 		return response && response.block
 	}
 	catch (err) {
-		console.log('getBlockNumberPriorDaysAgo', err)
+		console.log(err)
 		return null
 	}
 }
 
-const getXVaderApy = async (numberOfDays = 7) => {
-	const sevenDaysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
-	if (!sevenDaysAgoBlockNumber) {
+const getXVaderApy = async (numberOfDays = 1) => {
+	const daysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
+	if (!daysAgoBlockNumber) {
 		return null
 	}
-	const [currentPrice, sevenDaysAgoPrice] = await Promise.all([
+	const [currentPrice, daysAgoPrice] = await Promise.all([
 		getXVaderPrice(),
-		getXVaderPrice(sevenDaysAgoBlockNumber),
+		getXVaderPrice(daysAgoBlockNumber),
 	])
 	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
-	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(sevenDaysAgoPrice)
+	const sevenDaysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice)
 	const apr = currentPriceBN
 		.sub(sevenDaysAgoPriceBN)
 		.mul(ethers.utils.parseUnits('1'))

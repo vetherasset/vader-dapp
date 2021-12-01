@@ -45,6 +45,7 @@ const Stake = (props) => {
 	useEffect(() => {
 		getXVaderApy()
 			.then((apy) => {
+				console.log(apy)
 				setStakingApy(Number(apy))
 			})
 	}, [wallet.account, refreshDataToken])
@@ -450,6 +451,7 @@ const StakePanel = (props) => {
 								toast({
 									...staked,
 									description: <Link
+										variant='underline'
 										_focus={{
 											boxShadow: '0',
 										}}
