@@ -14,7 +14,7 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderPrice, getXVaderApy } from '../common/calculation'
+import { getXVaderPrice, getXVaderApr } from '../common/calculation'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
@@ -25,7 +25,7 @@ const Stake = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakingApy, setStakingApy] = useState(0)
+	const [stakingApy, setStakingApr] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const stakedNow = `
@@ -43,11 +43,11 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApy()
-			.then((apy) => {
-				setStakingApy(Number(apy))
+		getXVaderApr()
+			.then((apr) => {
+				setStakingApr(Number(apr))
 			})
-	}, [wallet.account, refreshDataToken])
+	}, [wallet.account])
 
 	useEffect(() => {
 		if (wallet.account) {

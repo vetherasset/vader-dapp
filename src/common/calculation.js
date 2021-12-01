@@ -30,7 +30,7 @@ const getBlockNumberPriorDaysAgo = async (numberOfDays) => {
 	}
 }
 
-const getXVaderApy = async (numberOfDays = 1) => {
+const getXVaderAprByNumberOfDays = async (numberOfDays = 7) => {
 	const daysAgoBlockNumber = await getBlockNumberPriorDaysAgo(numberOfDays)
 	if (!daysAgoBlockNumber) {
 		return null
@@ -39,8 +39,8 @@ const getXVaderApy = async (numberOfDays = 1) => {
 		getXVaderPrice(),
 		getXVaderPrice(daysAgoBlockNumber),
 	])
-	const currentPriceBN = ethers.utils.parseUnits(currentPrice, 18)
-	const daysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice, 18)
+	const currentPriceBN = ethers.utils.parseUnits(currentPrice)
+	const daysAgoPriceBN = ethers.utils.parseUnits(daysAgoPrice)
 	const apr = currentPriceBN
 		.sub(daysAgoPriceBN)
 		.mul(ethers.utils.parseUnits('1'))
@@ -51,7 +51,20 @@ const getXVaderApy = async (numberOfDays = 1) => {
 	return ethers.utils.formatUnits(apr)
 }
 
+const getXVaderApr = async (maxNumberOfDays = 7) => {
+	if (maxNumberOfDays === 0) {
+		return null
+	}
+	console.log('GETTING_APR', maxNumberOfDays)
+	const apr = await getXVaderAprByNumberOfDays(maxNumberOfDays)
+	if (+apr > 0) {
+		console.log('FOUND', apr, maxNumberOfDays)
+		return apr
+	}
+	return getXVaderApr(maxNumberOfDays - 1)
+}
+
 export {
 	getXVaderPrice,
-	getXVaderApy,
+	getXVaderApr,
 }
