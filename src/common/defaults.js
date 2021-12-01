@@ -28,8 +28,14 @@ defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 defaults.api = {}
-defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
-defaults.api.uniswapV2GraphUrl = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
+defaults.api.graphql = {}
+defaults.api.graphql.uri = {}
+defaults.api.graphql.uri.vaderProtocol = (
+	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
+			undefined
+)
+
 defaults.api.etherscanUrl = (
 	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
 		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
