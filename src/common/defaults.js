@@ -43,7 +43,7 @@ defaults.address.vader = (
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x87D96b9f386d70C72fD7DBcE5a3d2a7D3321446d' :
+		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
 			undefined
 )
 defaults.address.xvader = (
