@@ -19,7 +19,7 @@ const notBurnEligible = {
 }
 
 const featureNotAvailable = {
-	title: 'This feature\'s not yet available',
+	title: 'This feature is not available',
 	description: 'This option will be implemented in the near future.',
 	status: 'error',
 	duration: defaults.toast.duration,
@@ -38,7 +38,7 @@ const tokenNotAvailableToselect = {
 
 const connected = {
 	title: 'Wallet connected',
-	description: 'Your wallet account has been connected.',
+	description: 'Your wallet has been connected.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -56,7 +56,7 @@ const insufficientBalance = {
 
 const rejected = {
 	title: 'Transaction rejected',
-	description: 'You have rejected the transaction.',
+	description: 'You have rejected the transaction. Please try again.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -65,7 +65,7 @@ const rejected = {
 
 const failed = {
 	title: 'Transaction failed',
-	description: 'Something happened. Proccessing failed.',
+	description: 'Transaction failed. Please try again',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -73,8 +73,8 @@ const failed = {
 }
 
 const exception = {
-	title: 'Something is wrong',
-	description: 'Such transaction would be reverted.',
+	title: 'Transaction error',
+	description: 'This transaction will be reverted. Please try again.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -92,8 +92,8 @@ const walletNotConnected = {
 }
 
 const vaderconverted = {
-	title: 'Vader Token burnt for USDV',
-	description: 'Your tokens were burnt succesfully.',
+	title: 'VADER Token burnt for USDV',
+	description: 'Your VADER tokens were successfully burnt for USDV.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -101,8 +101,8 @@ const vaderconverted = {
 }
 
 const vaderclaimed = {
-	title: 'Vader succesfully claimed',
-	description: 'Your tokens have been claimed.',
+	title: 'VADER succesfully claimed',
+	description: 'Your VADER tokens were successfully claimed.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -110,8 +110,8 @@ const vaderclaimed = {
 }
 
 const usdvredeemed = {
-	title: 'USDV burnt for Vader Token',
-	description: 'Your tokens were burnt succesfully.',
+	title: 'USDV burnt for VADER Token',
+	description: 'Your USDV tokens were successfully burnt for VADER.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -119,8 +119,8 @@ const usdvredeemed = {
 }
 
 const vethupgraded = {
-	title: 'Veth burnt for Vader Token',
-	description: 'Your tokens were burnt succesfully.',
+	title: 'VETH burnt for VADER Token',
+	description: 'Your VETH tokens were succesfully burnt for VADER.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -129,7 +129,7 @@ const vethupgraded = {
 
 const noAmount = {
 	title: 'No amount specified',
-	description: 'You didn\'t specify amount.',
+	description: 'Please specify amount.',
 	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -138,7 +138,7 @@ const noAmount = {
 
 const noToken0 = {
 	title: 'No token selected',
-	description: 'You didn\'t select a token.',
+	description: 'Please select a token.',
 	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -155,8 +155,8 @@ const nothingtoclaim = {
 }
 
 const nomorethaneligible = {
-	title: 'Can not burn more than eligible',
-	description: 'You can\'t burn more than you\'re eligible.',
+	title: 'Cannot burn more than eligible',
+	description: 'Please specify burn amount that is up to eligible amount.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -165,7 +165,7 @@ const nomorethaneligible = {
 
 const tokenValueTooSmall = {
 	title: 'Token amount is too small',
-	description: 'The amount you specified is too small.',
+	description: 'Please input a larger token amount.',
 	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
