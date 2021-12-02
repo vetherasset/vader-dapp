@@ -44,17 +44,19 @@ const getXVaderPrice = async (type = 'Hour', first = 0) => {
 const getXVaderApr = async (type) => {
 	const prices = await getXVaderPrice(type, 2)
 	const [currentPrice, previousPrice] = prices?.globals
-	const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
-	const previousPriceBN = utils.parseUnits(previousPrice.value, 'wei')
-	const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
-	const apr = ((((currentPriceBN.sub(previousPriceBN))
-		.mul(utils.parseUnits('1', 18)))
-		.div(previousPriceBN))
-		.mul(365))
-		.mul(24)
-		.div(hoursDifferent)
-		.toString()
-	return utils.formatUnits(apr)
+	if(currentPrice && previousPrice) {
+		const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
+		const previousPriceBN = utils.parseUnits(previousPrice.value, 'wei')
+		const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
+		const apr = ((((currentPriceBN.sub(previousPriceBN))
+			.mul(utils.parseUnits('1', 18)))
+			.div(previousPriceBN))
+			.mul(365))
+			.mul(24)
+			.div(hoursDifferent)
+			.toString()
+		return utils.formatUnits(apr)
+	}
 }
 
 const queryGraphQL = async (query, uri) => {
