@@ -1,20 +1,9 @@
-import { ethers, BigNumber } from 'ethers'
+import { ethers } from 'ethers'
 import humanStandardTokenAbi from '../artifacts/abi/humanStandardToken'
 import converterAbi from '../artifacts/abi/converter'
-import routerAbi from '../artifacts/abi/vaderRouter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
-
-const addLiquidity = async (tokenA, tokenB, amountAdesired, amountBDesired, to, deadline, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		routerAbi,
-		provider.getSigner(0),
-	)
-	// eslint-disable-next-line quotes
-	return await contract["addLiquidity(address,address,uint256,uint256,address,uint256)"](tokenA, tokenB, amountAdesired, amountBDesired, to, deadline)
-}
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -140,39 +129,6 @@ const claim = async (provider) => {
 	return await contract.claim()
 }
 
-
-const getSwapRate = async (from, to, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.pool,
-		provider.getSigner(0),
-	)
-
-	return BigNumber.from(await contract.callStatic.swap(1, from, to))
-}
-
-const getSwapFee = async (inputAmount, from, to, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.pools,
-		provider,
-	)
-
-	const baseAmount = BigNumber.from(await contract.getBaseAmount(to))
-	const tokenAmount = BigNumber.from(await contract.getTokenAmount(to))
-	const numerator = tokenAmount.mul(BigNumber.from(inputAmount).pow(2))
-	const denominator = baseAmount.add(1).pow(2)
-
-	return numerator.div(denominator)
-}
-
-const swapForAsset = async (amount, from, to, provider) => {
-	const contract = new ethers.Contract(
-		defaults.address.router,
-		provider.getSigner(0),
-	)
-
-	return ethers.BigNumber.from(await contract.swap(amount, from, to))
-}
-
 const stakeVader = async (amount, provider) => {
 	const contract = new ethers.Contract(
 		defaults.address.xvader,
@@ -194,9 +150,8 @@ const unstakeVader = async (shares, provider) => {
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
-	convert, getSwapRate, getSwapFee,
+	convert,
 	stakeVader, unstakeVader,
-	swapForAsset, addLiquidity,
 	getSalt, getClaimed, getClaim, getVester,
 	claim,
 }
