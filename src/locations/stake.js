@@ -134,12 +134,13 @@ const Stake = (props) => {
 						</Container>
 					</Flex>
 
-					{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
-						<Flex
-							minH='94.1167px'
-						>
-							<Container p='0'>
-								{xvdrExchangeRate > 0 &&
+					<Flex
+						minH='94.1167px'
+					>
+						{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
+							<>
+								<Container p='0'>
+									{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -147,7 +148,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>1 xVADER RATE</Badge>
+										>xVADER RATE</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
@@ -158,11 +159,11 @@ const Stake = (props) => {
 										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-								}
-							</Container>
+									}
+								</Container>
 
-							<Container p='0'>
-								{Number(stakingApr) > 0 &&
+								<Container p='0'>
+									{Number(stakingApr) > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
@@ -181,10 +182,11 @@ const Stake = (props) => {
 										{getPercentage(stakingApr)}
 									</Box>
 								</ScaleFade>
-								}
-							</Container>
-						</Flex>
-					}
+									}
+								</Container>
+							</>
+						}
+					</Flex>
 
 					{token1balance.gt(0) &&
 							<>
@@ -314,50 +316,56 @@ const Stake = (props) => {
 
 				<Flex
 					w={{ base: '100%', md: '77%' }}
-					minH='482.95px'
 					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
 					p='0 0 2rem'
-					layerStyle='colorful'
 					flexDir='column'
 				>
-					<Tabs isFitted colorScheme='bluish'>
-						<TabList mb='1rem'>
-							<Tab p='1.5rem 0' _focus={{
-								boxShadow: '0',
-								borderRadius: '24px 0 0 0',
-							}}>
-								<Text as='h3' m='0' fontSize='1.24rem'>
+					<Flex
+						layerStyle='colorful'
+						height='482.95px'
+						marginTop='2.33rem'
+					>
+						<Tabs
+							width='100%'
+							isFitted colorScheme='bluish'>
+							<TabList mb='1rem'>
+								<Tab p='1.5rem 0' _focus={{
+									boxShadow: '0',
+									borderRadius: '24px 0 0 0',
+								}}>
+									<Text as='h3' m='0' fontSize='1.24rem'>
             		Stake
-								</Text>
-							</Tab>
-							<Tab p='1.5rem 0' _focus={{
-								boxShadow: '0',
-								borderRadius: '0 24px 0 0',
-							}}>
-								<Text as='h3' m='0' fontSize='1.24rem'>
+									</Text>
+								</Tab>
+								<Tab p='1.5rem 0' _focus={{
+									boxShadow: '0',
+									borderRadius: '0 24px 0 0',
+								}}>
+									<Text as='h3' m='0' fontSize='1.24rem'>
             		Unstake
-								</Text>
-							</Tab>
-						</TabList>
-						<TabPanels
-							p={{ base: '0 0.9rem', md: '0 2.6rem' }}
-						>
-							<TabPanel p='0'>
-								<StakePanel
-									exchangeRate={xvdrExchangeRate}
-									balance={token0balance}
-									refreshData={setRefreshDataToken}
-								/>
-							</TabPanel>
-							<TabPanel p='0'>
-								<UnstakePanel
-									exchangeRate={xvdrExchangeRate}
-									balance={token1balance}
-									refreshData={setRefreshDataToken}
-								/>
-							</TabPanel>
-						</TabPanels>
-					</Tabs>
+									</Text>
+								</Tab>
+							</TabList>
+							<TabPanels
+								p={{ base: '0 0.9rem', md: '0 2.6rem' }}
+							>
+								<TabPanel p='0'>
+									<StakePanel
+										exchangeRate={xvdrExchangeRate}
+										balance={token0balance}
+										refreshData={setRefreshDataToken}
+									/>
+								</TabPanel>
+								<TabPanel p='0'>
+									<UnstakePanel
+										exchangeRate={xvdrExchangeRate}
+										balance={token1balance}
+										refreshData={setRefreshDataToken}
+									/>
+								</TabPanel>
+							</TabPanels>
+						</Tabs>
+					</Flex>
 				</Flex>
 			</Flex>
 		</Box>
