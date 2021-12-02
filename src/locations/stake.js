@@ -64,7 +64,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken1balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
@@ -82,7 +81,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	return (
