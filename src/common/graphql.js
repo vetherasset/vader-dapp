@@ -46,13 +46,12 @@ const getXVaderApr = async (type) => {
 		getXVaderPrice(),
 		getXVaderPrice(type, 3),
 	])
-	const currentPriceBN = utils.parseUnits(currentPrice.global.value, 'wei')
-	const previousPrice = utils.parseUnits(daysAgoPrice.globals?.[0].value, 'wei')
+	const currentPriceBN = utils.parseUnits(currentPrice?.global.value, 'wei')
+	const previousPrice = utils.parseUnits(daysAgoPrice?.globals?.[0].value, 'wei')
 	const apr = ((((currentPriceBN.sub(previousPrice))
 		.mul(utils.parseUnits('1', 18)))
 		.div(previousPrice))
 		.mul(365))
-		.div(7)
 		.div(24)
 		.toString()
 	return utils.formatUnits(apr)

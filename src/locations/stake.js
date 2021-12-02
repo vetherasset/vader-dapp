@@ -125,32 +125,11 @@ const Stake = (props) => {
 						</Container>
 					</Flex>
 
-					<Flex>
-						{Number(stakingApr) > 0 &&
-							<Container p='0'>
-								<ScaleFade
-									initialScale={0.9}
-									in={stakingApr >= 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>1 HOUR APR</Badge>
-									</Box>
-									<Box
-										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-										lineHeight='1.2'
-										fontWeight='normal'
-										mb='23px'
-										textAlign={{ base: 'center', md: 'left' }}>
-										{getPercentage(stakingApr)}
-									</Box>
-								</ScaleFade>
-							</Container>
-						}
-
-						{xvdrExchangeRate > 0 &&
-							<Container p='0'>
+					<Flex
+						minH='94.1167px'
+					>
+						<Container p='0'>
+							{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -169,8 +148,31 @@ const Stake = (props) => {
 										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-							</Container>
-						}
+							}
+						</Container>
+
+						<Container p='0'>
+							{Number(stakingApr) > 0 &&
+								<ScaleFade
+									initialScale={0.9}
+									in={stakingApr >= 0}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
+										<Badge
+											fontSize={{ base: '0.9rem', md: '1rem' }}
+											colorScheme='accent'
+										>1 HOUR APR</Badge>
+									</Box>
+									<Box
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
+										lineHeight='1.2'
+										fontWeight='normal'
+										mb='23px'
+										textAlign={{ base: 'center', md: 'left' }}>
+										{getPercentage(stakingApr)}
+									</Box>
+								</ScaleFade>
+							}
+						</Container>
 					</Flex>
 
 					{token1balance.gt(0) &&
