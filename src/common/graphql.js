@@ -46,15 +46,18 @@ const getXVaderApr = async (type) => {
 		getXVaderPrice(),
 		getXVaderPrice(type, 3),
 	])
-	const currentPriceBN = utils.parseUnits(currentPrice?.global.value, 'wei')
-	const previousPriceBN = utils.parseUnits(previousPrice?.globals?.[0].value, 'wei')
-	const apr = ((((currentPriceBN.sub(previousPriceBN))
-		.mul(utils.parseUnits('1', 18)))
-		.div(previousPriceBN))
-		.mul(365))
-		.mul(24)
-		.toString()
-	return utils.formatUnits(apr)
+
+	if(currentPrice?.global?.value && previousPrice?.globals?.[0].value) {
+		const currentPriceBN = utils.parseUnits((currentPrice.global.value), 'wei')
+		const previousPriceBN = utils.parseUnits(previousPrice.globals[0].value, 'wei')
+		const apr = ((((currentPriceBN.sub(previousPriceBN))
+			.mul(utils.parseUnits('1', 18)))
+			.div(previousPriceBN))
+			.mul(365))
+			.mul(24)
+			.toString()
+		return utils.formatUnits(apr)
+	}
 }
 
 const queryGraphQL = async (query, uri) => {
