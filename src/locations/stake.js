@@ -14,7 +14,7 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderPrice, getXVaderApy } from '../common/calculation'
+import { getXVaderApr, getXVaderPrice } from '../common/graphql'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
@@ -25,7 +25,7 @@ const Stake = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakingApy, setStakingApy] = useState(0)
+	const [stakingApr, setStakingApr] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const stakedNow = `
@@ -38,16 +38,16 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		getXVaderPrice().then(price => {
-			setXvdrExchangeRate(Number(price))
+			setXvdrExchangeRate(ethers.BigNumber.from(price.global.value))
 		})
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApy()
-			.then((apy) => {
-				setStakingApy(Number(apy))
+		getXVaderApr('Hour')
+			.then(n => {
+				setStakingApr(n)
 			})
-	}, [wallet.account, refreshDataToken])
+	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -64,7 +64,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken1balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
@@ -82,7 +81,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	return (
@@ -127,32 +125,11 @@ const Stake = (props) => {
 						</Container>
 					</Flex>
 
-					<Flex>
-						{stakingApy >= 0 &&
-							<Container p='0'>
-								<ScaleFade
-									initialScale={0.9}
-									in={stakingApy >= 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>7 DAYS APR</Badge>
-									</Box>
-									<Box
-										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-										lineHeight='1.2'
-										fontWeight='normal'
-										mb='23px'
-										textAlign={{ base: 'center', md: 'left' }}>
-										{getPercentage(stakingApy)}
-									</Box>
-								</ScaleFade>
-							</Container>
-						}
-
-						{xvdrExchangeRate > 0 &&
-							<Container p='0'>
+					<Flex
+						minH='94.1167px'
+					>
+						<Container p='0'>
+							{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -168,11 +145,34 @@ const Stake = (props) => {
 										fontWeight='normal'
 										mb='23px'
 										textAlign={{ base: 'center', md: 'left' }}>
-										{prettifyNumber(xvdrExchangeRate, 0, 5)}
+										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-							</Container>
-						}
+							}
+						</Container>
+
+						<Container p='0'>
+							{Number(stakingApr) > 0 &&
+								<ScaleFade
+									initialScale={0.9}
+									in={stakingApr >= 0}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
+										<Badge
+											fontSize={{ base: '0.9rem', md: '1rem' }}
+											colorScheme='accent'
+										>1 HOUR APR</Badge>
+									</Box>
+									<Box
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
+										lineHeight='1.2'
+										fontWeight='normal'
+										mb='23px'
+										textAlign={{ base: 'center', md: 'left' }}>
+										{getPercentage(stakingApr)}
+									</Box>
+								</ScaleFade>
+							}
+						</Container>
 					</Flex>
 
 					{token1balance.gt(0) &&
@@ -356,7 +356,7 @@ const Stake = (props) => {
 const ExchangeRate = (props) => {
 
 	ExchangeRate.propTypes = {
-		rate: PropTypes.number.isRequired,
+		rate: PropTypes.any.isRequired,
 	}
 
 	return (
@@ -365,7 +365,7 @@ const ExchangeRate = (props) => {
 				<>
 					<Fade
 						in={props.rate > 0}>
-						1 xVADER = {prettifyNumber(props.rate, 0, 2)} VADER
+						1 xVADER = {prettifyNumber(ethers.utils.formatUnits(props.rate, 18), 0, 5)} VADER
 					</Fade>
 				</>
 			}
@@ -376,7 +376,7 @@ const ExchangeRate = (props) => {
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -450,6 +450,7 @@ const StakePanel = (props) => {
 								toast({
 									...staked,
 									description: <Link
+										variant='underline'
 										_focus={{
 											boxShadow: '0',
 										}}
@@ -690,7 +691,7 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
