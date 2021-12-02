@@ -52,7 +52,6 @@ const getXVaderApr = async (type) => {
 		.mul(utils.parseUnits('1', 18)))
 		.div(previousPrice))
 		.mul(365))
-		.div(7)
 		.div(24)
 		.toString()
 	return utils.formatUnits(apr)
