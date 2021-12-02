@@ -128,8 +128,8 @@ const Stake = (props) => {
 					<Flex
 						minH='94.1167px'
 					>
-						{Number(stakingApr) > 0 &&
-							<Container p='0'>
+						<Container p='0'>
+							{Number(stakingApr) > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
@@ -148,11 +148,11 @@ const Stake = (props) => {
 										{getPercentage(stakingApr)}
 									</Box>
 								</ScaleFade>
-							</Container>
-						}
+							}
+						</Container>
 
-						{xvdrExchangeRate > 0 &&
-							<Container p='0'>
+						<Container p='0'>
+							{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -171,8 +171,8 @@ const Stake = (props) => {
 										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-							</Container>
-						}
+							}
+						</Container>
 					</Flex>
 
 					{token1balance.gt(0) &&
