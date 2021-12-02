@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
-import tokenListSources from '../tokenListSources.json'
+import tokenListSources from '../tokenListSources'
+import vaderTokens from '../artifacts/json/vaderTokens'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
@@ -54,7 +55,7 @@ defaults.address.vether = (
 			undefined
 )
 defaults.address.xvader = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0x665ff8fAA06986Bd6f1802fA6C1D2e7d780a7369' :
 		defaults.network.chainId === 42 ? '0x0AA1056Ee563C14484fCC530625cA74575C97512' :
 			undefined
 )
@@ -73,24 +74,9 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
-defaults.address.pool = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
-			undefined
-)
-defaults.address.router = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
-			undefined
-)
-
-defaults.address.uniswapV2Pools = {
-	usdcEthPool: '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
-	vaderEthPool: '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
-}
 
 defaults.tokenList = {}
-defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
+defaults.tokenList.default = vaderTokens
 defaults.tokenList.sources = tokenListSources
 
 defaults.vader = {}
