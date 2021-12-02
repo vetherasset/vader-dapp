@@ -913,18 +913,6 @@ const UnstakePanel = (props) => {
 						mr='0.4rem'
 						onClick={() => {
 							setInputAmount(
-								ethers.utils.formatUnits(props.balance, token0.decimals),
-							)
-							setValue(props.balance)
-						}}>
-							MAX
-					</Button>
-					<Button
-						variant='outline'
-						size='sm'
-						mr='0.4rem'
-						onClick={() => {
-							setInputAmount(
 								ethers.utils.formatUnits(
 									props.balance.div(100).mul(25),
 									token0.decimals),
@@ -960,6 +948,18 @@ const UnstakePanel = (props) => {
 							setValue(props.balance.div(100).mul(75))
 						}}>
 							75%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(props.balance, token0.decimals),
+							)
+							setValue(props.balance)
+						}}>
+							MAX
 					</Button>
 				</Flex>
 				<Flex mt='5.05rem' justifyContent='center'>
