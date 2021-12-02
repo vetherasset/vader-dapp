@@ -14,7 +14,7 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderPrice } from '../common/graphql'
+import { getXVaderApr, getXVaderPrice } from '../common/graphql'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
@@ -43,7 +43,10 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		setStakingApr(0)
+		getXVaderApr('Hour')
+			.then(n => {
+				setStakingApr(n)
+			})
 	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
@@ -134,7 +137,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>7 DAYS APR</Badge>
+										>1 HOUR APR</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
@@ -353,7 +356,7 @@ const Stake = (props) => {
 const ExchangeRate = (props) => {
 
 	ExchangeRate.propTypes = {
-		rate: PropTypes.number.isRequired,
+		rate: PropTypes.any.isRequired,
 	}
 
 	return (
@@ -373,7 +376,7 @@ const ExchangeRate = (props) => {
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -688,7 +691,7 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
