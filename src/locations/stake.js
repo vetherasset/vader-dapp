@@ -125,7 +125,9 @@ const Stake = (props) => {
 						</Container>
 					</Flex>
 
-					<Flex>
+					<Flex
+						minH='94.1167px'
+					>
 						{Number(stakingApr) > 0 &&
 							<Container p='0'>
 								<ScaleFade
