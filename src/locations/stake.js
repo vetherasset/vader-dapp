@@ -134,12 +134,13 @@ const Stake = (props) => {
 						</Container>
 					</Flex>
 
-					{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
-						<Flex
-							minH='94.1167px'
-						>
-							<Container p='0'>
-								{xvdrExchangeRate > 0 &&
+					<Flex
+						minH='94.1167px'
+					>
+						{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
+							<>
+								<Container p='0'>
+									{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -147,7 +148,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>1 xVADER RATE</Badge>
+										>xVADER RATE</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
@@ -158,11 +159,11 @@ const Stake = (props) => {
 										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-								}
-							</Container>
+									}
+								</Container>
 
-							<Container p='0'>
-								{Number(stakingApr) > 0 &&
+								<Container p='0'>
+									{Number(stakingApr) > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
@@ -181,10 +182,11 @@ const Stake = (props) => {
 										{getPercentage(stakingApr)}
 									</Box>
 								</ScaleFade>
-								}
-							</Container>
-						</Flex>
-					}
+									}
+								</Container>
+							</>
+						}
+					</Flex>
 
 					{token1balance.gt(0) &&
 							<>
