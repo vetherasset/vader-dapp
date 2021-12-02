@@ -2,12 +2,12 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { utils } from 'ethers'
 import defaults from './defaults'
 
-const getXVaderPrice = async (type = 'Hour', skip = 0, first = 1) => {
-	const query = skip > 0 ? `
+const getXVaderPrice = async (type = 'Hour', first = 0) => {
+	const query = first > 0 ? `
 	{
 		globals(
 			first: ${first}
-			skip: ${skip},
+			skip: 0,
 			orderBy: timestamp,
 			orderDirection: desc,
 			where:{ 
@@ -42,17 +42,17 @@ const getXVaderPrice = async (type = 'Hour', skip = 0, first = 1) => {
 }
 
 const getXVaderApr = async (type) => {
-	const [currentPrice, previousPrice] = await Promise.all([
-		getXVaderPrice(),
-		getXVaderPrice(type, 3),
-	])
-	const currentPriceBN = utils.parseUnits(currentPrice?.global.value, 'wei')
-	const previousPriceBN = utils.parseUnits(previousPrice?.globals?.[0].value, 'wei')
+	const prices = await getXVaderPrice(type, 2)
+	const [currentPrice, previousPrice] = prices?.globals
+	const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
+	const previousPriceBN = utils.parseUnits(previousPrice.value, 'wei')
+	const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
 	const apr = ((((currentPriceBN.sub(previousPriceBN))
 		.mul(utils.parseUnits('1', 18)))
 		.div(previousPriceBN))
 		.mul(365))
 		.mul(24)
+		.div(hoursDifferent)
 		.toString()
 	return utils.formatUnits(apr)
 }
