@@ -58,7 +58,6 @@ const App = () => {
 						position='absolute'
 						left='50%'
 						top='65%'
-						background={{ base: 'red', sm: 'yellow', md: 'green', lg: 'red' }}
 						transform='translate(-50%, -65%)'
 						m='0 auto'
 						overflowX='hidden'>
