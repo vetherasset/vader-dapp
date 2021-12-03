@@ -392,14 +392,14 @@ const Burn = (props) => {
 						display='block'
 						mb='2rem'
 					>
-            Burn or claim to obtain assets.
+            Burn to obtain assets.
 					</Text>
 
 					<Text
 						as='h4'
 						fontSize='1.24rem'
 						fontWeight='bolder'>
-							Token
+							Token to burn
 					</Text>
 					<Flex
 						marginBottom='0.7rem'>
