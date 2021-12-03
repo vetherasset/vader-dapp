@@ -14,7 +14,7 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderPrice, getXVaderApy } from '../common/calculation'
+import { getXVaderApr, getXVaderPrice } from '../common/graphql'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
@@ -25,7 +25,7 @@ const Stake = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakingApy, setStakingApy] = useState(0)
+	const [stakingApr, setStakingApr] = useState(0)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const stakedNow = `
@@ -38,16 +38,20 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		getXVaderPrice().then(price => {
-			setXvdrExchangeRate(Number(price))
+			if(price?.global?.value) {
+				setXvdrExchangeRate(ethers.BigNumber.from(price.global.value))
+			}
 		})
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApy()
-			.then((apy) => {
-				setStakingApy(Number(apy))
+		getXVaderApr('Hour')
+			.then(n => {
+				if(n) {
+					setStakingApr(n)
+				}
 			})
-	}, [wallet.account, refreshDataToken])
+	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -64,7 +68,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken1balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
@@ -82,7 +85,6 @@ const Stake = (props) => {
 					console.log(err)
 				})
 		}
-		return () => setToken0balance(ethers.BigNumber.from('0'))
 	}, [wallet.account, refreshDataToken])
 
 	return (
@@ -121,38 +123,24 @@ const Stake = (props) => {
 								<Box
 									as='p'
 									fontSize={{ base: '0.9rem', md: '1rem' }}
-								><b>xVADER</b> is fully composable that can interact with other protocols and&nbsp;you&lsquo;ll receive voting rights with your <i>xVADER</i>.
-									Your <i>xVADER</i> will continuously compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.</Box>
+								><b>xVADER</b> is fully composable that can interact with other protocols. By staking <i>VADER</i>, you will be able to participate in governance, get access to ecosystem airdrops, obtain priority whitelist for new <i>VADER</i> ecosystem projects and get paid from liquidity incentives - all by holding the token.
+								</Box>
+								<Box
+									as='p'
+									fontSize={{ base: '0.9rem', md: '1rem' }}>
+									<i>xVADER</i> continuously yields compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.
+								</Box>
 							</>
 						</Container>
 					</Flex>
 
-					<Flex>
-						{stakingApy >= 0 &&
-							<Container p='0'>
-								<ScaleFade
-									initialScale={0.9}
-									in={stakingApy >= 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>7 DAYS APR</Badge>
-									</Box>
-									<Box
-										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-										lineHeight='1.2'
-										fontWeight='normal'
-										mb='23px'
-										textAlign={{ base: 'center', md: 'left' }}>
-										{getPercentage(stakingApy)}
-									</Box>
-								</ScaleFade>
-							</Container>
-						}
-
-						{xvdrExchangeRate > 0 &&
-							<Container p='0'>
+					<Flex
+						minH='94.1167px'
+					>
+						{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
+							<>
+								<Container p='0'>
+									{xvdrExchangeRate > 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -160,7 +148,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>1 xVADER RATE</Badge>
+										>xVADER RATE</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
@@ -168,10 +156,35 @@ const Stake = (props) => {
 										fontWeight='normal'
 										mb='23px'
 										textAlign={{ base: 'center', md: 'left' }}>
-										{prettifyNumber(xvdrExchangeRate, 0, 5)}
+										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
 									</Box>
 								</ScaleFade>
-							</Container>
+									}
+								</Container>
+
+								<Container p='0'>
+									{Number(stakingApr) > 0 &&
+								<ScaleFade
+									initialScale={0.9}
+									in={stakingApr >= 0}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
+										<Badge
+											fontSize={{ base: '0.9rem', md: '1rem' }}
+											colorScheme='accent'
+										>1 HOUR APR</Badge>
+									</Box>
+									<Box
+										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
+										lineHeight='1.2'
+										fontWeight='normal'
+										mb='23px'
+										textAlign={{ base: 'center', md: 'left' }}>
+										{getPercentage(stakingApr)}
+									</Box>
+								</ScaleFade>
+									}
+								</Container>
+							</>
 						}
 					</Flex>
 
@@ -303,50 +316,56 @@ const Stake = (props) => {
 
 				<Flex
 					w={{ base: '100%', md: '77%' }}
-					minH='482.95px'
 					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
 					p='0 0 2rem'
-					layerStyle='colorful'
 					flexDir='column'
 				>
-					<Tabs isFitted colorScheme='bluish'>
-						<TabList mb='1rem'>
-							<Tab p='1.5rem 0' _focus={{
-								boxShadow: '0',
-								borderRadius: '24px 0 0 0',
-							}}>
-								<Text as='h3' m='0' fontSize='1.24rem'>
+					<Flex
+						layerStyle='colorful'
+						height='482.95px'
+						marginTop='2.33rem'
+					>
+						<Tabs
+							width='100%'
+							isFitted colorScheme='bluish'>
+							<TabList mb='1rem'>
+								<Tab p='1.5rem 0' _focus={{
+									boxShadow: '0',
+									borderRadius: '24px 0 0 0',
+								}}>
+									<Text as='h3' m='0' fontSize='1.24rem'>
             		Stake
-								</Text>
-							</Tab>
-							<Tab p='1.5rem 0' _focus={{
-								boxShadow: '0',
-								borderRadius: '0 24px 0 0',
-							}}>
-								<Text as='h3' m='0' fontSize='1.24rem'>
+									</Text>
+								</Tab>
+								<Tab p='1.5rem 0' _focus={{
+									boxShadow: '0',
+									borderRadius: '0 24px 0 0',
+								}}>
+									<Text as='h3' m='0' fontSize='1.24rem'>
             		Unstake
-								</Text>
-							</Tab>
-						</TabList>
-						<TabPanels
-							p={{ base: '0 0.9rem', md: '0 2.6rem' }}
-						>
-							<TabPanel p='0'>
-								<StakePanel
-									exchangeRate={xvdrExchangeRate}
-									balance={token0balance}
-									refreshData={setRefreshDataToken}
-								/>
-							</TabPanel>
-							<TabPanel p='0'>
-								<UnstakePanel
-									exchangeRate={xvdrExchangeRate}
-									balance={token1balance}
-									refreshData={setRefreshDataToken}
-								/>
-							</TabPanel>
-						</TabPanels>
-					</Tabs>
+									</Text>
+								</Tab>
+							</TabList>
+							<TabPanels
+								p={{ base: '0 0.9rem', md: '0 2.6rem' }}
+							>
+								<TabPanel p='0'>
+									<StakePanel
+										exchangeRate={xvdrExchangeRate}
+										balance={token0balance}
+										refreshData={setRefreshDataToken}
+									/>
+								</TabPanel>
+								<TabPanel p='0'>
+									<UnstakePanel
+										exchangeRate={xvdrExchangeRate}
+										balance={token1balance}
+										refreshData={setRefreshDataToken}
+									/>
+								</TabPanel>
+							</TabPanels>
+						</Tabs>
+					</Flex>
 				</Flex>
 			</Flex>
 		</Box>
@@ -356,7 +375,7 @@ const Stake = (props) => {
 const ExchangeRate = (props) => {
 
 	ExchangeRate.propTypes = {
-		rate: PropTypes.number.isRequired,
+		rate: PropTypes.any.isRequired,
 	}
 
 	return (
@@ -365,7 +384,7 @@ const ExchangeRate = (props) => {
 				<>
 					<Fade
 						in={props.rate > 0}>
-						1 xVADER = {prettifyNumber(props.rate, 0, 2)} VADER
+						1 xVADER = {prettifyNumber(ethers.utils.formatUnits(props.rate, 18), 0, 5)} VADER
 					</Fade>
 				</>
 			}
@@ -376,7 +395,7 @@ const ExchangeRate = (props) => {
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -450,6 +469,7 @@ const StakePanel = (props) => {
 								toast({
 									...staked,
 									description: <Link
+										variant='underline'
 										_focus={{
 											boxShadow: '0',
 										}}
@@ -593,18 +613,6 @@ const StakePanel = (props) => {
 						mr='0.4rem'
 						onClick={() => {
 							setInputAmount(
-								ethers.utils.formatUnits(props.balance, token0.decimals),
-							)
-							setValue(props.balance)
-						}}>
-							MAX
-					</Button>
-					<Button
-						variant='outline'
-						size='sm'
-						mr='0.4rem'
-						onClick={() => {
-							setInputAmount(
 								ethers.utils.formatUnits(
 									props.balance.div(100).mul(25),
 									token0.decimals),
@@ -640,6 +648,18 @@ const StakePanel = (props) => {
 							setValue(props.balance.div(100).mul(75))
 						}}>
 							75%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(props.balance, token0.decimals),
+							)
+							setValue(props.balance)
+						}}>
+							MAX
 					</Button>
 				</Flex>
 				<Flex mt='5.05rem' justifyContent='center'>
@@ -690,7 +710,7 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.number.isRequired,
+		exchangeRate: PropTypes.any.isRequired,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -906,18 +926,6 @@ const UnstakePanel = (props) => {
 						mr='0.4rem'
 						onClick={() => {
 							setInputAmount(
-								ethers.utils.formatUnits(props.balance, token0.decimals),
-							)
-							setValue(props.balance)
-						}}>
-							MAX
-					</Button>
-					<Button
-						variant='outline'
-						size='sm'
-						mr='0.4rem'
-						onClick={() => {
-							setInputAmount(
 								ethers.utils.formatUnits(
 									props.balance.div(100).mul(25),
 									token0.decimals),
@@ -953,6 +961,18 @@ const UnstakePanel = (props) => {
 							setValue(props.balance.div(100).mul(75))
 						}}>
 							75%
+					</Button>
+					<Button
+						variant='outline'
+						size='sm'
+						mr='0.4rem'
+						onClick={() => {
+							setInputAmount(
+								ethers.utils.formatUnits(props.balance, token0.decimals),
+							)
+							setValue(props.balance)
+						}}>
+							MAX
 					</Button>
 				</Flex>
 				<Flex mt='5.05rem' justifyContent='center'>

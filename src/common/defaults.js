@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
-import tokenListSources from '../tokenListSources.json'
+import tokenListSources from '../tokenListSources'
+import vaderTokens from '../artifacts/json/vaderTokens'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
@@ -28,7 +29,14 @@ defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 defaults.api = {}
-defaults.api.graphUrl = 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol'
+defaults.api.graphql = {}
+defaults.api.graphql.uri = {}
+defaults.api.graphql.uri.vaderProtocol = (
+	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
+			undefined
+)
+
 defaults.api.etherscanUrl = (
 	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
 		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
@@ -38,16 +46,16 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x237E9d2F4d4834fD3fCB0ECdeE912682F5D24984' :
+		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
 			undefined
 )
 defaults.address.vether = (
 	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
+		defaults.network.chainId === 42 ? '0x4402a7c8829489705852e54da50ebec60c8c86a8' :
 			undefined
 )
 defaults.address.xvader = (
-	defaults.network.chainId === 1 ? '' :
+	defaults.network.chainId === 1 ? '0x665ff8fAA06986Bd6f1802fA6C1D2e7d780a7369' :
 		defaults.network.chainId === 42 ? '0x0AA1056Ee563C14484fCC530625cA74575C97512' :
 			undefined
 )
@@ -66,19 +74,9 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
-defaults.address.pool = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0xf780120f249Cd518309a2315b73288B05Ff6Abc3' :
-			undefined
-)
-defaults.address.router = (
-	defaults.network.chainId === 1 ? '' :
-		defaults.network.chainId === 42 ? '0x784634B1c7136575D93Ce66Da3A14a9352015063' :
-			undefined
-)
 
 defaults.tokenList = {}
-defaults.tokenList.default = 'https://raw.githubusercontent.com/vetherasset/vader-tokens/master/index.json'
+defaults.tokenList.default = vaderTokens
 defaults.tokenList.sources = tokenListSources
 
 defaults.vader = {}
@@ -158,7 +156,7 @@ defaults.unstakeable = [
 		'name':'xVADER',
 		'symbol':'xVADER',
 		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/xvader/xvader-symbol-w-ring.png',
 	},
 ]
 
@@ -184,5 +182,13 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
+
+defaults.swap = {}
+defaults.swap.slippage = 0.5
+defaults.swap.minSlippage = 0.05
+defaults.swap.maxSlippage = 1
+defaults.swap.deadline = 30
+defaults.swap.minDeadline = 1
+defaults.swap.maxDeadline = 180
 
 export default defaults
