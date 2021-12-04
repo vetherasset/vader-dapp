@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import useLocalStorageState from 'use-local-storage-state'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
-	ScaleFade, Fade,
+	ScaleFade, Fade, Tooltip,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -29,6 +29,20 @@ const Stake = (props) => {
 	const [stakingApr, setStakingApr] = useState(0)
 	const [daysApr, setDaysApr] = useLocalStorageState('daysApr', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
+
+	const drawPeriod = () => {
+		let name
+		switch (daysApr) {
+		case 1: name = '1 day'; break
+		case 7: name = '7 days'; break
+		case 14: name = '2 weeks'; break
+		case 30: name = '1 month'; break
+		case 90: name = '3 months'; break
+		case 180: name = '6 months'; break
+		case 365: name = '1 year'
+		}
+		return name
+	}
 
 	const stakedNow = `
 		@keyframes colorAnimation {
@@ -197,10 +211,17 @@ const Stake = (props) => {
 											}
 										}}
 										textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>{daysApr} APR</Badge>
+										<Tooltip
+											hasArrow
+											label='Press to cycle'
+											color='black'
+											openDelay={1325}
+											placement='right'>
+											<Badge
+												fontSize={{ base: '0.9rem', md: '1rem' }}
+												colorScheme='accent'
+											>{drawPeriod()} APR</Badge>
+										</Tooltip>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
