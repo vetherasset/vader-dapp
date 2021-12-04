@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import useLocalStorageState from 'use-local-storage-state'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
-	ScaleFade, Fade,
+	ScaleFade, Fade, Tooltip,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -26,7 +27,22 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakingApr, setStakingApr] = useState(0)
+	const [daysApr, setDaysApr] = useLocalStorageState('daysApr', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
+
+	const drawPeriod = () => {
+		let name
+		switch (daysApr) {
+		case 1: name = '1 day'; break
+		case 7: name = '7 days'; break
+		case 14: name = '2 weeks'; break
+		case 30: name = '1 month'; break
+		case 90: name = '3 months'; break
+		case 180: name = '6 months'; break
+		case 365: name = '1 year'
+		}
+		return name
+	}
 
 	const stakedNow = `
 		@keyframes colorAnimation {
@@ -45,13 +61,13 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApr('Hour')
+		getXVaderApr('Day', daysApr)
 			.then(n => {
 				if(n) {
 					setStakingApr(n)
 				}
 			})
-	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
+	}, [wallet.account, daysApr, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -168,10 +184,43 @@ const Stake = (props) => {
 									initialScale={0.9}
 									in={stakingApr >= 0}>
 									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>1 HOUR APR</Badge>
+										<Tooltip
+											hasArrow
+											label='Press to cycle'
+											color='black'
+											openDelay={1325}
+											placement='right'>
+											<Badge
+												_hover={{
+													cursor: 'pointer',
+												}}
+												onClick={() => {
+													if (daysApr === 1) {
+														setDaysApr(daysApr + 6)
+													}
+													else if (daysApr === 7) {
+														setDaysApr(daysApr * 2)
+													}
+													else if (daysApr === 14) {
+														setDaysApr((daysApr * 2) + 2)
+													}
+													else if (daysApr === 30) {
+														setDaysApr(daysApr * 3)
+													}
+													else if (daysApr === 90) {
+														setDaysApr(daysApr * 2)
+													}
+													else if (daysApr === 180) {
+														setDaysApr(365)
+													}
+													else if (daysApr === 365) {
+														setDaysApr(1)
+													}
+												}}
+												fontSize={{ base: '0.9rem', md: '1rem' }}
+												colorScheme='accent'
+											>{drawPeriod()} APR</Badge>
+										</Tooltip>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
