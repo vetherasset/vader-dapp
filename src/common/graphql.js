@@ -47,13 +47,13 @@ const getXVaderApr = async (type, days = 7) => {
 	if(currentPrice && previousPrice) {
 		const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
 		const previousPriceBN = utils.parseUnits(previousPrice.value, 'wei')
-		const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
+		// const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
 		const apr = ((((currentPriceBN.sub(previousPriceBN))
 			.mul(utils.parseUnits('1', 18)))
 			.div(previousPriceBN))
-			.mul(365))
-			.mul(days)
-			.div(hoursDifferent)
+			// .mul(365))
+			.mul(days))
+			// .div(hoursDifferent)
 			.toString()
 		return utils.formatUnits(apr)
 	}

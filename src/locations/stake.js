@@ -183,34 +183,7 @@ const Stake = (props) => {
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
-									<Box
-										_hover={{
-											cursor: 'pointer',
-										}}
-										onClick={() => {
-											if (daysApr === 1) {
-												setDaysApr(daysApr + 6)
-											}
-											else if (daysApr === 7) {
-												setDaysApr(daysApr * 2)
-											}
-											else if (daysApr === 14) {
-												setDaysApr((daysApr * 2) + 2)
-											}
-											else if (daysApr === 30) {
-												setDaysApr(daysApr * 3)
-											}
-											else if (daysApr === 90) {
-												setDaysApr(daysApr * 2)
-											}
-											else if (daysApr === 180) {
-												setDaysApr(365)
-											}
-											else if (daysApr === 365) {
-												setDaysApr(1)
-											}
-										}}
-										textAlign={{ base: 'center', md: 'left' }}>
+									<Box textAlign={{ base: 'center', md: 'left' }}>
 										<Tooltip
 											hasArrow
 											label='Press to cycle'
@@ -218,6 +191,32 @@ const Stake = (props) => {
 											openDelay={1325}
 											placement='right'>
 											<Badge
+												_hover={{
+													cursor: 'pointer',
+												}}
+												onClick={() => {
+													if (daysApr === 1) {
+														setDaysApr(daysApr + 6)
+													}
+													else if (daysApr === 7) {
+														setDaysApr(daysApr * 2)
+													}
+													else if (daysApr === 14) {
+														setDaysApr((daysApr * 2) + 2)
+													}
+													else if (daysApr === 30) {
+														setDaysApr(daysApr * 3)
+													}
+													else if (daysApr === 90) {
+														setDaysApr(daysApr * 2)
+													}
+													else if (daysApr === 180) {
+														setDaysApr(365)
+													}
+													else if (daysApr === 365) {
+														setDaysApr(1)
+													}
+												}}
 												fontSize={{ base: '0.9rem', md: '1rem' }}
 												colorScheme='accent'
 											>{drawPeriod()} APR</Badge>
