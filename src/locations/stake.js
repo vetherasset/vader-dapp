@@ -45,7 +45,7 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApr('Hour')
+		getXVaderApr('Day')
 			.then(n => {
 				if(n) {
 					setStakingApr(n)
@@ -171,7 +171,7 @@ const Stake = (props) => {
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>1 HOUR APR</Badge>
+										>7 DAYs APR</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}

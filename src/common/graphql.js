@@ -52,7 +52,7 @@ const getXVaderApr = async (type) => {
 			.mul(utils.parseUnits('1', 18)))
 			.div(previousPriceBN))
 			.mul(365))
-			.mul(24)
+			.mul(7)
 			.div(hoursDifferent)
 			.toString()
 		return utils.formatUnits(apr)
