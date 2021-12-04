@@ -41,7 +41,7 @@ const getXVaderPrice = async (type = 'Hour', first = 0) => {
 	}
 }
 
-const getXVaderApr = async (type) => {
+const getXVaderApr = async (type, days = 7) => {
 	const prices = await getXVaderPrice(type, 2)
 	const [currentPrice, previousPrice] = prices?.globals
 	if(currentPrice && previousPrice) {
@@ -52,7 +52,7 @@ const getXVaderApr = async (type) => {
 			.mul(utils.parseUnits('1', 18)))
 			.div(previousPriceBN))
 			.mul(365))
-			.mul(7)
+			.mul(days)
 			.div(hoursDifferent)
 			.toString()
 		return utils.formatUnits(apr)

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import useLocalStorageState from 'use-local-storage-state'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
 	ScaleFade, Fade,
@@ -26,6 +27,7 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakingApr, setStakingApr] = useState(0)
+	const [daysApr, setDaysApr] = useLocalStorageState('daysApr', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const stakedNow = `
@@ -45,13 +47,13 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApr('Day')
+		getXVaderApr('Day', daysApr)
 			.then(n => {
 				if(n) {
 					setStakingApr(n)
 				}
 			})
-	}, [wallet.account, refreshDataToken, setXvdrExchangeRate])
+	}, [wallet.account, daysApr, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -167,11 +169,38 @@ const Stake = (props) => {
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
+									<Box
+										_hover={{
+											cursor: 'pointer',
+										}}
+										onClick={() => {
+											if (daysApr === 1) {
+												setDaysApr(daysApr + 6)
+											}
+											else if (daysApr === 7) {
+												setDaysApr(daysApr * 2)
+											}
+											else if (daysApr === 14) {
+												setDaysApr((daysApr * 2) + 2)
+											}
+											else if (daysApr === 30) {
+												setDaysApr(daysApr * 3)
+											}
+											else if (daysApr === 90) {
+												setDaysApr(daysApr * 2)
+											}
+											else if (daysApr === 180) {
+												setDaysApr(365)
+											}
+											else if (daysApr === 365) {
+												setDaysApr(1)
+											}
+										}}
+										textAlign={{ base: 'center', md: 'left' }}>
 										<Badge
 											fontSize={{ base: '0.9rem', md: '1rem' }}
 											colorScheme='accent'
-										>7 DAYs APR</Badge>
+										>{daysApr} APR</Badge>
 									</Box>
 									<Box
 										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
