@@ -2,11 +2,11 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 import { utils } from 'ethers'
 import defaults from './defaults'
 
-const getXVaderPrice = async (type = 'Hour', first = 0) => {
+const getXVaderPrice = async (type = 'Hour', first) => {
 	const query = first > 0 ? `
 	{
 		globals(
-			first: ${first}
+			${first ? `first: ${first}` : ''}
 			skip: 0,
 			orderBy: timestamp,
 			orderDirection: desc,
@@ -41,19 +41,20 @@ const getXVaderPrice = async (type = 'Hour', first = 0) => {
 	}
 }
 
-const getXVaderApr = async (type, days = 7) => {
-	const prices = await getXVaderPrice(type, 2)
-	const [currentPrice, previousPrice] = prices?.globals
-	if(currentPrice && previousPrice) {
+const getXVaderApr = async (type, days = 3) => {
+	const prices = await getXVaderPrice(type, days)
+	const [currentPrice] = prices?.globals
+	const [oldestPrice] = prices?.globals?.slice(-1)
+	if(currentPrice && oldestPrice) {
 		const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
-		const previousPriceBN = utils.parseUnits(previousPrice.value, 'wei')
-		const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
-		const apr = ((((currentPriceBN.sub(previousPriceBN))
+		const oldestPriceBN = utils.parseUnits(oldestPrice.value, 'wei')
+		// const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
+		const apr = ((((currentPriceBN.sub(oldestPriceBN))
 			.mul(utils.parseUnits('1', 18)))
-			.div(previousPriceBN))
-			.mul(365))
-			.mul(days)
-			.div(hoursDifferent)
+			.div(oldestPriceBN))
+			// .mul(365))
+			.mul(days))
+			// .div(hoursDifferent)
 			.toString()
 		return utils.formatUnits(apr)
 	}

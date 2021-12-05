@@ -27,13 +27,13 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakingApr, setStakingApr] = useState(0)
-	const [daysApr, setDaysApr] = useLocalStorageState('daysApr', 7)
+	const [daysApr, setDaysApr] = useLocalStorageState('daysApr7261499', 3)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const drawPeriod = () => {
 		let name
 		switch (daysApr) {
-		case 1: name = '1 day'; break
+		case 3: name = '3 days'; break
 		case 7: name = '7 days'; break
 		case 14: name = '2 weeks'; break
 		case 30: name = '1 month'; break
@@ -153,10 +153,10 @@ const Stake = (props) => {
 					<Flex
 						minH='94.1167px'
 					>
-						{((xvdrExchangeRate > 0) || (stakingApr > 0)) &&
+						{((xvdrExchangeRate >= 0) || (stakingApr >= 0)) &&
 							<>
 								<Container p='0'>
-									{xvdrExchangeRate > 0 &&
+									{xvdrExchangeRate >= 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={xvdrExchangeRate > 0}>
@@ -179,7 +179,7 @@ const Stake = (props) => {
 								</Container>
 
 								<Container p='0'>
-									{Number(stakingApr) > 0 &&
+									{Number(stakingApr) >= 0 &&
 								<ScaleFade
 									initialScale={0.9}
 									in={stakingApr >= 0}>
@@ -195,26 +195,26 @@ const Stake = (props) => {
 													cursor: 'pointer',
 												}}
 												onClick={() => {
-													if (daysApr === 1) {
-														setDaysApr(daysApr + 6)
+													if (daysApr === 3) {
+														setDaysApr(7)
 													}
 													else if (daysApr === 7) {
-														setDaysApr(daysApr * 2)
+														setDaysApr(14)
 													}
 													else if (daysApr === 14) {
-														setDaysApr((daysApr * 2) + 2)
+														setDaysApr(30)
 													}
 													else if (daysApr === 30) {
-														setDaysApr(daysApr * 3)
+														setDaysApr(90)
 													}
 													else if (daysApr === 90) {
-														setDaysApr(daysApr * 2)
+														setDaysApr(180)
 													}
 													else if (daysApr === 180) {
 														setDaysApr(365)
 													}
 													else if (daysApr === 365) {
-														setDaysApr(1)
+														setDaysApr(3)
 													}
 												}}
 												fontSize={{ base: '0.9rem', md: '1rem' }}
