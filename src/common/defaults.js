@@ -160,6 +160,8 @@ defaults.unstakeable = [
 	},
 ]
 
+defaults.xVaderAPRBasedNumberOfRecords = 3
+
 defaults.layout = {}
 defaults.layout.header = {}
 defaults.layout.header.width = '100%'

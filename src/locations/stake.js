@@ -61,7 +61,7 @@ const Stake = (props) => {
 	}, [wallet.account, refreshDataToken])
 
 	useEffect(() => {
-		getXVaderApr('Day', daysApr)
+		getXVaderApr('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
 			.then(n => {
 				if(n) {
 					setStakingApr(n)
