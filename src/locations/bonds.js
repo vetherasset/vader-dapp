@@ -8,7 +8,7 @@ import { BondItem } from '../components/BondItem'
 import { tokenValueTooSmall } from '../messages'
 import defaults from '../common/defaults'
 
-const Bond = (props) => {
+const Bonds = (props) => {
 
 	return (
 		<Box
@@ -85,7 +85,7 @@ const Bond = (props) => {
 											as='h4'
 											fontSize='1.1rem'
 											fontWeight='bolder'>
-											Protocol
+											Price
 										</Text>
 									</Flex>
 									<Flex>
@@ -128,11 +128,12 @@ const Bond = (props) => {
 							return (
 								<BondItem
 									key={index}
-									protocol={item.where}
+									address={item.address}
+									price={item.price}
 									payout={item.payout}
 									token0={item.token0}
 									token1={item.token1}
-									isBonded={item.isBonded}/>
+									hasBought={item.hasBought}/>
 							)
 						})}
 					</Box>
@@ -154,4 +155,4 @@ const Bond = (props) => {
 	)
 }
 
-export default Bond
+export default Bonds

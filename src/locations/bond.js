@@ -1,13 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
-import { Link } from 'react-router-dom'
-import { Box, Button, Flex, Text, useDisclosure, Tabs, TabList, Tab,
-	TabPanels, TabPanel, InputGroup, Input, InputRightAddon, Image, Spinner,
-	useToast } from '@chakra-ui/react'
+import { Link, useParams } from 'react-router-dom'
+import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
+	useToast, Checkbox } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
-import { TokenSelector } from '../components/TokenSelector'
 import { tokenValueTooSmall } from '../messages'
 import defaults from '../common/defaults'
 
@@ -27,10 +25,10 @@ const field = {
 const Bond = (props) => {
 
 	const wallet = useWallet()
-	const { isOpen, onOpen, onClose } = useDisclosure()
+	const { address } = useParams()
 	const toast = useToast()
 
-	const [isSelect, setIsSelect] = useState(-1)
+	const [bond, setBond] = useState([])
 	const [token0, setToken0] = useState(false)
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [token0amount, setToken0amount] = useState(0)
@@ -40,6 +38,13 @@ const Bond = (props) => {
 	const [token1amount, setToken1amount] = useState(0)
 	const [token1balance, setToken1balance] = useState(0)
 	const [working, setWorking] = useState(false)
+
+
+	useEffect(() => {
+		setBond(defaults.bonds?.available?.filter((b) => {
+			return b.address === address
+		}))
+	}, [address])
 
 	return (
 		<>
@@ -77,7 +82,11 @@ const Bond = (props) => {
 						as='h4'
 						fontSize='1.24rem'
 						fontWeight='bolder'>
-						Bond
+						{bond[0]?.token0?.symbol && bond[0]?.token1?.symbol &&
+							<>
+								{`${bond[0].token0.symbol}-${bond[0].token1.symbol} ${bond[0].name} ${bond[0].liquidityPosition ? 'LP' : '' }`}
+							</>
+						}
 					</Text>
 					<Box
 						as='button'
@@ -100,54 +109,14 @@ const Bond = (props) => {
 					>
 						<Flex
 							flexDir='column'
-							minH='526.4px'
 							height='100%'
 							width={{ base: '100%', md: '50%' }}
 						>
-							<Tabs
-								width='100%'
-								minH='526.4px'
-								height='100%'
-								isFitted colorScheme='bluish'>
-								<TabList mb='1rem'>
-									<Tab p='1.5rem 0' _focus={{
-										boxShadow: '0',
-										borderRadius: '24px 0 0 0',
-									}}>
-										<Text as='h3' m='0' fontSize='1.24rem'>
-            		Bond
-										</Text>
-									</Tab>
-									<Tab p='1.5rem 0' _focus={{
-										boxShadow: '0',
-									}}>
-										<Text as='h3' m='0' fontSize='1.24rem'>
-            		Withdraw
-										</Text>
-									</Tab>
-								</TabList>
-								<TabPanels>
-									<TabPanel p='0'>
-										<BondPanel/>
-									</TabPanel>
-									<TabPanel p='0'>
-										<BondPanel/>
-									</TabPanel>
-								</TabPanels>
-							</Tabs>
-
+							<BondPanel/>
 						</Flex>
 					</Flex>
 				</Flex>
 			</Box>
-			<TokenSelector
-				isSelect={isSelect}
-				setToken0={setToken0}
-				setToken1={setToken1}
-				isOpen={isOpen}
-				onOpen={onOpen}
-				onClose={onClose}
-			/>
 		</>
 	)
 }
@@ -164,7 +133,14 @@ const BondPanel = (props) => {
 	const toast = useToast()
 	const [value, setValue] = useState(0)
 	const [inputAmount, setInputAmount] = useState('')
-	const [token0] = useState(defaults.stakeable[0])
+	const [token0] = useState(
+		{
+			'name':'ETHER',
+			'symbol':'ETH',
+			'decimals':18,
+			'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		},
+	)
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [working, setWorking] = useState(false)
 
@@ -172,7 +148,6 @@ const BondPanel = (props) => {
 		<>
 			<Flex
 				p='0 1.8rem'
-				minHeight='429px'
 				paddingBottom='1.8rem'
 				flexDir='column'>
 				<Flex
@@ -303,6 +278,13 @@ const BondPanel = (props) => {
 							MAX
 					</Button>
 				</Flex>
+				<Checkbox
+					colorScheme='pink'
+					size='lg'
+					mt='0.7rem'
+				>
+				Deposit LP tokens instead
+				</Checkbox>
 				<Flex mt='5.05rem' justifyContent='center'>
 					<Button
 						size='lg'

@@ -8,15 +8,16 @@ import { prettifyCurrency } from '../common/utils'
 export const BondItem = (props) => {
 
 	BondItem.propTypes = {
-		protocol: PropTypes.object.isRequired,
+		address: PropTypes.string.isRequired,
+		price: PropTypes.number.isRequired,
 		payout: PropTypes.object.isRequired,
 		token0: PropTypes.object.isRequired,
 		token1: PropTypes.object.isRequired,
-		isBonded: PropTypes.bool.isRequired,
+		hasBought: PropTypes.bool.isRequired,
 	}
 
 	return (
-		<Link to={`/bond/${props.protocol.address}`}>
+		<Link to={`/bond/${props.address}`}>
 			<Flex
 				width='100%'
 				alignItems='center'
@@ -24,12 +25,12 @@ export const BondItem = (props) => {
 				p='0 24px'
 				minH='60px'
 				cursor='pointer'
-				animation={ props.isBonded ? '2.3s ease-in-out infinite bgAnimation' : '' }
+				animation={ props.hasBought ? '2.3s ease-in-out infinite bgAnimation' : '' }
 				transition='all 0.3s ease 0s'
 				background='rgba(244, 155, 202, 0.08) none repeat scroll 0% 0%'
 				mb='16px'
 				borderRadius='16px'
-				border={ props.isBonded ? '1px solid #ffffff10' : '1px solid #ffffff08' }
+				border={ props.hasBought ? '1px solid #ffffff10' : '1px solid #ffffff08' }
 				_hover={{
 					cursor: 'pointer',
 					background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
@@ -42,28 +43,26 @@ export const BondItem = (props) => {
 						width='23px'
 						height='23px'
 						borderRadius='50%'
-						objectFit='none'
 						background='#fff'
-						mr='10px'
+						mr='7px'
 						src={props.token0.logoURI}
 					/>
 					<Image
 						width='23px'
 						height='23px'
 						borderRadius='50%'
-						objectFit='none'
 						background='#fff'
 						mr='10px'
 						src={props.token1.logoURI}
 					/>
 					{props.token0.symbol}/{props.token1.symbol}
-					{props.isBonded &&
+					{props.hasBought &&
 						<Tag
 							ml='10px'
 							colorScheme='green'>
 							<CheckCircleIcon
 								mr='5px'
-							/> BONDED
+							/> BOUGHT
 						</Tag>
 					}
 				</Flex>
@@ -74,7 +73,7 @@ export const BondItem = (props) => {
 					gridGap='0.7rem'
 				>
 					<Tag colorScheme='blue'>
-						{props.protocol.name}
+						{prettifyCurrency(props.price, 0, 4)}
 					</Tag>
 					<Tag colorScheme='blue'>
 						{props.payout.symbol}
