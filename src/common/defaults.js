@@ -193,4 +193,61 @@ defaults.swap.deadline = 30
 defaults.swap.minDeadline = 1
 defaults.swap.maxDeadline = 180
 
+defaults.bonds = {
+	available:
+	[
+		{
+			liquidityPosition: true,
+			where: {
+				name: 'Uniswap V2',
+				logoURI: 'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+				address: '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
+			},
+			token0: {
+				'chainId':defaults.network.chainId,
+				'address':defaults.address.usdv,
+				'name':'USDV',
+				'symbol':'USDV',
+				'decimals':18,
+				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+			},
+			token1: {
+				'chainId':defaults.network.chainId,
+				'address':defaults.address.vader,
+				'name':'VADER',
+				'symbol':'VADER',
+				'decimals':18,
+				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+			},
+			payout: defaults.stakeable[0],
+			isBonded: true,
+		},
+		{
+			liquidityPosition: true,
+			where: {
+				name: 'Uniswap V2',
+				logoURI: 'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+				address: '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
+			},
+			token0: {
+				'chainId':defaults.network.chainId,
+				'address':defaults.address.usdv,
+				'name':'USDV',
+				'symbol':'USDV',
+				'decimals':18,
+				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+			},
+			token1: {
+				'chainId':defaults.network.chainId,
+				'address':defaults.address.vader,
+				'name':'VADER',
+				'symbol':'VADER',
+				'decimals':18,
+				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+			},
+			payout: defaults.stakeable[0],
+		},
+	],
+}
+
 export default defaults

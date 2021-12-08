@@ -17,6 +17,11 @@ export const Header = (props) => {
 			link: '/stake',
 		},
 		{
+			name: 'Bond',
+			text: 'Bond',
+			link: '/bond',
+		},
+		{
 			name: 'Acquire',
 			text: 'Acquire',
 			link: '/acquire',
@@ -39,6 +44,7 @@ export const Header = (props) => {
 				<Logotype margin='0 8px 0' />
 			</Flex>
 			<Flex w='auto'
+				minW='216px'
 				alignItems='center'
 				justifyContent='space-around'
 				textTransform='capitalize'
@@ -56,6 +62,7 @@ export const Header = (props) => {
 							padding: '0.4rem 0.8rem',
 							...(location.pathname === '/' && p.name === 'Stake' && current),
 							...(p.link === location.pathname && current),
+							...(p.link === '/bond' && location.pathname.includes('bond') && current),
 							...(p.link === '/pool' && location.pathname.includes('pool') && current),
 						}}
 					>
