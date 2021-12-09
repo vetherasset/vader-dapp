@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
+import vaderBonds from '../artifacts/js/vaderBonds'
 import vaderTokens from '../artifacts/json/vaderTokens'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
@@ -160,6 +161,8 @@ defaults.unstakeable = [
 	},
 ]
 
+defaults.bonds = vaderBonds
+
 defaults.xVaderAPRBasedNumberOfRecords = 3
 
 defaults.layout = {}
@@ -192,61 +195,5 @@ defaults.swap.maxSlippage = 1
 defaults.swap.deadline = 30
 defaults.swap.minDeadline = 1
 defaults.swap.maxDeadline = 180
-
-defaults.bonds = {
-	'available':
-	[
-		{
-			'name': 'Uniswap V2',
-			'logoURI': 'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
-			'address': '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
-			'token0': {
-				'chainId':defaults.network.chainId,
-				'address':defaults.address.usdv,
-				'name':'USDV',
-				'symbol':'USDV',
-				'decimals':18,
-				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
-			},
-			'token1': {
-				'chainId':defaults.network.chainId,
-				'address':defaults.address.vader,
-				'name':'VADER',
-				'symbol':'VADER',
-				'decimals':18,
-				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
-			},
-			'liquidityPosition': true,
-			'payout': defaults.stakeable[0],
-			'hasBought': true,
-			'price': '1',
-		},
-		{
-			'name': 'Uniswap V3',
-			'logoURI': 'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
-			'address': '0x452c60e1e3ae0965c121db1c7b3a525d197ca0aa',
-			'token0': {
-				'chainId':defaults.network.chainId,
-				'address':defaults.address.usdv,
-				'name':'USDV',
-				'symbol':'USDV',
-				'decimals':18,
-				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
-			},
-			'token1': {
-				'chainId':defaults.network.chainId,
-				'address':defaults.address.vader,
-				'name':'VADER',
-				'symbol':'VADER',
-				'decimals':18,
-				'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
-			},
-			'liquidityPosition': true,
-			'payout': defaults.stakeable[0],
-			'hasBought': false,
-			'price': '0.5',
-		},
-	],
-}
 
 export default defaults

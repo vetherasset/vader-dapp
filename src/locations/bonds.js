@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { Box, Flex, Text,
-	useToast, InputGroup, Input, InputRightAddon, Image, Button, Spinner } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import { BondItem } from '../components/BondItem'
-import { tokenValueTooSmall } from '../messages'
 import defaults from '../common/defaults'
 
 const Bonds = (props) => {
@@ -124,7 +121,7 @@ const Bonds = (props) => {
 								}
 							`}
 						</style>
-						{defaults.bonds.available?.map((item, index) => {
+						{defaults.bonds?.map((item, index) => {
 							return (
 								<BondItem
 									key={index}
