@@ -27,13 +27,12 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
 	const [stakingApr, setStakingApr] = useState(0)
-	const [daysApr, setDaysApr] = useLocalStorageState('daysApr7261499', 3)
+	const [daysApr, setDaysApr] = useLocalStorageState('daysApr0243394', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 
 	const drawPeriod = () => {
 		let name
 		switch (daysApr) {
-		case 3: name = '3 days'; break
 		case 7: name = '7 days'; break
 		case 14: name = '2 weeks'; break
 		case 30: name = '1 month'; break
@@ -195,10 +194,7 @@ const Stake = (props) => {
 													cursor: 'pointer',
 												}}
 												onClick={() => {
-													if (daysApr === 3) {
-														setDaysApr(7)
-													}
-													else if (daysApr === 7) {
+													if (daysApr === 7) {
 														setDaysApr(14)
 													}
 													else if (daysApr === 14) {
@@ -214,7 +210,7 @@ const Stake = (props) => {
 														setDaysApr(365)
 													}
 													else if (daysApr === 365) {
-														setDaysApr(3)
+														setDaysApr(7)
 													}
 												}}
 												fontSize={{ base: '0.9rem', md: '1rem' }}
