@@ -126,6 +126,7 @@ const Bonds = (props) => {
 									address={item.address}
 									token0={item.token0}
 									token1={item.token1}
+									payout={item.payout}
 								/>
 							)
 						})}
