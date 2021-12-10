@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-import { useWallet } from 'use-wallet'
-import { ethers } from 'ethers'
+import React from 'react'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import { BondItem } from '../components/BondItem'
 import defaults from '../common/defaults'
@@ -126,11 +124,9 @@ const Bonds = (props) => {
 								<BondItem
 									key={index}
 									address={item.address}
-									price={item.price}
-									payout={item.payout}
 									token0={item.token0}
 									token1={item.token1}
-									hasBought={item.hasBought}/>
+								/>
 							)
 						})}
 					</Box>

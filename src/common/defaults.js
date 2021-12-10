@@ -1,3 +1,4 @@
+import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
 import vaderBonds from '../artifacts/js/vaderBonds'
@@ -37,6 +38,11 @@ defaults.api.graphql.uri.vaderProtocol = (
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
+defaults.api.graphql.client = new ApolloClient({
+	uri: defaults.api.graphql.uri.vaderProtocol,
+	cache: new InMemoryCache(),
+})
+defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
 	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
@@ -82,6 +88,13 @@ defaults.tokenList.sources = tokenListSources
 
 defaults.vader = {}
 defaults.vader.conversionRate = 10000
+
+defaults.ether = {
+	'name':'ETHER',
+	'symbol':'ETH',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/vader-dapp/65a55cc1d1e89e1549b3d119d296ac8d701a37ea/src/assets/png/eth-diamond-purple-purple.png',
+}
 
 defaults.nativeAsset = {
 	'chainId':defaults.network.chainId,

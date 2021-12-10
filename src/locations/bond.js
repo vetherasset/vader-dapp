@@ -17,12 +17,7 @@ const Bond = (props) => {
 	const { address } = useParams()
 	const toast = useToast()
 	const [bond, setBond] = useState([])
-	const [token0, setToken0] = useState({
-		'name':'ETHER',
-		'symbol':'ETH',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/vader-dapp/65a55cc1d1e89e1549b3d119d296ac8d701a37ea/src/assets/png/eth-diamond-purple-purple.png',
-	})
+	const [token0, setToken0] = useState(defaults.ether)
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [token0amount, setToken0amount] = useState(0)
 	const [token0balance, setToken0balance] = useState(0)
