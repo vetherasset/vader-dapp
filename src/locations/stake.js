@@ -428,7 +428,7 @@ const ExchangeRate = (props) => {
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.any.isRequired,
+		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -743,7 +743,7 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.any.isRequired,
+		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
