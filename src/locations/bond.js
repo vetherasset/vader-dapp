@@ -9,7 +9,9 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { tokenValueTooSmall } from '../messages'
 import { prettifyCurrency } from '../common/utils'
+import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
+import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 
 const Bond = (props) => {
 
@@ -87,7 +89,7 @@ const Bond = (props) => {
 							fontWeight='bolder'>
 							{bond[0]?.token0?.symbol && bond[0]?.token1?.symbol &&
 								<>
-									{`${bond[0].token0.symbol}-${bond[0].token1.symbol} ${bond[0].name} ${bond[0].liquidityPosition ? 'LP' : '' }`}
+									{`${bond[0].token0.symbol} / ${bond[0].token1.symbol} ${bond[0].name} ${bond[0].liquidityPosition ? 'LP' : '' }`}
 								</>
 							}
 						</Text>
@@ -385,7 +387,7 @@ const Bond = (props) => {
 									gridGap='12px'
 									flexDir='column'>
 
-									<PriceOverview price={bond?.[0]?.price}/>
+									<PriceOverview />
 
 									<Breakdown/>
 
@@ -472,9 +474,9 @@ const Bond = (props) => {
 
 const PriceOverview = (props) => {
 
-	PriceOverview.propTypes = {
-		price: PropTypes.any.isRequired,
-	}
+	const [bondPrice] = useBondPrice()
+	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
+	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 
 	return (
 		<Flex>
@@ -482,13 +484,24 @@ const PriceOverview = (props) => {
 				<Box textAlign={{ base: 'center', md: 'left' }}>
 					<Tag
 						width='100%'
+						minH='95.5167px'
 						flexDir='column'
 						size='lg'
 						variant='outline'
 						p='18px 0'
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
-						<TagLabel fontSize='2.1rem'>{prettifyCurrency(props.price, 0, 4)}</TagLabel>
+						<TagLabel fontSize='2.1rem'>
+							{!isNaN(Number(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)) &&
+								<>
+									{prettifyCurrency(ethers.utils.formatUnits(
+										bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice,
+										18,
+									), 0, 5)
+									}
+								</>
+							}
+						</TagLabel>
 					</Tag>
 				</Box>
 			</Container>
@@ -497,13 +510,24 @@ const PriceOverview = (props) => {
 				<Box textAlign={{ base: 'center', md: 'left' }}>
 					<Tag
 						width='100%'
+						minH='95.5167px'
 						flexDir='column'
 						size='lg'
 						variant='outline'
 						p='18px 0'
 					>
 						<Box fontSize='1rem'>Market Price</Box>
-						<TagLabel fontSize='2.1rem'>{prettifyCurrency(props.price, 0, 4)}</TagLabel>
+						<TagLabel fontSize='2.1rem'>
+							{!isNaN(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)) &&
+								<>
+									{prettifyCurrency(
+										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)),
+										0,
+										5,
+									)}
+								</>
+							}
+						</TagLabel>
 					</Tag>
 				</Box>
 			</Container>

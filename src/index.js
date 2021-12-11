@@ -11,7 +11,7 @@ import * as serviceWorker from './serviceWorker'
 ReactDOM.render(
 	<StrictMode>
 		<ColorModeScript initialColorMode={theme.config.initialColorMode} />
-		<ApolloProvider client={defaults.api.graphql.client}>
+		<ApolloProvider client={defaults.api.graphql.client.vaderProtocol}>
 			<App />
 		</ApolloProvider>
 	</StrictMode>,

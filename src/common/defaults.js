@@ -38,10 +38,24 @@ defaults.api.graphql.uri.vaderProtocol = (
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
-defaults.api.graphql.client = new ApolloClient({
+defaults.api.graphql.uri.uniswapV2 = (
+	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+			undefined
+)
+
+defaults.api.graphql.cache = new InMemoryCache()
+
+defaults.api.graphql.client = {}
+defaults.api.graphql.client.vaderProtocol = new ApolloClient({
 	uri: defaults.api.graphql.uri.vaderProtocol,
-	cache: new InMemoryCache(),
+	cache: defaults.api.graphql.cache,
 })
+defaults.api.graphql.client.uniswapV2 = new ApolloClient({
+	uri: defaults.api.graphql.uri.uniswapV2,
+	cache: defaults.api.graphql.cache,
+})
+
 defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
@@ -81,6 +95,10 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
+
+defaults.address.uniswapV2 = {}
+defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
+defaults.address.uniswapV2.usdcEthPair = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
 
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
