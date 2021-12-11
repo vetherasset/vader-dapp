@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import React, { useEffect, useMemo, useState } from 'react'
-import PropTypes from 'prop-types'
+import { useLocalStorage, useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
@@ -8,10 +8,12 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { tokenValueTooSmall } from '../messages'
+import { getERC20BalanceOf } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
+import { TokenJazzicon } from '../components/TokenJazzicon'
 
 const Bond = (props) => {
 
@@ -19,14 +21,15 @@ const Bond = (props) => {
 	const { address } = useParams()
 	const toast = useToast()
 	const [bond, setBond] = useState([])
-	const [token0, setToken0] = useState(defaults.ether)
+	const [token0, setToken0] = useState({})
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [token0amount, setToken0amount] = useState(0)
-	const [token0balance, setToken0balance] = useState(0)
+	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
-	const [slippageTolAmount, setSlippageTolAmount] = useState()
-	const [slippageTol, setSlippageTol] = useState(2)
+	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
+	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
+	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
 
 	const isBondAddress = useMemo(() => {
@@ -48,6 +51,36 @@ const Bond = (props) => {
 			}))
 		}
 	}, [address])
+
+	useEffect(() => {
+		if (wallet.account && token0) {
+			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+			if (!token0.isEther) {
+				getERC20BalanceOf(
+					token0.address,
+					wallet.account,
+					provider,
+				)
+					.then(n => {
+						setToken0balance(n)
+					})
+					.catch((err) => {
+						console.log(err)
+					})
+			}
+			else {
+				provider.getSigner().getBalance()
+					.then((n) => setToken0balance(n))
+			}
+		}
+	}, [wallet.account, token0])
+
+	useEffect(() => {
+		if(useLPTokens) {
+			setToken0(bond?.[0]?.principal)
+		}
+		return () => setToken0(defaults.ether)
+	}, [useLPTokens, bond])
 
 	if (isBondAddress) {
 		return (
@@ -87,9 +120,9 @@ const Bond = (props) => {
 							as='h4'
 							fontSize='1.24rem'
 							fontWeight='bolder'>
-							{bond[0]?.token0?.symbol && bond[0]?.token1?.symbol &&
+							{bond?.[0]?.name &&
 								<>
-									{`${bond[0].token0.symbol} / ${bond[0].token1.symbol} ${bond[0].name} ${bond[0].liquidityPosition ? 'LP' : '' }`}
+									{bond?.[0]?.name}
 								</>
 							}
 						</Text>
@@ -207,19 +240,24 @@ const Bond = (props) => {
 														zIndex='1'
 													>
 														<Box d='flex' alignItems='center'>
-															<Image
-																width='24px'
-																height='24px'
-																borderRadius='50%'
-																mr='10px'
-																src={token0.logoURI}
-															/>
+															{token0 && token0?.logoURI &&
+																<Image
+																	width='24px'
+																	height='24px'
+																	borderRadius='50%'
+																	mr='5px'
+																	src={token0?.logoURI}
+																/>
+															}
+															{token0?.address && !token0?.logoURI &&
+																<TokenJazzicon address={token0.address} />
+															}
 															<Box
 																as='h3'
 																m='0'
 																fontSize='1.02rem'
 																fontWeight='bold'
-																textTransform='capitalize'>{token0.symbol}</Box>
+																textTransform='capitalize'>{token0?.symbol}</Box>
 														</Box>
 													</Flex>
 												</InputRightAddon>
@@ -237,10 +275,10 @@ const Bond = (props) => {
 												onClick={() => {
 													setInputAmount(
 														ethers.utils.formatUnits(
-															balance.div(100).mul(25),
+															token0balance.div(100).mul(25),
 															token0.decimals),
 													)
-													setValue(balance.div(100).mul(25))
+													setValue(token0balance.div(100).mul(25))
 												}}>
 											25%
 											</Button>
@@ -251,10 +289,10 @@ const Bond = (props) => {
 												onClick={() => {
 													setInputAmount(
 														ethers.utils.formatUnits(
-															balance.div(100).mul(50),
+															token0balance.div(100).mul(50),
 															token0.decimals),
 													)
-													setValue(balance.div(100).mul(50))
+													setValue(token0balance.div(100).mul(50))
 												}}>
 											50%
 											</Button>
@@ -265,10 +303,10 @@ const Bond = (props) => {
 												onClick={() => {
 													setInputAmount(
 														ethers.utils.formatUnits(
-															balance.div(100).mul(75),
+															token0balance.div(100).mul(75),
 															token0.decimals),
 													)
-													setValue(balance.div(100).mul(75))
+													setValue(token0balance.div(100).mul(75))
 												}}>
 											75%
 											</Button>
@@ -278,9 +316,9 @@ const Bond = (props) => {
 												mr='0.4rem'
 												onClick={() => {
 													setInputAmount(
-														ethers.utils.formatUnits(balance, token0.decimals),
+														ethers.utils.formatUnits(token0balance, token0.decimals),
 													)
-													setValue(balance)
+													setValue(token0balance)
 												}}>
 											MAX
 											</Button>
@@ -305,9 +343,10 @@ const Bond = (props) => {
 												size='sm'
 												mr='0.4rem'
 												style={{
-													border: '2px solid #3fa3fa',
+													border: slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
 												}}
 												onClick={() => {
+													setSlippageTolAmount('')
 													setSlippageTol(2)
 												}}>
 											2%
@@ -316,7 +355,11 @@ const Bond = (props) => {
 												variant='outline'
 												size='sm'
 												mr='0.4rem'
+												style={{
+													border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+												}}
 												onClick={() => {
+													setSlippageTolAmount('')
 													setSlippageTol(3)
 												}}>
 											3%
@@ -325,7 +368,11 @@ const Bond = (props) => {
 												variant='outline'
 												size='sm'
 												mr='0.4rem'
+												style={{
+													border: slippageTol === 5 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+												}}
 												onClick={() => {
+													setSlippageTolAmount('')
 													setSlippageTol(5)
 												}}>
 											5%
@@ -334,6 +381,9 @@ const Bond = (props) => {
 												size='sm'
 												variant='outline'
 												placeholder='Custom %'
+												style={{
+													border: (([2, 3, 5].indexOf(slippageTol) === -1) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
+												}}
 												value={slippageTolAmount}
 												onChange={(e) => {
 													if (isNaN(e.target.value)) {
@@ -370,7 +420,10 @@ const Bond = (props) => {
 										>
 											Use LP tokens instead
 										</Box>
-										<Switch size='lg'/>
+										<Switch
+											size='lg'
+											isChecked={useLPTokens}
+											onChange={() => setUseLPTokens(!useLPTokens)}/>
 									</Flex>
 								</Flex>
 							</Flex>
@@ -472,7 +525,7 @@ const Bond = (props) => {
 	)
 }
 
-const PriceOverview = (props) => {
+const PriceOverview = () => {
 
 	const [bondPrice] = useBondPrice()
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)

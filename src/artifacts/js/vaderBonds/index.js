@@ -1,9 +1,14 @@
 module.exports =
 	[
 		{
-			'name': 'Uniswap V2',
-			'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+			'name': 'Uniswap V2 VADER / ETH LP',
 			'address':'0x66BcC1c537509bA441ccc9DF39E18CC142C59775',
+			'principal': {
+				'address':'0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
+				'name':'Uniswap VADER/ETH LP',
+				'symbol':'UNI-V2',
+				'decimals':18,
+			},
 			'token0': {
 				'address':'0x2602278ee1882889b946eb11dc0e810075650983',
 				'name':'VADER',

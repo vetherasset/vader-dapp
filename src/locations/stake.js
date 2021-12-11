@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import useLocalStorageState from 'use-local-storage-state'
+import { useLocalStorage } from 'react-use'
 import { useXvaderPrice } from '../hooks/useXvaderPrice'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
@@ -26,7 +26,7 @@ const Stake = (props) => {
 	const wallet = useWallet()
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
-	const [daysApr, setDaysApr] = useLocalStorageState('daysApr23049', 3)
+	const [daysApr, setDaysApr] = useLocalStorage('daysApr23049', 3)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
 	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0, defaults.api.graphql.pollInterval)
 	const [stakingApr] = useXvaderAPR('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
@@ -275,7 +275,7 @@ const Stake = (props) => {
 														<Image
 															width='24px'
 															height='24px'
-															mr='10px'
+															mr='5px'
 															src={defaults.unstakeable[0].logoURI}
 														/>
 														xVADER
@@ -621,7 +621,7 @@ const StakePanel = (props) => {
 									<Image
 										width='24px'
 										height='24px'
-										mr='10px'
+										mr='5px'
 										src={token0.logoURI}
 									/>
 									<Box
@@ -934,7 +934,7 @@ const UnstakePanel = (props) => {
 									<Image
 										width='24px'
 										height='24px'
-										mr='10px'
+										mr='5px'
 										src={token0.logoURI}
 									/>
 									<Box

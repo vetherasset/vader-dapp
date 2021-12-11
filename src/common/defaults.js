@@ -109,6 +109,7 @@ defaults.ether = {
 	'symbol':'ETH',
 	'decimals':18,
 	'logoURI':'https://raw.githubusercontent.com/vetherasset/vader-dapp/65a55cc1d1e89e1549b3d119d296ac8d701a37ea/src/assets/png/eth-diamond-purple-purple.png',
+	'isEther': true,
 }
 
 defaults.vader = {

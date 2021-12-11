@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from 'react'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
@@ -16,7 +15,7 @@ export const BondItem = (props) => {
 		address: PropTypes.string.isRequired,
 		token0: PropTypes.object.isRequired,
 		token1: PropTypes.object,
-		setLoading: PropTypes.func,
+		payout: PropTypes.object.isRequired,
 	}
 
 	const wallet = useWallet()
