@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocalStorage, useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
@@ -23,7 +22,6 @@ const Bond = (props) => {
 	const [bond, setBond] = useState([])
 	const [token0, setToken0] = useState({})
 	const [token0Approved, setToken0Approved] = useState(false)
-	const [token0amount, setToken0amount] = useState(0)
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
@@ -31,6 +29,10 @@ const Bond = (props) => {
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
+
+	console.log(value)
+	console.log(setWorking)
+	console.log(setToken0Approved)
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -588,83 +590,83 @@ const PriceOverview = () => {
 	)
 }
 
-const Overview = () => {
+// const Overview = () => {
 
-	return (
-		<>
-			<Flex
-				flexDir='column'
-				p='0 0.15rem'
-				marginBottom='.7rem'
-				opacity='0.87'
-			>
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
-							Total rewards
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							999999
-						</Box>
-					</Container>
-				</Flex>
+// 	return (
+// 		<>
+// 			<Flex
+// 				flexDir='column'
+// 				p='0 0.15rem'
+// 				marginBottom='.7rem'
+// 				opacity='0.87'
+// 			>
+// 				<Flex>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='left'
+// 						>
+// 							Total rewards
+// 						</Box>
+// 					</Container>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='right'
+// 						>
+// 							999999
+// 						</Box>
+// 					</Container>
+// 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
-							Claimed
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							222
-						</Box>
-					</Container>
-				</Flex>
+// 				<Flex>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='left'
+// 						>
+// 							Claimed
+// 						</Box>
+// 					</Container>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='right'
+// 						>
+// 							222
+// 						</Box>
+// 					</Container>
+// 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
-							Remains vested
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-							222
-						</Box>
-					</Container>
-				</Flex>
+// 				<Flex>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='left'>
+// 							Remains vested
+// 						</Box>
+// 					</Container>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='right'>
+// 							222
+// 						</Box>
+// 					</Container>
+// 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
-							Vesting Term
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-							4
-						</Box>
-					</Container>
-				</Flex>
-			</Flex>
-		</>
-	)
-}
+// 				<Flex>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='left'>
+// 							Vesting Term
+// 						</Box>
+// 					</Container>
+// 					<Container p='0'>
+// 						<Box
+// 							textAlign='right'>
+// 							4
+// 						</Box>
+// 					</Container>
+// 				</Flex>
+// 			</Flex>
+// 		</>
+// 	)
+// }
 
 const Breakdown = () => {
 
