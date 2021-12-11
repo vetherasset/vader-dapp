@@ -6,6 +6,8 @@ import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
 import Stake from './locations/stake'
+import Bonds from './locations/bonds'
+import Bond from './locations/bond'
 import defaults from './common/defaults'
 import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
@@ -28,6 +30,12 @@ const App = () => {
 					<Switch>
 						<Route path='/' exact render={() =>
 							<Stake position='relative' zIndex='1'/>
+						}/>
+						<Route path='/bond' exact render={() =>
+							<Bonds position='relative' zIndex='1'/>
+						}/>
+						<Route path='/bond/:address' exact render={() =>
+							<Bond position='relative' zIndex='1'/>
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
@@ -77,6 +85,7 @@ const App = () => {
 const maskTransform = () => {
 	const location = useLocation()
 	if(
+		location.pathname.includes('bond') ||
 		location.pathname.includes('pool') ||
 		location.pathname.includes('stake')
 	) {

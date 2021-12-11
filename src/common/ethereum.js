@@ -4,6 +4,7 @@ import converterAbi from '../artifacts/abi/converter'
 import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
+import vaderBond from '../artifacts/abi/vaderBond'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -32,12 +33,12 @@ const getERC20BalanceOf = async (tokenAddress, address, provider) => {
 	return await contract.balanceOf(address)
 }
 
-const resolveUnknownERC20 = async (tokenAddress, provider) => {
+const resolveUnknownERC20 = async (tokenAddress, logoURI = '') => {
 	let token
 	const contract = new ethers.Contract(
 		tokenAddress,
 		humanStandardTokenAbi,
-		provider,
+		defaults.network.provider,
 	)
 	const address = await contract.resolvedAddress
 	const name = await contract.name().then(r => { return r }).catch(err => console.log(err))
@@ -57,7 +58,7 @@ const resolveUnknownERC20 = async (tokenAddress, provider) => {
 			'name':name,
 			'symbol':symbol,
 			'decimals':decimals,
-			'logoURI':'',
+			'logoURI':logoURI,
 		}
 	}
 	return token
@@ -147,11 +148,140 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
+const bondInfo = async (address, bondContractAddress, provider) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		provider.getSigner(0),
+	)
+	return await contract.bondInfo(address)
+}
+
+const bondPrice = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.bondPrice()
+}
+
+const bondCurrentDebt = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.currentDebt()
+}
+
+const bondDebtDecay = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.debtDecay()
+}
+
+const bondDebtRatio = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.debtRatio()
+}
+
+const bondLastDecay = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.lastDecay()
+}
+
+const bondPayoutFor = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.payoutFor()
+}
+
+const bondPendingPayoutFor = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.pendingPayoutFor()
+}
+
+const bondPercentVestedFor = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.percentVestedFor()
+}
+
+const bondPayoutToken = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.payoutToken()
+}
+
+const bondPrincipalToken = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.principalToken()
+}
+
+const bondTerms = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.terms()
+}
+
+const bondTotalDebt = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.totalDebt()
+}
+
+const bondTreasury = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.treasury()
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
-	convert,
-	stakeVader, unstakeVader,
+	convert, bondInfo, bondPrice, bondCurrentDebt,
+	bondDebtDecay, stakeVader, unstakeVader,
+	bondDebtRatio, bondLastDecay, bondPayoutFor,
+	bondPendingPayoutFor, bondPayoutToken, bondPercentVestedFor,
+	bondPrincipalToken, bondTerms, bondTotalDebt, bondTreasury,
 	getSalt, getClaimed, getClaim, getVester,
-	claim,
+	claim, resolveUnknownERC20 as resolveERC20,
 }
