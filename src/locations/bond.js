@@ -7,7 +7,7 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { tokenValueTooSmall } from '../messages'
-import { getERC20BalanceOf } from '../common/ethereum'
+import { getERC20BalanceOf, getERC20Allowance } from '../common/ethereum'
 import { prettifyCurrency } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
@@ -30,10 +30,6 @@ const Bond = (props) => {
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
 
-	console.log(value)
-	console.log(setWorking)
-	console.log(setToken0Approved)
-
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
 			if ((defaults.bonds?.filter((b) => {
@@ -55,12 +51,48 @@ const Bond = (props) => {
 	}, [address])
 
 	useEffect(() => {
+		if(useLPTokens) {
+			setToken0(bond?.[0]?.principal)
+		}
+		return () => setToken0(defaults.ether)
+	}, [useLPTokens, bond])
+
+	useEffect(() => {
 		if (wallet.account && token0) {
+			if (!token0?.isEther) {
+				setWorking(true)
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+				getERC20Allowance(
+					token0.address,
+					wallet.account,
+					bond?.[0]?.address,
+					provider,
+				).then((n) => {
+					setWorking(false)
+					if(n.gt(0))	setToken0Approved(true)
+				})
+					.catch((err) => {
+						setWorking(false)
+						console.log(err)
+					})
+			}
+			else {
+				setToken0Approved(true)
+			}
+		}
+		return () => {
+			setWorking(false)
+			setToken0Approved(false)
+		}
+	}, [wallet.account, bond, token0])
+
+	useEffect(() => {
+		if (wallet.account && token0?.address) {
 			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			if (!token0.isEther) {
 				getERC20BalanceOf(
-					token0.address,
-					wallet.account,
+					token0?.address,
+					wallet?.account,
 					provider,
 				)
 					.then(n => {
@@ -76,13 +108,6 @@ const Bond = (props) => {
 			}
 		}
 	}, [wallet.account, token0])
-
-	useEffect(() => {
-		if(useLPTokens) {
-			setToken0(bond?.[0]?.principal)
-		}
-		return () => setToken0(defaults.ether)
-	}, [useLPTokens, bond])
 
 	if (isBondAddress) {
 		return (
