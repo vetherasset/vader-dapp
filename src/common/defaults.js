@@ -160,7 +160,7 @@ defaults.unstakeable = [
 	},
 ]
 
-defaults.xVaderAPRBasedNumberOfRecords = 3
+defaults.xVaderAPRBasedNumberOfRecords = 7
 
 defaults.layout = {}
 defaults.layout.header = {}
