@@ -4,7 +4,7 @@ module.exports =
 			'name': 'Uniswap V2 VADER / ETH LP',
 			'address':'0x66BcC1c537509bA441ccc9DF39E18CC142C59775',
 			'principal': {
-				'address':'0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
+				'address':'0x38F19a5452B03262203cAe9532Fbfd211fa32FF1',
 				'name':'Uniswap VADER/ETH LP',
 				'symbol':'UNI-V2',
 				'decimals':18,
