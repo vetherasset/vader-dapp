@@ -190,6 +190,15 @@ const staked = {
 	position: defaults.toast.position,
 }
 
+const bondConcluded = {
+	title: 'Bond purchase succesfull',
+	description: 'The bond purchase has been concluded.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const unstaked = {
 	title: 'xVADER tokens unstaked',
 	description: 'Your xVADER tokens have been unstaked succesfully.',
@@ -205,4 +214,5 @@ export {
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
+	bondConcluded,
 }
