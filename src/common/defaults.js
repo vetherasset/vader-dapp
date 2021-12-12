@@ -182,7 +182,7 @@ defaults.unstakeable = [
 
 defaults.bonds = vaderBonds
 
-defaults.xVaderAPRBasedNumberOfRecords = 3
+defaults.xVaderAPRBasedNumberOfRecords = 7
 
 defaults.layout = {}
 defaults.layout.header = {}
