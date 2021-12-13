@@ -29,7 +29,7 @@ const Bond = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
-	const [bondPrice] = useBondPrice()
+	const [bondPrice, refetchBondPrice] = useBondPrice()
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
@@ -120,6 +120,7 @@ const Bond = (props) => {
 										defaults.network.tx.confirmations,
 									).then((r) => {
 										setWorking(false)
+										refetchBondPrice()
 										toast({
 											...bondConcluded,
 											description: <LinkExt
@@ -702,6 +703,7 @@ const PriceOverview = () => {
 	const [bondPrice] = useBondPrice()
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
+	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 
 	return (
 		<Flex>
@@ -717,13 +719,12 @@ const PriceOverview = () => {
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{!isNaN(Number(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)) &&
+							{principalEth &&
 								<>
-									{prettifyCurrency(ethers.utils.formatUnits(
-										bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice,
-										18,
-									), 0, 5)
-									}
+									{prettifyCurrency(
+										Number(ethers.utils.formatUnits(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+										0, 5)}
 								</>
 							}
 						</TagLabel>
