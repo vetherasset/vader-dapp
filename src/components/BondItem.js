@@ -22,8 +22,7 @@ export const BondItem = (props) => {
 
 	const wallet = useWallet()
 	const [bondInfo] = useBondInfo(String(wallet.account).toLocaleLowerCase())
-
-	const [bondPrice] = useBondPrice()
+	const [bondPrice] = useBondPrice(props.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 
@@ -82,11 +81,11 @@ export const BondItem = (props) => {
 						justifyContent='flex-end'
 						gridGap='0.7rem'
 					>
-						{bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+						{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									<Tag colorScheme='blue'>
 										{prettifyCurrency(
-											Number(ethers.utils.formatUnits(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice, 18)) *
+											Number(ethers.utils.formatUnits(bondPrice?.global?.value, 18)) *
 											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
 											0, 5)}
 									</Tag>

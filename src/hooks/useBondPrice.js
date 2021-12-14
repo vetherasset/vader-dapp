@@ -1,16 +1,12 @@
 import { useQuery, gql } from '@apollo/client'
 import defaults from '../common/defaults'
 
-export const useBondPrice = (first = 1, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useBondPrice = (bondAddress, pollInterval = defaults.api.graphql.pollInterval) => {
 
 	const query = gql`
 		query {
-			bondPriceChangedEvents(
-				first: ${first}
-			) {
-				id
-				internalPrice
-				debtRatio
+			global(id: "${String(bondAddress).toLocaleLowerCase()}_bondPrice") {
+				value
 			}
 		}`
 

@@ -31,7 +31,7 @@ const Bond = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(ethers.BigNumber.from(0))
-	const [bondPrice, refetchBondPrice] = useBondPrice()
+	const [bondPrice, refetchBondPrice] = useBondPrice(bond?.[0]?.address)
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
@@ -100,8 +100,8 @@ const Bond = (props) => {
 						if (!token0.isEther) {
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
-							const p = !(Number(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)) ? ethers.BigNumber.from(0) :
-								Number(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)
+							const p = !(Number(bondPrice?.global?.value)) ? ethers.BigNumber.from(0) :
+								Number(bondPrice?.global?.value)
 							const maxPrice = ethers.BigNumber.from(
 								p,
 							)
@@ -111,6 +111,7 @@ const Bond = (props) => {
 								.add(ethers.BigNumber.from(
 									p,
 								))
+							console.log(maxPrice)
 							bondDeposit(
 								value,
 								maxPrice,
@@ -597,7 +598,9 @@ const Bond = (props) => {
 									gridGap='12px'
 									flexDir='column'>
 
-									<PriceOverview />
+									<PriceOverview
+										bond={bond}
+									/>
 
 									<Breakdown
 										value={value}
@@ -675,9 +678,13 @@ const Bond = (props) => {
 	)
 }
 
-const PriceOverview = () => {
+const PriceOverview = (props) => {
 
-	const [bondPrice] = useBondPrice()
+	PriceOverview.propTypes = {
+		bond: PropTypes.any.isRequired,
+	}
+
+	const [bondPrice] = useBondPrice(props.bond?.[0]?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
@@ -696,10 +703,10 @@ const PriceOverview = () => {
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+							{bondPrice?.global?.value && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									{prettifyCurrency(
-										Number(ethers.utils.formatUnits(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice, 18)) *
+										Number(ethers.utils.formatUnits(bondPrice?.global?.value, 18)) *
 										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
 										0, 5)}
 								</>
@@ -820,12 +827,13 @@ const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
 		value: PropTypes.object.isRequired,
-		bond: PropTypes.any,
+		bond: PropTypes.any.isRequired,
 	}
 
-	const [bondPrice] = useBondPrice()
+	const [bondPrice] = useBondPrice(props.bond?.[0]?.address)
 	const [bondTerms] = useBondTerms(String(props.bond?.[0]?.address).toLocaleLowerCase())
 	const [treasuryBalance] = useTreasuryBalance(props.bond?.[0]?.address)
+
 
 	return (
 		<>
@@ -889,7 +897,7 @@ const Breakdown = (props) => {
 					{bondPrice && props.value &&
 						<>
 							{prettifyCurrency(
-								ethers.BigNumber.from(props.value).div(ethers.BigNumber.from(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)),
+								ethers.BigNumber.from(props.value).div(ethers.BigNumber.from(bondPrice?.global?.value)),
 								0,
 								5,
 								'VADER')}
