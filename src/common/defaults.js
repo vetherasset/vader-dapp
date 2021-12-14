@@ -23,6 +23,78 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 		},
 	],
 )
+defaults.network.rpcUrl = defaults.network.chainId === 1 ? `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}` : defaults.network.chainId === 42 ? `https://kovan.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}` : undefined
+
+defaults.network.connectors = {
+	injected: {
+		meta: {
+			key: 'injected',
+			name: 'Metamask',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/metamask.svg',
+		},
+	},
+	walletconnect: {
+		rpc: { [defaults.network.chainId]: defaults.network.rpcUrl },
+		meta: {
+			key: 'walletconnect',
+			name: 'WalletConnect',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/wallet-connect.svg',
+		},
+	},
+	ledger: {
+		url: defaults.network.rpcUrl,
+		meta: {
+			key: 'ledger',
+			name: 'Ledger',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/ledger_2.svg',
+		},
+	},
+	fortmatic: {
+		apiKey: process.env.REACT_APP_FORTMATIC_API_KEY,
+		chainId: defaults.network.chainId,
+		meta: {
+			key: 'fortmatic',
+			name: 'Fortmatic',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/fortmatic.svg',
+		},
+	},
+	torus: {
+		chainId: defaults.network.chainId,
+		initOptions: {
+			showTorusButton: false,
+		},
+		meta: {
+			key: 'torus',
+			name: 'Torus',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/torus.svg',
+		},
+	},
+	portis: {
+		dAppId: process.env.REACT_APP_PORTIS_DAPP_ID,
+		meta: {
+			key: 'portis',
+			name: 'Portis',
+			logo: 'https://app.1inch.io/assets/images/wallet-logos/portis.svg',
+		},
+	},
+	// trezor: {
+	// 	url: defaults.network.rpcUrl,
+	// 	manifestEmail: 'supports@vaderprotocol.io',
+	// 	manifestAppUrl: 'https://vaderprotocol.app',
+	// 	meta: {
+	// 		key: 'trezor',
+	// 		name: 'Trezor',
+	// 		logo: 'https://app.1inch.io/assets/images/wallet-logos/trezor.svg',
+	// 	},
+	// },
+	// authereum: {
+	// 	meta: {
+	// 		key: 'authereum',
+	// 		name: 'Authereum',
+	// 		logo: 'https://app.1inch.io/assets/images/wallet-logos/authereum.svg',
+	// 	},
+	// },
+}
 
 defaults.network.tx = {}
 defaults.network.tx.confirmations = 1
