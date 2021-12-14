@@ -1,5 +1,5 @@
-/* eslint-disable no-undef */
 import React, { useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useLocalStorage, useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
@@ -9,13 +9,15 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { bondConcluded, tokenValueTooSmall } from '../messages'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit } from '../common/ethereum'
-import { prettifyCurrency } from '../common/utils'
+import { prettifyCurrency, prettifyNumber } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount } from '../messages'
+import { useBondTerms } from '../hooks/useBondTerms'
+import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 
 const Bond = (props) => {
 
@@ -28,8 +30,8 @@ const Bond = (props) => {
 	const [token0Approved, setToken0Approved] = useState(false)
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
-	const [value, setValue] = useState(0)
-	const [bondPrice] = useBondPrice()
+	const [value, setValue] = useState(ethers.BigNumber.from(0))
+	const [bondPrice, refetchBondPrice] = useBondPrice()
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
@@ -120,6 +122,7 @@ const Bond = (props) => {
 										defaults.network.tx.confirmations,
 									).then((r) => {
 										setWorking(false)
+										refetchBondPrice()
 										toast({
 											...bondConcluded,
 											description: <LinkExt
@@ -271,6 +274,7 @@ const Bond = (props) => {
 						<Text
 							as='h4'
 							fontSize='1.24rem'
+							mr={{ base: '0', md: '10.66px' }}
 							fontWeight='bolder'>
 							{bond?.[0]?.name &&
 								<>
@@ -279,7 +283,6 @@ const Bond = (props) => {
 							}
 						</Text>
 						<Box
-							as='button'
 							width='22px'
 						>
 							{/* empty :-) */}
@@ -322,7 +325,7 @@ const Bond = (props) => {
 													boxShadow: 'none',
 												}}>
 												<Text as='h3' m='0' fontSize='1.24rem'>
-												Bond
+													Bond
 												</Text>
 											</Tab>
 											<Tab
@@ -596,35 +599,10 @@ const Bond = (props) => {
 
 									<PriceOverview />
 
-									<Breakdown/>
-
-									<Flex
-										m='1.66rem 0'
-										fontSize={{ base: '1.35rem', md: '1.5rem' }}
-										fontWeight='bolder'
-										justifyContent='center' alignItems='center' flexDir='column'
-									>
-										{prettifyCurrency(
-											858588,
-											0,
-											5,
-											'VADER',
-										)}
-										<Box
-											as='h3'
-											fontWeight='bold'
-											textAlign='center'
-											fontSize='1rem'
-										>
-											<Badge
-												as='div'
-												fontSize={{ base: '0.6rem', md: '0.75rem' }}
-												background='rgb(214, 188, 250)'
-												color='rgb(128, 41, 251)'
-											>Claimable Now
-											</Badge>
-										</Box>
-									</Flex>
+									<Breakdown
+										value={value}
+										bond={bond}
+									/>
 
 									<Flex justifyContent='center'>
 										<Button
@@ -648,7 +626,7 @@ const Bond = (props) => {
 																		}
 																		{token0 && token0Approved &&
 																	<>
-																		Bond
+																		Purchase
 																	</>
 																		}
 																	</>
@@ -671,7 +649,7 @@ const Bond = (props) => {
 													<>
 														{tabIndex === 0 &&
 															<>
-																Bond
+																Purchase
 															</>
 														}
 														{tabIndex === 1 &&
@@ -702,6 +680,7 @@ const PriceOverview = () => {
 	const [bondPrice] = useBondPrice()
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
+	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 
 	return (
 		<Flex>
@@ -717,13 +696,12 @@ const PriceOverview = () => {
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{!isNaN(Number(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)) &&
+							{bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
-									{prettifyCurrency(ethers.utils.formatUnits(
-										bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice,
-										18,
-									), 0, 5)
-									}
+									{prettifyCurrency(
+										Number(ethers.utils.formatUnits(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+										0, 5)}
 								</>
 							}
 						</TagLabel>
@@ -838,7 +816,16 @@ const PriceOverview = () => {
 // 	)
 // }
 
-const Breakdown = () => {
+const Breakdown = (props) => {
+
+	Breakdown.propTypes = {
+		value: PropTypes.object.isRequired,
+		bond: PropTypes.any,
+	}
+
+	const [bondPrice] = useBondPrice()
+	const [bondTerms] = useBondTerms(String(props.bond?.[0]?.address).toLocaleLowerCase())
+	const [treasuryBalance] = useTreasuryBalance(props.bond?.[0]?.address)
 
 	return (
 		<>
@@ -859,36 +846,19 @@ const Breakdown = () => {
 						<Box
 							textAlign='left'
 						>
-							What you get
+							Max available to buy
 						</Box>
 					</Container>
 					<Container p='0'>
 						<Box
 							textAlign='right'
 						>
-							999999
+							{treasuryBalance?.balances?.[0]?.balance}
 						</Box>
 					</Container>
 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
-							ROI
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							222
-						</Box>
-					</Container>
-				</Flex>
-
-				<Flex>
+				<Flex minH='48px'>
 					<Container p='0'>
 						<Box
 							textAlign='left'>
@@ -896,12 +866,51 @@ const Breakdown = () => {
 						</Box>
 					</Container>
 					<Container p='0'>
-						<Box
-							textAlign='right'>
-							3
-						</Box>
+						{bondTerms &&
+							<Box
+								textAlign='right'>
+							~ {prettifyNumber((Number(bondTerms?.term?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or&nbsp;<i>{(Number(bondTerms?.term?.vestingTerm))}</i>&nbsp;blocks
+							</Box>
+						}
 					</Container>
 				</Flex>
+			</Flex>
+
+			<Flex
+				minH='76px'
+				m='1.66rem 0'
+				fontSize={{ base: '1.35rem', md: '1.5rem' }}
+				fontWeight='bolder'
+				justifyContent='center' alignItems='center' flexDir='column'
+			>
+				<Box
+					minH={{ base: '32.4px', md: '36px' }}
+				>
+					{bondPrice && props.value &&
+						<>
+							{prettifyCurrency(
+								ethers.BigNumber.from(props.value).div(ethers.BigNumber.from(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice)),
+								0,
+								5,
+								'VADER')}
+						</>
+					}
+				</Box>
+
+				<Box
+					as='h3'
+					fontWeight='bold'
+					textAlign='center'
+					fontSize='1rem'
+				>
+					<Badge
+						as='div'
+						fontSize={{ base: '0.6rem', md: '0.75rem' }}
+						background='rgb(214, 188, 250)'
+						color='rgb(128, 41, 251)'
+					>PURCHASE VALUE
+					</Badge>
+				</Box>
 			</Flex>
 		</>
 	)

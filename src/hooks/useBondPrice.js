@@ -14,12 +14,12 @@ export const useBondPrice = (first = 1, pollInterval = defaults.api.graphql.poll
 			}
 		}`
 
-	const { data, error, loading } = useQuery(
+	const { data, error, loading, refetch } = useQuery(
 		query,
 		{
    		pollInterval: pollInterval,
 		},
 	)
 
-	return [data, loading, error]
+	return [data, refetch, loading, error]
 }

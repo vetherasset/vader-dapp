@@ -27,6 +27,9 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 defaults.network.tx = {}
 defaults.network.tx.confirmations = 1
 
+defaults.network.blockTime = {}
+defaults.network.blockTime.hour = 262
+
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
@@ -67,7 +70,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
+		defaults.network.chainId === 42 ? '0x1fd03e4ea209497910face52e5ca39124ef2e8be' :
 			undefined
 )
 defaults.address.vether = (
@@ -182,7 +185,7 @@ defaults.unstakeable = [
 
 defaults.bonds = vaderBonds
 
-defaults.xVaderAPRBasedNumberOfRecords = 3
+defaults.xVaderAPRBasedNumberOfRecords = 7
 
 defaults.layout = {}
 defaults.layout.header = {}

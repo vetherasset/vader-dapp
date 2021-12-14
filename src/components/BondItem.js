@@ -8,6 +8,8 @@ import { CheckCircleIcon } from '@chakra-ui/icons'
 import { prettifyCurrency } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import { useBondInfo } from '../hooks/useBondInfo'
+import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
+import defaults from '../common/defaults'
 
 export const BondItem = (props) => {
 
@@ -19,8 +21,11 @@ export const BondItem = (props) => {
 	}
 
 	const wallet = useWallet()
-	const [bondInfo] = useBondInfo(wallet.account)
-	const [bondItemPriceGQL] = useBondPrice()
+	const [bondInfo] = useBondInfo(String(wallet.account).toLocaleLowerCase())
+
+	const [bondPrice] = useBondPrice()
+	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
+	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 
 	return (
 		<>
@@ -77,23 +82,16 @@ export const BondItem = (props) => {
 						justifyContent='flex-end'
 						gridGap='0.7rem'
 					>
-						{bondItemPriceGQL?.bondPriceChangedEvents?.[0].internalPrice &&
+						{bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									<Tag colorScheme='blue'>
 										{prettifyCurrency(
-											ethers.utils.formatUnits(
-												bondItemPriceGQL?.bondPriceChangedEvents?.[0].internalPrice,
-												18,
-											),
-											0,
-											4,
-										)}
+											Number(ethers.utils.formatUnits(bondPrice?.bondPriceChangedEvents?.[0]?.internalPrice, 18)) *
+											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+											0, 5)}
 									</Tag>
 								</>
 						}
-						<Tag colorScheme='blue'>
-							{props.payout?.symbol}
-						</Tag>
 						<Tag colorScheme='blue'>
 							100%
 						</Tag>

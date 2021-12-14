@@ -88,14 +88,6 @@ const Bonds = (props) => {
 											as='h4'
 											fontSize='1.1rem'
 											fontWeight='bolder'>
-											Payout Asset
-										</Text>
-									</Flex>
-									<Flex>
-										<Text
-											as='h4'
-											fontSize='1.1rem'
-											fontWeight='bolder'>
 											ROI
 										</Text>
 									</Flex>
