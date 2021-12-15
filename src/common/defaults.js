@@ -24,6 +24,8 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	],
 )
 
+defaults.network.pollInterval = 100000
+
 defaults.network.tx = {}
 defaults.network.tx.confirmations = 1
 
@@ -32,6 +34,7 @@ defaults.network.blockTime.hour = 262
 
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
+
 
 defaults.api = {}
 defaults.api.graphql = {}

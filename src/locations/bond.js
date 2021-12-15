@@ -18,6 +18,8 @@ import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
+import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
+import { useBondInfo } from '../hooks/useBondInfo'
 
 const Bond = (props) => {
 
@@ -374,6 +376,8 @@ const Bond = (props) => {
 									</Tabs>
 
 									<Flex
+										pointerEvents={tabIndex === 1 ? 'none' : ''}
+										opacity={tabIndex === 1 ? '0.55' : '1'}
 										flexDir='column'
 									>
 										<Flex
@@ -513,6 +517,8 @@ const Bond = (props) => {
 									</Flex>
 
 									<Flex
+										pointerEvents={tabIndex === 1 ? 'none' : ''}
+										opacity={tabIndex === 1 ? '0.55' : '1'}
 										flexDir='column'
 									>
 										<Text
@@ -595,6 +601,8 @@ const Bond = (props) => {
 									</Flex>
 
 									<Flex
+										pointerEvents={tabIndex === 1 ? 'none' : ''}
+										opacity={tabIndex === 1 ? '0.55' : '1'}
 										borderTop='1px solid rgb(102, 101, 129)'
 										pt='2.1rem'
 										w='100%'
@@ -631,10 +639,18 @@ const Bond = (props) => {
 										bond={bond}
 									/>
 
-									<Breakdown
-										value={inputAmount}
-										bond={bond}
-									/>
+									{tabIndex == 0 &&
+										<Breakdown
+											value={inputAmount}
+											bond={bond}
+										/>
+									}
+
+									{tabIndex === 1 &&
+										<Overview
+											bond={bond}
+										/>
+									}
 
 									<Flex justifyContent='center'>
 										<Button
@@ -774,88 +790,108 @@ const PriceOverview = (props) => {
 	)
 }
 
-// const Overview = () => {
+const Overview = (props) => {
 
-// 	return (
-// 		<>
-// 			<Flex
-// 				flexDir='column'
-// 				p='0 0.15rem'
-// 				marginBottom='.7rem'
-// 				opacity='0.87'
-// 			>
-// 				<Flex>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='left'
-// 						>
-// 							Total rewards
-// 						</Box>
-// 					</Container>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='right'
-// 						>
-// 							999999
-// 						</Box>
-// 					</Container>
-// 				</Flex>
+	Overview.propTypes = {
+		bond: PropTypes.any,
+	}
 
-// 				<Flex>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='left'
-// 						>
-// 							Claimed
-// 						</Box>
-// 					</Container>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='right'
-// 						>
-// 							222
-// 						</Box>
-// 					</Container>
-// 				</Flex>
+	const wallet = useWallet()
+	const [bondInfo] = useBondInfo(props.bond?.[0]?.address, wallet.account)
+	const pendingPayout = useBondPendingPayout(props.bond?.[0]?.address)
 
-// 				<Flex>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='left'>
-// 							Remains vested
-// 						</Box>
-// 					</Container>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='right'>
-// 							222
-// 						</Box>
-// 					</Container>
-// 				</Flex>
+	console.log(bondInfo?.bondInfos?.[0]?.payout)
 
-// 				<Flex>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='left'>
-// 							Vesting Term
-// 						</Box>
-// 					</Container>
-// 					<Container p='0'>
-// 						<Box
-// 							textAlign='right'>
-// 							4
-// 						</Box>
-// 					</Container>
-// 				</Flex>
-// 			</Flex>
-// 		</>
-// 	)
-// }
+	return (
+		<>
+			<Flex
+				flexDir='column'
+				p='0 0.15rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+				minH='109.767px'
+			>
+				{bondInfo?.bondInfos?.[0]?.payout &&
+					<>
+						<Text
+							as='h4'
+							fontSize='1.24rem'
+							fontWeight='bolder'>
+						Overview
+						</Text>
+
+						<Flex>
+							<Container p='0'>
+								<Box
+									textAlign='left'
+								>
+								Remains vested
+								</Box>
+							</Container>
+							<Container p='0'>
+								<Box
+									textAlign='right'
+								>
+									<>
+										{prettifyCurrency(
+											bondInfo?.bondInfos?.[0]?.payout ? ethers.utils.formatUnits(bondInfo?.bondInfos?.[0]?.payout) : 0,
+											0,
+											5,
+											'VADER',
+										)
+										}
+									</>
+								</Box>
+							</Container>
+						</Flex>
+					</>
+				}
+			</Flex>
+
+			<Flex
+				minH='76px'
+				m='1.66rem 0'
+				fontSize={{ base: '1.35rem', md: '1.5rem' }}
+				fontWeight='bolder'
+				justifyContent='center' alignItems='center' flexDir='column'
+			>
+				<Box
+					minH={{ base: '32.4px', md: '36px' }}
+				>
+					{pendingPayout >= 0 &&
+							prettifyCurrency(
+								ethers.utils.formatUnits(pendingPayout, defaults.vader.decimals),
+								0,
+								5,
+								'VADER')
+					}
+				</Box>
+
+				<Box
+					as='h3'
+					fontWeight='bold'
+					textAlign='center'
+					fontSize='1rem'
+				>
+					{pendingPayout >= 0 &&
+						<Badge
+							as='div'
+							fontSize={{ base: '0.6rem', md: '0.75rem' }}
+							background='rgb(214, 188, 250)'
+							color='rgb(128, 41, 251)'
+						>CLAIMABLE NOW
+						</Badge>
+					}
+				</Box>
+			</Flex>
+		</>
+	)
+}
 
 const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
-		value: PropTypes.object.isRequired,
+		value: PropTypes.any.isRequired,
 		bond: PropTypes.any.isRequired,
 	}
 
@@ -936,7 +972,7 @@ const Breakdown = (props) => {
 						{bondTerms &&
 							<Box
 								textAlign='right'>
-							~ {prettifyNumber((Number(bondTerms?.term?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or&nbsp;<i>{(Number(bondTerms?.term?.vestingTerm))}</i>&nbsp;blocks
+							~ {prettifyNumber((Number(bondTerms?.term?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or <i>{(Number(bondTerms?.term?.vestingTerm))}</i> blocks
 							</Box>
 						}
 					</Container>

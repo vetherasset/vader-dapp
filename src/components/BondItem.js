@@ -21,7 +21,7 @@ export const BondItem = (props) => {
 	}
 
 	const wallet = useWallet()
-	const [bondInfo] = useBondInfo(String(wallet.account).toLocaleLowerCase())
+	const [bondInfo] = useBondInfo(props.address, wallet.account)
 	const [bondPrice] = useBondPrice(props.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)

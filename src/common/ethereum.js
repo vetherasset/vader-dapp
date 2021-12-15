@@ -211,13 +211,13 @@ const bondPayoutFor = async (bondContractAddress, value) => {
 	return await contract.payoutFor(value)
 }
 
-const bondPendingPayoutFor = async (bondContractAddress) => {
+const bondPendingPayoutFor = async (bondContractAddress, depositorAccount) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
 		vaderBond,
 		defaults.network.provider,
 	)
-	return await contract.pendingPayoutFor()
+	return await contract.pendingPayoutFor(depositorAccount)
 }
 
 const bondPercentVestedFor = async (bondContractAddress) => {

@@ -1,19 +1,16 @@
 import { useQuery, gql } from '@apollo/client'
 import defaults from '../common/defaults'
 
-export const useBondInfo = (depositorAddress, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useBondInfo = (bondContractAddress, depositorAddress, pollInterval = defaults.api.graphql.pollInterval) => {
 
 	const query = gql`
 		query {
 			bondInfos (
 				where: {
-					depositor: "${depositorAddress}"
+					id: "${String(bondContractAddress).toLocaleLowerCase()}"
+					depositor: "${String(depositorAddress).toLocaleLowerCase()}"
 				}
 			) {
-					id
-					depositor {
-						id
-					}
 					payout
 					vesting
 					lastBlock

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useWallet } from 'use-wallet'
 import { ethers } from 'ethers'
-import { getClaim } from '../common/ethereum'
+import { bondPendingPayoutFor } from '../common/ethereum'
 import defaults from '../common/defaults'
 
-export const useClaimableVeth = () => {
+export const useBondPendingPayout = (bondContractAddress) => {
 
 	const wallet = useWallet()
 	const [block, setBlock] = useState(0)
@@ -12,13 +12,13 @@ export const useClaimableVeth = () => {
 
 	useEffect(() => {
 		if (wallet.account) {
-			getClaim(wallet.account)
+			bondPendingPayoutFor(bondContractAddress, wallet.account)
 				.then((n) => {
 					setClaimable(n)
 				})
 				.catch(err => console.log(err))
 		}
-	}, [wallet.account, block])
+	}, [wallet.account, bondContractAddress, block])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
