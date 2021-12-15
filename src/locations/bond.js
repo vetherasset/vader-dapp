@@ -948,8 +948,6 @@ const Breakdown = (props) => {
 		}
 	}, [props.value])
 
-	console.log(props.treasuryBalance?.balances?.[0]?.balance)
-
 	return (
 		<>
 			<Flex
