@@ -8,14 +8,14 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { bondConcluded, tokenValueTooSmall } from '../messages'
-import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit } from '../common/ethereum'
+import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
-	insufficientBalance, failed, noAmount } from '../messages'
+	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 
@@ -31,6 +31,8 @@ const Bond = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(ethers.BigNumber.from(0))
+	const [purchaseValue, setPurchaseValue] = useState(ethers.BigNumber.from(0))
+	const [treasuryBalance] = useTreasuryBalance(bond?.[0]?.address)
 	const [bondPrice, refetchBondPrice] = useBondPrice(bond?.[0]?.address)
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
@@ -98,60 +100,68 @@ const Bond = (props) => {
 				else if ((value > 0)) {
 					if ((token0balance.gte(value))) {
 						if (!token0.isEther) {
-							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-							setWorking(true)
-							const p = !(Number(bondPrice?.global?.value)) ? ethers.BigNumber.from(0) :
-								Number(bondPrice?.global?.value)
-							const maxPrice = ethers.BigNumber.from(
-								p,
-							)
-								.div(100)
-								.mul(slippageTol)
-								.div(ethers.utils.parseUnits('1', 18))
-								.add(ethers.BigNumber.from(
+							const maxAvailable = (ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance)
+								.lte(ethers.BigNumber.from(bond?.[0]?.maxPayout))) ?
+								ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance, 18) :
+								ethers.BigNumber.from(bond?.[0]?.maxPayout)
+							if (purchaseValue.lte(maxAvailable)) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+								setWorking(true)
+								const p = !(Number(bondPrice?.global?.value)) ? ethers.BigNumber.from(0) :
+									Number(bondPrice?.global?.value)
+								const maxPrice = ethers.BigNumber.from(
 									p,
-								))
-							console.log(maxPrice)
-							bondDeposit(
-								value,
-								maxPrice,
-								wallet.account,
-								bond?.[0]?.address,
-								provider)
-								.then((tx) => {
-									tx.wait(
-										defaults.network.tx.confirmations,
-									).then((r) => {
-										setWorking(false)
-										refetchBondPrice()
-										toast({
-											...bondConcluded,
-											description: <LinkExt
-												variant='underline'
-												_focus={{
-													boxShadow: '0',
-												}}
-												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-												isExternal>
-												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
-											duration: defaults.toast.txHashDuration,
+								)
+									.div(100)
+									.mul(slippageTol)
+									.div(ethers.utils.parseUnits('1', 18))
+									.add(ethers.BigNumber.from(
+										p,
+									))
+								bondDeposit(
+									value,
+									maxPrice,
+									wallet.account,
+									bond?.[0]?.address,
+									provider)
+									.then((tx) => {
+										tx.wait(
+											defaults.network.tx.confirmations,
+										).then((r) => {
+											setWorking(false)
+											refetchBondPrice()
+											toast({
+												...bondConcluded,
+												description: <LinkExt
+													variant='underline'
+													_focus={{
+														boxShadow: '0',
+													}}
+													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+													isExternal>
+													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+												duration: defaults.toast.txHashDuration,
+											})
 										})
 									})
-								})
-								.catch(err => {
-									setWorking(false)
-									if (err.code === 4001) {
-										console.log('Transaction rejected: Your have decided to reject the transaction..')
-										toast(rejected)
-									}
-									else if(err.code === -32016) {
-										toast(exception)
-									}
-									else {
-										console.log(err)
-										toast(failed)
-									}
-								})
+									.catch(err => {
+										setWorking(false)
+										if (err.code === 4001) {
+											console.log('Transaction rejected: Your have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else if(err.code === -32016) {
+											toast(exception)
+										}
+										else {
+											console.log(err)
+											toast(failed)
+										}
+									})
+							}
+							else {
+								toast(bondPurchaseValueExceeds)
+							}
 						}
 						else {
 							// is Native
@@ -237,6 +247,21 @@ const Bond = (props) => {
 			}
 		}
 	}, [wallet.account, token0])
+
+	useEffect(() => {
+		if (value > 0) {
+			bondPayoutFor(
+				String(bond?.[0]?.address).toLocaleLowerCase(),
+				value,
+			)
+				.then(n => {
+					setPurchaseValue(n)
+				})
+		}
+		else {
+			setPurchaseValue(ethers.BigNumber.from(0))
+		}
+	}, [value])
 
 	if (isBondAddress) {
 		return (
@@ -603,7 +628,7 @@ const Bond = (props) => {
 									/>
 
 									<Breakdown
-										value={value}
+										value={inputAmount}
 										bond={bond}
 									/>
 
@@ -830,10 +855,24 @@ const Breakdown = (props) => {
 		bond: PropTypes.any.isRequired,
 	}
 
-	const [bondPrice] = useBondPrice(props.bond?.[0]?.address)
+	const [purchaseValue, setPurchaseValue] = useState(0)
 	const [bondTerms] = useBondTerms(String(props.bond?.[0]?.address).toLocaleLowerCase())
 	const [treasuryBalance] = useTreasuryBalance(props.bond?.[0]?.address)
 
+	useEffect(() => {
+		if (Number(props.value) > 0) {
+			bondPayoutFor(
+				String(props.bond?.[0]?.address).toLocaleLowerCase(),
+				ethers.utils.parseUnits(String(props.value), 18),
+			)
+				.then(n => {
+					setPurchaseValue(n)
+				})
+		}
+		else {
+			setPurchaseValue(ethers.BigNumber.from(0))
+		}
+	}, [props.value])
 
 	return (
 		<>
@@ -861,7 +900,17 @@ const Breakdown = (props) => {
 						<Box
 							textAlign='right'
 						>
-							{treasuryBalance?.balances?.[0]?.balance}
+							{treasuryBalance?.balances?.[0]?.balance &&
+								prettifyCurrency(
+									(ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance)
+										.lte(ethers.BigNumber.from(props.bond?.[0]?.maxPayout))) ?
+										ethers.utils.formatUnits(treasuryBalance?.balances?.[0]?.balance, 18) :
+										ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
+									0,
+									5,
+									'VADER',
+								)
+							}
 						</Box>
 					</Container>
 				</Flex>
@@ -894,10 +943,10 @@ const Breakdown = (props) => {
 				<Box
 					minH={{ base: '32.4px', md: '36px' }}
 				>
-					{bondPrice && props.value &&
+					{purchaseValue &&
 						<>
 							{prettifyCurrency(
-								ethers.BigNumber.from(props.value).div(ethers.BigNumber.from(bondPrice?.global?.value)),
+								ethers.utils.formatUnits(purchaseValue, 18),
 								0,
 								5,
 								'VADER')}
