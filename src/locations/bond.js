@@ -15,7 +15,7 @@ import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
-	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds } from '../messages'
+	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 
@@ -59,6 +59,10 @@ const Bond = (props) => {
 			else if (tabIndex === 0) {
 				if (!token0) {
 					toast(noToken0)
+				}
+				if (treasuryBalance?.balances?.[0]?.balance &&
+					ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader)) {
+					toast(bondSoldOut)
 				}
 				else if (token0 && !token0Approved) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)

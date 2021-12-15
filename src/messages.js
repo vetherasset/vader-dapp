@@ -208,6 +208,16 @@ const bondPurchaseValueExceeds = {
 	position: defaults.toast.position,
 }
 
+const bondSoldOut = {
+	title: 'Bond sale has been sold out',
+	description: 'This sale has been sold out and can not be purchased.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+
 const unstaked = {
 	title: 'xVADER tokens unstaked',
 	description: 'Your xVADER tokens have been unstaked succesfully.',
@@ -223,5 +233,5 @@ export {
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
-	bondConcluded, bondPurchaseValueExceeds,
+	bondConcluded, bondPurchaseValueExceeds, bondSoldOut,
 }
