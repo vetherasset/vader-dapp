@@ -901,15 +901,21 @@ const Breakdown = (props) => {
 							textAlign='right'
 						>
 							{treasuryBalance?.balances?.[0]?.balance &&
-								prettifyCurrency(
-									(ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance)
-										.lte(ethers.BigNumber.from(props.bond?.[0]?.maxPayout))) ?
-										ethers.utils.formatUnits(treasuryBalance?.balances?.[0]?.balance, 18) :
-										ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
-									0,
-									5,
-									'VADER',
-								)
+								<>
+									{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) &&
+									prettifyCurrency(
+										(ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance)
+											.lte(ethers.BigNumber.from(props.bond?.[0]?.maxPayout))) ?
+											ethers.utils.formatUnits(treasuryBalance?.balances?.[0]?.balance, 18) :
+											ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
+										0,
+										5,
+										'VADER',
+									)}
+									{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+										'Sold Out'
+									}
+								</>
 							}
 						</Box>
 					</Container>
@@ -943,13 +949,17 @@ const Breakdown = (props) => {
 				<Box
 					minH={{ base: '32.4px', md: '36px' }}
 				>
-					{purchaseValue &&
+					{treasuryBalance?.balances?.[0]?.balance &&
 						<>
-							{prettifyCurrency(
+							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) && purchaseValue &&
+							prettifyCurrency(
 								ethers.utils.formatUnits(purchaseValue, 18),
 								0,
 								5,
 								'VADER')}
+							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+								'Sold Out'
+							}
 						</>
 					}
 				</Box>
@@ -960,13 +970,32 @@ const Breakdown = (props) => {
 					textAlign='center'
 					fontSize='1rem'
 				>
-					<Badge
-						as='div'
-						fontSize={{ base: '0.6rem', md: '0.75rem' }}
-						background='rgb(214, 188, 250)'
-						color='rgb(128, 41, 251)'
-					>PURCHASE VALUE
-					</Badge>
+					{treasuryBalance?.balances?.[0]?.balance &&
+						<>
+							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) && purchaseValue &&
+								<>
+									<Badge
+										as='div'
+										fontSize={{ base: '0.6rem', md: '0.75rem' }}
+										background='rgb(214, 188, 250)'
+										color='rgb(128, 41, 251)'
+									>PURCHASE VALUE
+									</Badge>
+								</>
+							}
+							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+								<>
+									<Badge
+										as='div'
+										fontSize={{ base: '0.6rem', md: '0.75rem' }}
+										background='rgb(214, 188, 250)'
+										color='rgb(128, 41, 251)'
+									>NOT AVAILABLE
+									</Badge>
+								</>
+							}
+						</>
+					}
 				</Box>
 			</Flex>
 		</>
