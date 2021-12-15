@@ -71,6 +71,7 @@ defaults.network.connectors = {
 	},
 	portis: {
 		dAppId: process.env.REACT_APP_PORTIS_DAPP_ID,
+		chainId: [defaults.network.chainId],
 		meta: {
 			key: 'portis',
 			name: 'Portis',

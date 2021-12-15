@@ -17,7 +17,6 @@ export const WalletConnectionToggle = props => {
 
 	const toggle = () => {
 		if (!wallet.account) {
-			setWorking(true)
 			setIsModalOpen(true)
 		}
 	}
