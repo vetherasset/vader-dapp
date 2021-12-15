@@ -7,15 +7,15 @@ import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
-import { bondConcluded, tokenValueTooSmall } from '../messages'
-import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor } from '../common/ethereum'
+import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
-	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut } from '../messages'
+	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut, nothingtoclaim,
+	bondConcluded, tokenValueTooSmall, vaderclaimed } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
@@ -40,6 +40,8 @@ const Bond = (props) => {
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
+	const [bondInfo, refetchBondInfo] = useBondInfo(bond?.[0]?.address, wallet.account)
+	const [pendingPayout, setPendingPayoutBlock] = useBondPendingPayout(bond?.[0]?.address)
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -181,8 +183,42 @@ const Bond = (props) => {
 					toast(noAmount)
 				}
 			}
-			else {
-				console.log('claim')
+			else if (pendingPayout) {
+				if (ethers.BigNumber.from(pendingPayout).gt(0)) {
+					setWorking(true)
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					bondRedeem(
+						bond?.[0]?.address,
+						wallet.account,
+						provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then(() => {
+								setWorking(false)
+								refetchBondInfo()
+								setPendingPayoutBlock(0)
+								toast(vaderclaimed)
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else if(err.code === -32016) {
+								toast(exception)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(nothingtoclaim)
+				}
 			}
 		}
 	}
@@ -204,7 +240,7 @@ const Bond = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token0) {
-			if (!token0?.isEther) {
+			if (!token0?.isEther && bond?.[0]?.address) {
 				setWorking(true)
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				getERC20Allowance(
@@ -648,7 +684,8 @@ const Bond = (props) => {
 
 									{tabIndex === 1 &&
 										<Overview
-											bond={bond}
+											bondInfo={bondInfo}
+											pendingPayout={pendingPayout}
 										/>
 									}
 
@@ -793,14 +830,9 @@ const PriceOverview = (props) => {
 const Overview = (props) => {
 
 	Overview.propTypes = {
-		bond: PropTypes.any,
+		bondInfo: PropTypes.object,
+		pendingPayout: PropTypes.object,
 	}
-
-	const wallet = useWallet()
-	const [bondInfo] = useBondInfo(props.bond?.[0]?.address, wallet.account)
-	const pendingPayout = useBondPendingPayout(props.bond?.[0]?.address)
-
-	console.log(bondInfo?.bondInfos?.[0]?.payout)
 
 	return (
 		<>
@@ -811,7 +843,7 @@ const Overview = (props) => {
 				opacity='0.87'
 				minH='109.767px'
 			>
-				{bondInfo?.bondInfos?.[0]?.payout &&
+				{props.bondInfo?.bondInfos?.[0]?.payout &&
 					<>
 						<Text
 							as='h4'
@@ -834,7 +866,7 @@ const Overview = (props) => {
 								>
 									<>
 										{prettifyCurrency(
-											bondInfo?.bondInfos?.[0]?.payout ? ethers.utils.formatUnits(bondInfo?.bondInfos?.[0]?.payout) : 0,
+											props.bondInfo?.bondInfos?.[0]?.payout ? ethers.utils.formatUnits(props.bondInfo?.bondInfos?.[0]?.payout) : 0,
 											0,
 											5,
 											'VADER',
@@ -858,9 +890,9 @@ const Overview = (props) => {
 				<Box
 					minH={{ base: '32.4px', md: '36px' }}
 				>
-					{pendingPayout >= 0 &&
+					{props.pendingPayout && props.pendingPayout.gte(0) &&
 							prettifyCurrency(
-								ethers.utils.formatUnits(pendingPayout, defaults.vader.decimals),
+								ethers.utils.formatUnits(props.pendingPayout, defaults.vader.decimals),
 								0,
 								5,
 								'VADER')
@@ -873,7 +905,7 @@ const Overview = (props) => {
 					textAlign='center'
 					fontSize='1rem'
 				>
-					{pendingPayout >= 0 &&
+					{props.pendingPayout && props.pendingPayout.gte(0) &&
 						<Badge
 							as='div'
 							fontSize={{ base: '0.6rem', md: '0.75rem' }}

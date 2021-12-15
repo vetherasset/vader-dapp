@@ -200,8 +200,8 @@ const bondConcluded = {
 }
 
 const bondPurchaseValueExceeds = {
-	title: 'Bond purchase exceeds maximum value',
-	description: 'Your can not purchase more than max available.',
+	title: 'Purchase exceeds max available',
+	description: 'Your can\'t purchase more than max available.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,

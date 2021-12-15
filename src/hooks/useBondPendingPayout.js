@@ -11,7 +11,7 @@ export const useBondPendingPayout = (bondContractAddress) => {
 	const [claimable, setClaimable] = useState(ethers.BigNumber.from('0'))
 
 	useEffect(() => {
-		if (wallet.account) {
+		if (wallet.account && bondContractAddress) {
 			bondPendingPayoutFor(bondContractAddress, wallet.account)
 				.then((n) => {
 					setClaimable(n)
@@ -32,6 +32,6 @@ export const useBondPendingPayout = (bondContractAddress) => {
 		return () => clearInterval(interval)
 	}, [])
 
-	return claimable
+	return [claimable, setBlock]
 
 }

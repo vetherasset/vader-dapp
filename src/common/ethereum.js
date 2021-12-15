@@ -283,6 +283,15 @@ const bondDeposit = async (amount, maxPrice, depositor, bondContractAddress, pro
 	return await contract.deposit(amount, maxPrice, depositor)
 }
 
+const bondRedeem = async (bondContractAddress, depositor, provider) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		provider.getSigner(0),
+	)
+	return await contract.redeem(depositor)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -291,7 +300,7 @@ export {
 	bondDebtRatio, bondLastDecay, bondPayoutFor,
 	bondPendingPayoutFor, bondPayoutToken, bondPercentVestedFor,
 	bondPrincipalToken, bondTerms, bondTotalDebt, bondTreasury,
-	bondDeposit,
+	bondDeposit, bondRedeem,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
 }

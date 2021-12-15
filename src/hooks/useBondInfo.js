@@ -18,12 +18,12 @@ export const useBondInfo = (bondContractAddress, depositorAddress, pollInterval 
 		}
 	`
 
-	const { data, error, loading } = useQuery(
+	const { data, refetch, error, loading } = useQuery(
 		query,
 		{
    		pollInterval: pollInterval,
 		},
 	)
 
-	return [data, loading, error]
+	return [data, refetch, loading, error]
 }
