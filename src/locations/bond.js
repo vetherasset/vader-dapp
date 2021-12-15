@@ -948,6 +948,8 @@ const Breakdown = (props) => {
 		}
 	}, [props.value])
 
+	console.log(props.treasuryBalance?.balances?.[0]?.balance)
+
 	return (
 		<>
 			<Flex
@@ -1029,22 +1031,17 @@ const Breakdown = (props) => {
 							<>
 								{purchaseValue !== '' &&
 									prettifyCurrency(
-										ethers.utils.formatUnits(purchaseValue, 18),
+										purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
 										0,
 										5,
 										'VADER')
-								}
-								{purchaseValue === '' &&
-									prettifyCurrency(
-										0,
-										0,
-										5,
-										'VADER')
-								}
-								{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
-								'Sold Out'
 								}
 							</>
+							}
+							{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+								<>
+									Sold Out
+								</>
 							}
 						</>
 					}

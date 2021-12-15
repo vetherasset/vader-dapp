@@ -187,7 +187,7 @@ defaults.unstakeable = [
 ]
 
 defaults.bonds = vaderBonds
-defaults.bondConsideredSoldOutMinVader = 300
+defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
 
 defaults.xVaderAPRBasedNumberOfRecords = 7
 
