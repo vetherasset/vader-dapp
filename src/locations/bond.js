@@ -34,7 +34,7 @@ const Bond = (props) => {
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(ethers.BigNumber.from(0))
 	const [purchaseValue, setPurchaseValue] = useState(ethers.BigNumber.from(0))
-	const [treasuryBalance] = useTreasuryBalance(bond?.[0]?.address)
+	const [treasuryBalance, refetchTreasuryBalance] = useTreasuryBalance(bond?.[0]?.address)
 	const [bondPrice, refetchBondPrice] = useBondPrice(bond?.[0]?.address)
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
@@ -116,7 +116,7 @@ const Bond = (props) => {
 								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
 								const p = !(Number(bondPrice?.global?.value)) ? ethers.BigNumber.from(0) :
-									Number(bondPrice?.global?.value)
+									bondPrice?.global?.value
 								const maxPrice = ethers.BigNumber.from(
 									p,
 								)
@@ -138,6 +138,7 @@ const Bond = (props) => {
 										).then((r) => {
 											setWorking(false)
 											refetchBondPrice()
+											refetchTreasuryBalance()
 											toast({
 												...bondConcluded,
 												description: <LinkExt
@@ -678,6 +679,7 @@ const Bond = (props) => {
 									{tabIndex == 0 &&
 										<Breakdown
 											value={inputAmount}
+											treasuryBalance={treasuryBalance}
 											bond={bond}
 										/>
 									}
@@ -924,12 +926,12 @@ const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
 		value: PropTypes.any.isRequired,
+		treasuryBalance: PropTypes.object,
 		bond: PropTypes.any.isRequired,
 	}
 
-	const [purchaseValue, setPurchaseValue] = useState(0)
+	const [purchaseValue, setPurchaseValue] = useState('')
 	const [bondTerms] = useBondTerms(String(props.bond?.[0]?.address).toLocaleLowerCase())
-	const [treasuryBalance] = useTreasuryBalance(props.bond?.[0]?.address)
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {
@@ -972,19 +974,19 @@ const Breakdown = (props) => {
 						<Box
 							textAlign='right'
 						>
-							{treasuryBalance?.balances?.[0]?.balance &&
+							{props.treasuryBalance?.balances?.[0]?.balance &&
 								<>
-									{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) &&
+									{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) &&
 									prettifyCurrency(
-										(ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance)
+										(ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance)
 											.lte(ethers.BigNumber.from(props.bond?.[0]?.maxPayout))) ?
-											ethers.utils.formatUnits(treasuryBalance?.balances?.[0]?.balance, 18) :
+											ethers.utils.formatUnits(props.treasuryBalance?.balances?.[0]?.balance, 18) :
 											ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
 										0,
 										5,
 										'VADER',
 									)}
-									{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+									{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
 										'Sold Out'
 									}
 								</>
@@ -1021,16 +1023,28 @@ const Breakdown = (props) => {
 				<Box
 					minH={{ base: '32.4px', md: '36px' }}
 				>
-					{treasuryBalance?.balances?.[0]?.balance &&
+					{props.treasuryBalance?.balances?.[0]?.balance &&
 						<>
-							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) && purchaseValue &&
-							prettifyCurrency(
-								ethers.utils.formatUnits(purchaseValue, 18),
-								0,
-								5,
-								'VADER')}
-							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+							{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) &&
+							<>
+								{purchaseValue !== '' &&
+									prettifyCurrency(
+										ethers.utils.formatUnits(purchaseValue, 18),
+										0,
+										5,
+										'VADER')
+								}
+								{purchaseValue === '' &&
+									prettifyCurrency(
+										0,
+										0,
+										5,
+										'VADER')
+								}
+								{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
 								'Sold Out'
+								}
+							</>
 							}
 						</>
 					}
@@ -1042,9 +1056,9 @@ const Breakdown = (props) => {
 					textAlign='center'
 					fontSize='1rem'
 				>
-					{treasuryBalance?.balances?.[0]?.balance &&
+					{props.treasuryBalance?.balances?.[0]?.balance &&
 						<>
-							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) && purchaseValue &&
+							{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).gt(defaults.bondConsideredSoldOutMinVader) &&
 								<>
 									<Badge
 										as='div'
@@ -1055,7 +1069,7 @@ const Breakdown = (props) => {
 									</Badge>
 								</>
 							}
-							{ethers.BigNumber.from(treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
+							{ethers.BigNumber.from(props.treasuryBalance?.balances?.[0]?.balance).lte(defaults.bondConsideredSoldOutMinVader) &&
 								<>
 									<Badge
 										as='div'
