@@ -20,10 +20,9 @@ const Bonds = (props) => {
 				<Heading
 					as='h1'
 					size='md'
-					fontSize={{ base: '1.10rem', md: '1.25rem' }}>BOND SALES AVAILABLE.</Heading>
-					Stake your VADER for xVADER and maximize your yield. No Impermanent Loss.
-				<br/>
-					xVADER is fully composable that can interact with other protocols. By staking VADER, you will be able to participate in governance, get access to ecosystem airdrops.
+					fontSize={{ base: '1.10rem', md: '1.25rem' }}>VADER BONDS AVAILABLE.</Heading>
+					The first step of Vader Protocol&apos;s long-term roadmap to awaken our sustainable Protocol-Owned Liquidity (POL) growth.<br/>
+					Users can purchase discounted Vader by way of Vader Bonds, which are vested over a short duration, by supplying various LP units according to the protocol&apos;s growth needs.
 			</Flex>
 			<Flex
 				m='0 auto'

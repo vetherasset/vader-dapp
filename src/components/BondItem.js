@@ -89,7 +89,7 @@ export const BondItem = (props) => {
 					>
 						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
-									<Tag colorScheme='purple'>
+									<Tag colorScheme='gray'>
 										{prettifyCurrency(
 											Number(ethers.utils.formatUnits(price, 18)) *
 											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
