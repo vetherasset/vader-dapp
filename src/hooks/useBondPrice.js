@@ -1,21 +1,19 @@
-import { useQuery, gql } from '@apollo/client'
+import { useQuery } from 'react-query'
+import { bondPrice } from '../common/ethereum'
 import defaults from '../common/defaults'
 
-export const useBondPrice = (bondAddress, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useBondPrice = (bondAddress, staleTime = defaults.api.staleTime) => {
 
-	const query = gql`
-		query {
-			global(id: "${String(bondAddress).toLocaleLowerCase()}_bondPrice") {
-				value
-			}
-		}`
-
-	const { data, error, loading, refetch } = useQuery(
-		query,
-		{
-   		pollInterval: pollInterval,
-		},
+	const price = useQuery(`${bondAddress}_bondPrice`, async () => {
+		if (bondAddress) {
+			return await bondPrice(
+				bondAddress,
+			)
+		}
+	}, {
+		staleTime: staleTime,
+	},
 	)
 
-	return [data, refetch, loading, error]
+	return price
 }

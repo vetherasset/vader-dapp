@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { QueryClient } from 'react-query'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
 import vaderBonds from '../artifacts/js/vaderBonds'
@@ -37,6 +38,9 @@ defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 
 defaults.api = {}
+defaults.api.staleTime = 100000
+defaults.api.client = new QueryClient()
+
 defaults.api.graphql = {}
 defaults.api.graphql.uri = {}
 defaults.api.graphql.uri.vaderProtocol = (

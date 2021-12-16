@@ -35,7 +35,7 @@ const Bond = (props) => {
 	const [value, setValue] = useState(ethers.BigNumber.from(0))
 	const [purchaseValue, setPurchaseValue] = useState(ethers.BigNumber.from(0))
 	const [treasuryBalance, refetchTreasuryBalance] = useTreasuryBalance(bond?.[0]?.address)
-	const [bondPrice, refetchBondPrice] = useBondPrice(bond?.[0]?.address)
+	const { data: bondPrice, refetch: refetchBondPrice } = useBondPrice(bond?.[0]?.address)
 	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
@@ -115,8 +115,8 @@ const Bond = (props) => {
 							if (purchaseValue.lte(maxAvailable)) {
 								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
-								const p = !(Number(bondPrice?.global?.value)) ? ethers.BigNumber.from(0) :
-									bondPrice?.global?.value
+								const p = !(Number(bondPrice)) ? ethers.BigNumber.from(0) :
+									bondPrice
 								const maxPrice = ethers.BigNumber.from(
 									p,
 								)
@@ -768,7 +768,7 @@ const PriceOverview = (props) => {
 		bond: PropTypes.any.isRequired,
 	}
 
-	const [bondPrice] = useBondPrice(props.bond?.[0]?.address)
+	const { data: bondPrice } = useBondPrice(props.bond?.[0]?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
@@ -787,10 +787,10 @@ const PriceOverview = (props) => {
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{bondPrice?.global?.value && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+							{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									{prettifyCurrency(
-										Number(ethers.utils.formatUnits(bondPrice?.global?.value, 18)) *
+										Number(ethers.utils.formatUnits(bondPrice, 18)) *
 										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
 										0, 5)}
 								</>

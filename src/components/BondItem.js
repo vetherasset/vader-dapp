@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom'
 import { Flex, Image, Tag } from '@chakra-ui/react'
 import { CheckCircleIcon } from '@chakra-ui/icons'
 import { prettifyCurrency } from '../common/utils'
-import { useBondPrice } from '../hooks/useBondPrice'
 import { useBondInfo } from '../hooks/useBondInfo'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import defaults from '../common/defaults'
+import { useBondPrice } from '../hooks/useBondPrice'
 
 export const BondItem = (props) => {
 
@@ -22,9 +22,9 @@ export const BondItem = (props) => {
 
 	const wallet = useWallet()
 	const [bondInfo] = useBondInfo(props.address, wallet.account)
-	const [bondPrice] = useBondPrice(props.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
+	const { data: price } = useBondPrice(props.address)
 
 	return (
 		<>
@@ -81,11 +81,11 @@ export const BondItem = (props) => {
 						justifyContent='flex-end'
 						gridGap='0.7rem'
 					>
-						{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									<Tag colorScheme='blue'>
 										{prettifyCurrency(
-											Number(ethers.utils.formatUnits(bondPrice?.global?.value, 18)) *
+											Number(ethers.utils.formatUnits(price, 18)) *
 											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
 											0, 5)}
 									</Tag>
