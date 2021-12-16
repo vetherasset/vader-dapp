@@ -377,11 +377,11 @@ const Bond = (props) => {
 					minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 					maxWidth={defaults.layout.container.md.width}
 					m='0 auto'
-					p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
+					p={{ base: '5rem 1.1rem 6rem', md: '5rem 0 0' }}
 					{...props}
 				>
 			 <Flex
-						 minH='96.3667px'
+						minH='96.3667px'
 						m='0 auto'
 						p='1.8rem'
 						flexDir='row'
@@ -1010,7 +1010,6 @@ const Breakdown = (props) => {
 	const bondPirce = (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
-	const roi = getPercentage(calculateDifference(marketPrice, bondPirce))
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {

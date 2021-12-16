@@ -37,7 +37,7 @@ export const BondItem = (props) => {
 					width='100%'
 					alignItems='center'
 					justifyContent='space-between'
-					p='0 24px'
+					p={{ base: '12px 24px', md: '0 24px' }}
 					minH='60px'
 					cursor='pointer'
 					animation={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '2.3s ease-in-out infinite bgAnimation' : '' }
@@ -46,6 +46,7 @@ export const BondItem = (props) => {
 					mb='16px'
 					borderRadius='16px'
 					border={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '1px solid #ffffff10' : '1px solid #ffffff08' }
+					flexWrap={{ base: 'wrap', md: '' }}
 					_hover={{
 						cursor: 'pointer',
 						background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
@@ -53,6 +54,7 @@ export const BondItem = (props) => {
 					}}
 				>
 					<Flex
+						mb={{ base: '0.5rem', md: '' }}
 						fontWeight='bolder'>
 						<Image
 							width='23px'
