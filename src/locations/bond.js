@@ -8,7 +8,7 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem } from '../common/ethereum'
-import { prettifyCurrency, prettifyNumber } from '../common/utils'
+import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
@@ -775,6 +775,17 @@ const PriceOverview = (props) => {
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 
+	let bondPriceAsUSD = null
+	if (bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice) {
+		bondPriceAsUSD = Number(ethers.utils.formatUnits(bondPrice, 18)) *
+			(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))
+	}
+	let marketPriceAsUSD = null
+	if (usdcEth?.pairs?.[0]?.token0Price && vaderEth?.pairs?.[0]?.token1Price) {
+		marketPriceAsUSD = Number(usdcEth?.pairs?.[0]?.token0Price) *
+			Number(vaderEth?.pairs?.[0]?.token1Price)
+	}
+	const roi = calculateDifference(marketPriceAsUSD, bondPriceAsUSD)
 	return (
 		<Flex>
 			<Container p='0 6px 6px 2px'>
@@ -789,11 +800,10 @@ const PriceOverview = (props) => {
 					>
 						<Box fontSize='1rem'>Bond Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+							{bondPriceAsUSD &&
 								<>
 									{prettifyCurrency(
-										Number(ethers.utils.formatUnits(bondPrice, 18)) *
-										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+										bondPriceAsUSD,
 										0, 5)}
 								</>
 							}
@@ -814,10 +824,10 @@ const PriceOverview = (props) => {
 					>
 						<Box fontSize='1rem'>Market Price</Box>
 						<TagLabel fontSize='2.1rem'>
-							{!isNaN(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)) &&
+							{ marketPriceAsUSD &&
 								<>
 									{prettifyCurrency(
-										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)),
+										marketPriceAsUSD,
 										0,
 										5,
 									)}
@@ -825,6 +835,9 @@ const PriceOverview = (props) => {
 							}
 						</TagLabel>
 					</Tag>
+				</Box>
+				<Box textAlign={{ base: 'center', md: 'left' }}>
+					ROI: {getPercentage(roi)}
 				</Box>
 			</Container>
 		</Flex>
