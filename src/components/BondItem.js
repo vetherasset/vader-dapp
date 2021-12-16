@@ -46,7 +46,7 @@ export const BondItem = (props) => {
 					mb='16px'
 					borderRadius='16px'
 					border={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '1px solid #ffffff10' : '1px solid #ffffff08' }
-					flexWrap={{ base: 'wrap', md: '' }}
+					flexWrap='wrap'
 					_hover={{
 						cursor: 'pointer',
 						background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
@@ -54,7 +54,7 @@ export const BondItem = (props) => {
 					}}
 				>
 					<Flex
-						mb={{ base: '0.5rem', md: '' }}
+						mb={{ base: '0.5rem', md: '0' }}
 						fontWeight='bolder'>
 						<Image
 							width='23px'

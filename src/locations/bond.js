@@ -707,7 +707,9 @@ const Bond = (props) => {
 										pointerEvents={tabIndex === 1 ? 'none' : ''}
 										opacity={tabIndex === 1 ? '0.55' : '1'}
 										borderTop='1px solid rgb(102, 101, 129)'
+										borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
 										pt='2.1rem'
+										pb={{ base: '2.1rem', md: '0' }}
 										w='100%'
 										flexDir='row'
 										justifyContent='space-between'
