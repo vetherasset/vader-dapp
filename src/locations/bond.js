@@ -680,6 +680,7 @@ const Bond = (props) => {
 									{tabIndex == 0 &&
 										<Breakdown
 											value={inputAmount}
+											useLPTokens={useLPTokens}
 											treasuryBalance={treasuryBalance}
 											bond={bond}
 										/>
@@ -927,27 +928,34 @@ const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
 		value: PropTypes.any.isRequired,
+		useLPTokens: PropTypes.bool.isRequired,
 		treasuryBalance: PropTypes.object,
 		bond: PropTypes.any.isRequired,
 	}
 
 	const [purchaseValue, setPurchaseValue] = useState('')
+	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {
-			bondPayoutFor(
-				String(props.bond?.[0]?.address).toLocaleLowerCase(),
-				ethers.utils.parseUnits(String(props.value), 18),
-			)
-				.then(n => {
-					setPurchaseValue(n)
-				})
+			if (props.useLPTokens || principalEth?.principalPrice) {
+				bondPayoutFor(
+					String(props.bond?.[0]?.address).toLocaleLowerCase(),
+					props.useLPTokens ? ethers.utils.parseUnits(String(props.value), 18) :
+						ethers.utils.parseUnits(
+							String(Number(props.value) / Number(principalEth?.principalPrice)), props.bond?.principal?.decimals,
+						),
+				)
+					.then(n => {
+						setPurchaseValue(n)
+					})
+			}
 		}
 		else {
 			setPurchaseValue(ethers.BigNumber.from(0))
 		}
-	}, [props.value])
+	}, [props.value, props.useLPTokens, principalEth?.principalPrice])
 
 	return (
 		<>
