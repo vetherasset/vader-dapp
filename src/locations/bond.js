@@ -40,7 +40,7 @@ const Bond = (props) => {
 	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
-	const [bondInfo, refetchBondInfo] = useBondInfo(bond?.[0]?.address, wallet.account)
+	const { data: bondInfo, refetch: refetchBondInfo } = useBondInfo(bond?.[0]?.address, wallet.account, true)
 	const [pendingPayout, setPendingPayoutBlock] = useBondPendingPayout(bond?.[0]?.address)
 
 	const isBondAddress = useMemo(() => {
@@ -138,6 +138,7 @@ const Bond = (props) => {
 										).then((r) => {
 											setWorking(false)
 											refetchBondPrice()
+											refetchBondInfo()
 											refetchTreasuryBalance()
 											toast({
 												...bondConcluded,
@@ -834,7 +835,7 @@ const PriceOverview = (props) => {
 const Overview = (props) => {
 
 	Overview.propTypes = {
-		bondInfo: PropTypes.object,
+		bondInfo: PropTypes.array,
 		pendingPayout: PropTypes.object,
 	}
 
@@ -847,7 +848,7 @@ const Overview = (props) => {
 				opacity='0.87'
 				minH='109.767px'
 			>
-				{props.bondInfo?.bondInfos?.[0]?.payout &&
+				{props.bondInfo?.[0]?.gt(0) &&
 					<>
 						<Text
 							as='h4'
@@ -870,7 +871,7 @@ const Overview = (props) => {
 								>
 									<>
 										{prettifyCurrency(
-											props.bondInfo?.bondInfos?.[0]?.payout ? ethers.utils.formatUnits(props.bondInfo?.bondInfos?.[0]?.payout) : 0,
+											props.bondInfo?.[0] ? ethers.utils.formatUnits(props.bondInfo?.[0], defaults.vader.decimals) : 0,
 											0,
 											5,
 											'VADER',

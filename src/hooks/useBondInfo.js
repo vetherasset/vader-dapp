@@ -1,9 +1,12 @@
-import { useQuery, gql } from '@apollo/client'
+import { useQuery as useApolloQuery, gql } from '@apollo/client'
+import { useQuery } from 'react-query'
 import defaults from '../common/defaults'
+import { bondInfo } from '../common/ethereum'
 
-export const useBondInfo = (bondContractAddress, depositorAddress, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useBondInfo = (bondContractAddress, depositorAddress, rpc = false, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
 
-	const query = gql`
+	if (!rpc) {
+		const query = gql`
 		query {
 			bondInfos (
 				where: {
@@ -17,13 +20,28 @@ export const useBondInfo = (bondContractAddress, depositorAddress, pollInterval 
 				}
 		}
 	`
-
-	const { data, refetch, error, loading } = useQuery(
-		query,
-		{
+		const bondInfoQ = useApolloQuery(
+			query,
+			{
    		pollInterval: pollInterval,
-		},
-	)
+			},
+		)
 
-	return [data, refetch, loading, error]
+		return bondInfoQ
+	}
+	else {
+		const bondInfoQ = useQuery(`${bondContractAddress}_${depositorAddress}_bondInfo`, async () => {
+			if (bondContractAddress && depositorAddress) {
+				return await bondInfo(
+					bondContractAddress,
+					depositorAddress,
+				)
+			}
+		}, {
+			staleTime: staleTime,
+		},
+		)
+		return bondInfoQ
+	}
+
 }

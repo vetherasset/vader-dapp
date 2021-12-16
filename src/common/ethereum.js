@@ -148,13 +148,13 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
-const bondInfo = async (address, bondContractAddress, provider) => {
+const bondInfo = async (bondContractAddress, depositorAddress) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
 		vaderBond,
-		provider.getSigner(0),
+		defaults.network.provider,
 	)
-	return await contract.bondInfo(address)
+	return await contract.bondInfo(depositorAddress)
 }
 
 const bondPrice = async (bondContractAddress) => {

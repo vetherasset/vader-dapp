@@ -21,7 +21,7 @@ export const BondItem = (props) => {
 	}
 
 	const wallet = useWallet()
-	const [bondInfo] = useBondInfo(props.address, wallet.account)
+	const { data: bondInfo } = useBondInfo(props.address, wallet.account, true)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 	const { data: price } = useBondPrice(props.address)
@@ -36,12 +36,12 @@ export const BondItem = (props) => {
 					p='0 24px'
 					minH='60px'
 					cursor='pointer'
-					animation={ bondInfo?.bonds?.[0]?.payout && ethers.BigNumber.from(bondInfo?.bonds?.[0]?.payout).gt(0) ? '2.3s ease-in-out infinite bgAnimation' : '' }
+					animation={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '2.3s ease-in-out infinite bgAnimation' : '' }
 					transition='all 0.3s ease 0s'
 					background='rgba(244, 155, 202, 0.08) none repeat scroll 0% 0%'
 					mb='16px'
 					borderRadius='16px'
-					border={ bondInfo?.bonds?.[0]?.payout && ethers.BigNumber.from(bondInfo?.bonds?.[0]?.payout).gt(0) ? '1px solid #ffffff10' : '1px solid #ffffff08' }
+					border={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '1px solid #ffffff10' : '1px solid #ffffff08' }
 					_hover={{
 						cursor: 'pointer',
 						background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
@@ -65,7 +65,7 @@ export const BondItem = (props) => {
 							src={props.token1?.logoURI}
 						/>
 						{props.token0?.symbol}{props.token1 ? ` / ${props.token1.symbol}` : ''}
-						{bondInfo?.bonds?.[0]?.payout && ethers.BigNumber.from(bondInfo?.bonds?.[0]?.payout).gt(0) &&
+						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&
 							<Tag
 								ml='10px'
 								colorScheme='green'>
