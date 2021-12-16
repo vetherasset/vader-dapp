@@ -68,10 +68,12 @@ export const BondItem = (props) => {
 						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&
 							<Tag
 								ml='10px'
-								colorScheme='green'>
+								borderRadius='11px'
+								variant='subtle'
+								colorScheme='cyan'>
 								<CheckCircleIcon
 									mr='5px'
-								/> BOUGHT
+								/> Purchased
 							</Tag>
 						}
 					</Flex>
@@ -83,7 +85,7 @@ export const BondItem = (props) => {
 					>
 						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
-									<Tag colorScheme='blue'>
+									<Tag colorScheme='purple'>
 										{prettifyCurrency(
 											Number(ethers.utils.formatUnits(price, 18)) *
 											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
@@ -91,10 +93,10 @@ export const BondItem = (props) => {
 									</Tag>
 								</>
 						}
-						<Tag colorScheme='blue'>
+						<Tag colorScheme='gray'>
 							100%
 						</Tag>
-						<Tag colorScheme='blue'>
+						<Tag colorScheme='gray'>
 							{prettifyCurrency(999999999, 0, 4)}
 						</Tag>
 					</Flex>

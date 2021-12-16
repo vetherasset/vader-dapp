@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading } from '@chakra-ui/react'
 import { BondItem } from '../components/BondItem'
 import defaults from '../common/defaults'
 
@@ -13,6 +13,18 @@ const Bonds = (props) => {
 			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
+			<Flex
+				flexDir='column'
+				textAlign='center'
+			>
+				<Heading
+					as='h1'
+					size='md'
+					fontSize={{ base: '1.10rem', md: '1.25rem' }}>BOND SALES AVAILABLE.</Heading>
+					Stake your VADER for xVADER and maximize your yield. No Impermanent Loss.
+				<br/>
+					xVADER is fully composable that can interact with other protocols. By staking VADER, you will be able to participate in governance, get access to ecosystem airdrops.
+			</Flex>
 			<Flex
 				m='0 auto'
 				p='1.8rem'
