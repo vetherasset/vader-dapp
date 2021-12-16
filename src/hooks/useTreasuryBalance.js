@@ -1,9 +1,12 @@
-import { useQuery, gql } from '@apollo/client'
+import { useQuery as useApolloQuery, gql } from '@apollo/client'
+import { useQuery } from 'react-query'
+import { bondTreasury, getERC20BalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
 
-export const useTreasuryBalance = (bondAddress, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useTreasuryBalance = (bondAddress, rpc = false, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
 
-	const treasuryQuery = gql`
+	if (!rpc) {
+		const treasuryQuery = gql`
 		query {
 			global(
 				id: "${String(bondAddress).toLocaleLowerCase()}_treasury")
@@ -13,7 +16,7 @@ export const useTreasuryBalance = (bondAddress, pollInterval = defaults.api.grap
 			}
 	`
 
-	const balanceQuery = gql`
+		const balanceQuery = gql`
 		query ($address: String!) {
 			balances(
 				where: {
@@ -26,19 +29,46 @@ export const useTreasuryBalance = (bondAddress, pollInterval = defaults.api.grap
 		}
 	`
 
-	const { data: treasury } = useQuery(
-		treasuryQuery,
+		const { data: treasury } = useApolloQuery(
+			treasuryQuery,
 	 )
 
-	const address = treasury?.global?.value
-	const { data, refetch, error, loading } = useQuery(balanceQuery,
-		{
-			skip: !address,
-			variables: { address },
-			pollInterval: pollInterval,
+		const address = treasury?.global?.value
+		const balance = useApolloQuery(balanceQuery,
+			{
+				skip: !address,
+				variables: { address },
+				pollInterval: pollInterval,
+			},
+		)
+
+		return balance
+	}
+	else {
+
+		const { data: treasury } = useQuery(`${bondAddress}_bondTreasury`, async () => {
+			if (bondAddress) {
+				return await bondTreasury(
+					bondAddress,
+				)
+			}
 		},
-	)
+		)
 
-	return [data, refetch, error, loading]
+		const address = treasury
+		const balance = useQuery(`${address}_treasuryBalance`, async () => {
+			if (address) {
+				return await getERC20BalanceOf(
+					defaults.vader.address,
+					address,
+					defaults.network.provider,
+				)
+			}
+		}, {
+			staleTime: staleTime,
+		},
+		)
+		return balance
 
+	}
 }
