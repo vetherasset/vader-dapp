@@ -242,7 +242,7 @@ const Bond = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token0) {
-			if (!token0?.isEther && bond?.[0]?.address) {
+			if (!token0.isEther && bond?.[0]?.address && token0.address) {
 				setWorking(true)
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				getERC20Allowance(
