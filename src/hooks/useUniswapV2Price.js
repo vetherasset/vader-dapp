@@ -7,7 +7,7 @@ export const useUniswapV2Price = (pairAddress, principalPrice = false, pollInter
 		query {
 			pairs (
 				where: {
-					id: "${pairAddress}"
+					id: "${String(pairAddress).toLowerCase()}"
 				}
 				) {
 					token0Price

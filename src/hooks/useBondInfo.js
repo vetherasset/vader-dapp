@@ -10,8 +10,8 @@ export const useBondInfo = (bondContractAddress, depositorAddress, rpc = false, 
 		query {
 			bondInfos (
 				where: {
-					id: "${String(bondContractAddress).toLocaleLowerCase()}"
-					depositor: "${String(depositorAddress).toLocaleLowerCase()}"
+					id: "${String(bondContractAddress).toLowerCase()}"
+					depositor: "${String(depositorAddress).toLowerCase()}"
 				}
 			) {
 					payout

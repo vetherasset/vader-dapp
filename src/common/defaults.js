@@ -49,7 +49,7 @@ defaults.api.graphql.uri.vaderProtocol = (
 )
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/sc0vu/uniswap-v2-kovan' :
 			undefined
 )
 
@@ -191,6 +191,8 @@ defaults.unstakeable = [
 
 defaults.bonds = vaderBonds
 defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
+defaults.bondZapSubmitWithMinPayoutPercent = 20
+defaults.bondZapMinPayoutAllowed = '10000000000000000'
 
 defaults.xVaderAPRBasedNumberOfRecords = 7
 

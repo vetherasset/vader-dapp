@@ -9,7 +9,7 @@ export const useTreasuryBalance = (bondAddress, rpc = false, pollInterval = defa
 		const treasuryQuery = gql`
 		query {
 			global(
-				id: "${String(bondAddress).toLocaleLowerCase()}_treasury")
+				id: "${String(bondAddress).toLowerCase()}_treasury")
 				{
 					value
 				}
@@ -21,7 +21,7 @@ export const useTreasuryBalance = (bondAddress, rpc = false, pollInterval = defa
 			balances(
 				where: {
 					account: $address
-					token: "${String(defaults.address.vader).toLocaleLowerCase()}"
+					token: "${String(defaults.address.vader).toLowerCase()}"
 				}
 			) {
 				balance

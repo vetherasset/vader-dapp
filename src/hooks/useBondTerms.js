@@ -9,7 +9,7 @@ export const useBondTerms = (bondAddress, rpc = false, pollInterval = defaults.a
 		const query = gql`
 		query {
 			term (
-				id: "${String(bondAddress).toLocaleLowerCase()}"
+				id: "${String(bondAddress).toLowerCase()}"
 			) {
 				controlVariable
 				vestingTerm

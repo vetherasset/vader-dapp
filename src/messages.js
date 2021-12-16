@@ -217,6 +217,14 @@ const bondSoldOut = {
 	position: defaults.toast.position,
 }
 
+const bondAmountTooSmall = {
+	title: 'Amount to buy bond with is too small',
+	description: 'Please input a larger amount.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
 
 const unstaked = {
 	title: 'xVADER tokens unstaked',
@@ -233,5 +241,5 @@ export {
 	noAmount, noToken0, tokenValueTooSmall, positionOpened, exception,
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
-	bondConcluded, bondPurchaseValueExceeds, bondSoldOut,
+	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
 }

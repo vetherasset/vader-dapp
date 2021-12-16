@@ -7,7 +7,7 @@ import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
-import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem } from '../common/ethereum'
+import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
@@ -15,7 +15,7 @@ import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut, nothingtoclaim,
-	bondConcluded, tokenValueTooSmall, vaderclaimed } from '../messages'
+	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
@@ -33,6 +33,7 @@ const Bond = (props) => {
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from(0))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(ethers.BigNumber.from(0))
+	const [principalEth] = useUniswapV2Price(bond?.[0]?.principal?.address, true)
 	const [purchaseValue, setPurchaseValue] = useState(ethers.BigNumber.from(0))
 	const { data: treasuryBalance, refetch: refetchTreasuryBalance } = useTreasuryBalance(bond?.[0]?.address, true)
 	const { data: bondPrice, refetch: refetchBondPrice } = useBondPrice(bond?.[0]?.address)
@@ -174,7 +175,62 @@ const Bond = (props) => {
 							}
 						}
 						else {
-							// is Native
+							const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
+								purchaseValue
+							const minPayout =
+							p
+								.div(100)
+								.mul(defaults.bondZapSubmitWithMinPayoutPercent)
+								.sub(p)
+								.mul(-1)
+							if (minPayout?.gt(ethers.BigNumber.from(String(defaults.bondZapMinPayoutAllowed), defaults.vader.decimals))) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+								setWorking(true)
+								zapDeposit(
+									bond?.[0]?.zap,
+									value,
+									minPayout,
+									provider)
+									.then((tx) => {
+										tx.wait(
+											defaults.network.tx.confirmations,
+										).then((r) => {
+											setWorking(false)
+											refetchBondPrice()
+											refetchBondInfo()
+											refetchTreasuryBalance()
+											toast({
+												...bondConcluded,
+												description: <LinkExt
+													variant='underline'
+													_focus={{
+														boxShadow: '0',
+													}}
+													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+													isExternal>
+													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+												duration: defaults.toast.txHashDuration,
+											})
+										})
+									})
+									.catch(err => {
+										setWorking(false)
+										if (err.code === 4001) {
+											console.log('Transaction rejected: Your have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else if(err.code === -32016) {
+											toast(exception)
+										}
+										else {
+											console.log(err)
+											toast(failed)
+										}
+									})
+							}
+							else {
+								toast(bondAmountTooSmall)
+							}
 						}
 					}
 					else {
@@ -295,18 +351,24 @@ const Bond = (props) => {
 
 	useEffect(() => {
 		if (value > 0) {
-			bondPayoutFor(
-				String(bond?.[0]?.address).toLocaleLowerCase(),
-				value,
-			)
-				.then(n => {
-					setPurchaseValue(n)
-				})
+			if (useLPTokens || principalEth?.principalPrice) {
+				bondPayoutFor(
+					bond?.[0]?.address,
+					useLPTokens ? value :
+						ethers.utils.parseUnits(
+							(Number(inputAmount) / Number(principalEth?.principalPrice)).toFixed(bond?.[0].principal?.decimals), bond?.[0].principal?.decimals,
+						)
+					,
+				)
+					.then(n => {
+						setPurchaseValue(n)
+					})
+			}
+			else {
+				setPurchaseValue(ethers.BigNumber.from(0))
+			}
 		}
-		else {
-			setPurchaseValue(ethers.BigNumber.from(0))
-		}
-	}, [value])
+	}, [value, useLPTokens])
 
 	if (isBondAddress) {
 		return (
@@ -774,7 +836,7 @@ const PriceOverview = (props) => {
 	const { data: bondPrice } = useBondPrice(props.bond?.[0]?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
-	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
+	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
 
 	return (
 		<Flex>
@@ -935,20 +997,21 @@ const Breakdown = (props) => {
 	}
 
 	const [purchaseValue, setPurchaseValue] = useState('')
-	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
+	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
 	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {
 			if (props.useLPTokens || principalEth?.principalPrice) {
 				bondPayoutFor(
-					String(props.bond?.[0]?.address).toLocaleLowerCase(),
-					props.useLPTokens ? ethers.utils.parseUnits(String(props.value), 18) :
+					String(props.bond?.[0]?.address).toLowerCase(),
+					props.useLPTokens ? ethers.utils.parseUnits(Number(props.value).toFixed(props.bond?.[0].principal?.decimals), props.bond?.[0].principal?.decimals) :
 						ethers.utils.parseUnits(
-							String(Number(props.value) / Number(principalEth?.principalPrice)), props.bond?.principal?.decimals,
+							(Number(props.value) / Number(principalEth?.principalPrice)).toFixed(props.bond?.[0].principal?.decimals), props.bond?.[0].principal?.decimals,
 						),
 				)
 					.then(n => {
+						console.log(n)
 						setPurchaseValue(n)
 					})
 			}
