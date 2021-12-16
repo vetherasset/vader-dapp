@@ -49,7 +49,7 @@ defaults.api.graphql.uri.vaderProtocol = (
 )
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/sc0vu/uniswap-v2-kovan' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
 			undefined
 )
 

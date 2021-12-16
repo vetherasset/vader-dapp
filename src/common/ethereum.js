@@ -5,7 +5,7 @@ import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
 import vaderBond from '../artifacts/abi/vaderBond'
-import zapEth from '../artifacts/abi/zapEth'
+import zapEth from '../artifacts/abi/zaPeth'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(

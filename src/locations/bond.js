@@ -8,7 +8,7 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
-import { prettifyCurrency, prettifyNumber } from '../common/utils'
+import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
@@ -880,13 +880,13 @@ const PriceOverview = (props) => {
 						<Box fontSize='1rem'>Market Price</Box>
 						<TagLabel fontSize='2.1rem'>
 							{!isNaN(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)) &&
-								<>
-									{prettifyCurrency(
-										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)),
-										0,
-										5,
-									)}
-								</>
+									<>
+										{prettifyCurrency(
+											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)),
+											0,
+											5,
+										)}
+									</>
 							}
 						</TagLabel>
 					</Tag>
@@ -910,7 +910,7 @@ const Overview = (props) => {
 				p='0 0.15rem'
 				marginBottom='.7rem'
 				opacity='0.87'
-				minH='109.767px'
+				minH='133.767px'
 			>
 				{props.bondInfo?.[0]?.gt(0) &&
 					<>
@@ -995,12 +995,22 @@ const Breakdown = (props) => {
 		value: PropTypes.any.isRequired,
 		useLPTokens: PropTypes.bool.isRequired,
 		treasuryBalance: PropTypes.object,
+		bondPrice: PropTypes.any,
+		marketPrice: PropTypes.any,
 		bond: PropTypes.any.isRequired,
 	}
 
 	const [purchaseValue, setPurchaseValue] = useState('')
+	const { data: bondPrice } = useBondPrice(props.bond?.[0]?.address)
+	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
+	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
 	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
+
+	const bondPirce = (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
+	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
+	const roi = getPercentage(calculateDifference(marketPrice, bondPirce))
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {
@@ -1030,6 +1040,7 @@ const Breakdown = (props) => {
 				p='0 0.15rem'
 				marginBottom='.7rem'
 				opacity='0.87'
+				minH='133.767px'
 			>
 				<Text
 					as='h4'
@@ -1067,6 +1078,23 @@ const Breakdown = (props) => {
 								</>
 							}
 						</Box>
+					</Container>
+				</Flex>
+
+				<Flex minH='24px'>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+							ROI
+						</Box>
+					</Container>
+					<Container p='0'>
+						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
+						<Box
+							textAlign='right'>
+							{getPercentage(calculateDifference(marketPrice, bondPirce))}
+						</Box>
+						}
 					</Container>
 				</Flex>
 

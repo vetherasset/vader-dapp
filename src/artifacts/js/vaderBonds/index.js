@@ -6,7 +6,7 @@ module.exports =
 			'zap': '0x6D51Ef96C362fdea02c61Ce2dD1A263B5ABbd4B9',
 			'maxPayout': '25040678586266968100000000',
 			'principal': {
-				'address':'0xC42706E83433580dd8d865a30e2Ae61082056007',
+				'address':'0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
 				'name':'Uniswap VADER/ETH LP',
 				'symbol':'UNI-V2',
 				'decimals':18,

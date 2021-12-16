@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Flex, Image, Tag } from '@chakra-ui/react'
 import { CheckCircleIcon } from '@chakra-ui/icons'
-import { prettifyCurrency } from '../common/utils'
+import { prettifyCurrency, getPercentage, calculateDifference } from '../common/utils'
 import { useBondInfo } from '../hooks/useBondInfo'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import defaults from '../common/defaults'
@@ -22,9 +22,13 @@ export const BondItem = (props) => {
 
 	const wallet = useWallet()
 	const { data: bondInfo } = useBondInfo(props.address, wallet.account, true)
+	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
 	const { data: price } = useBondPrice(props.address)
+	const bondPirce = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
+	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 
 	return (
 		<>
@@ -93,9 +97,11 @@ export const BondItem = (props) => {
 									</Tag>
 								</>
 						}
-						<Tag colorScheme='gray'>
-							100%
-						</Tag>
+						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
+							<Tag colorScheme='gray'>
+								{getPercentage(calculateDifference(marketPrice, bondPirce))}
+							</Tag>
+						}
 						<Tag colorScheme='gray'>
 							{prettifyCurrency(999999999, 0, 4)}
 						</Tag>
