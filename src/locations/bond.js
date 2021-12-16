@@ -617,89 +617,91 @@ const Bond = (props) => {
 										</Flex>
 									</Flex>
 
-									<Flex
-										pointerEvents={tabIndex === 1 ? 'none' : ''}
-										opacity={tabIndex === 1 ? '0.55' : '1'}
-										flexDir='column'
-									>
-										<Text
-											as='h4'
-											fontWeight='bolder'>
-											Slippage Tolerance
-										</Text>
+									{useLPTokens &&
 										<Flex
-											mt='.6rem'
-											justifyContent='flex-start'
-											flexDir='row'
+											pointerEvents={tabIndex === 1 ? 'none' : ''}
+											opacity={tabIndex === 1 ? '0.55' : '1'}
+											flexDir='column'
 										>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													setSlippageTolAmount('')
-													setSlippageTol(2)
-												}}>
-											2%
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													setSlippageTolAmount('')
-													setSlippageTol(3)
-												}}>
-											3%
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: slippageTol === 5 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													setSlippageTolAmount('')
-													setSlippageTol(5)
-												}}>
-											5%
-											</Button>
-											<Input
-												size='sm'
-												variant='outline'
-												placeholder='Custom %'
-												style={{
-													border: (([2, 3, 5].indexOf(slippageTol) === -1) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
-												}}
-												value={slippageTolAmount}
-												onChange={(e) => {
-													if (isNaN(e.target.value)) {
-														setSlippageTolAmount(prev => prev)
-													}
-													else {
-														setSlippageTolAmount(String(e.target.value))
-														if(Number(e.target.value) >= 0) {
-															try {
-																setSlippageTol(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-															}
-															catch(err) {
-																if (err.code === 'NUMERIC_FAULT') {
-																	console.log('value too small')
+											<Text
+												as='h4'
+												fontWeight='bolder'>
+													Slippage Tolerance
+											</Text>
+											<Flex
+												mt='.6rem'
+												justifyContent='flex-start'
+												flexDir='row'
+											>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTolAmount('')
+														setSlippageTol(2)
+													}}>
+														2%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTolAmount('')
+														setSlippageTol(3)
+													}}>
+														3%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 5 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTolAmount('')
+														setSlippageTol(5)
+													}}>
+														5%
+												</Button>
+												<Input
+													size='sm'
+													variant='outline'
+													placeholder='Custom %'
+													style={{
+														border: (([2, 3, 5].indexOf(slippageTol) === -1) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
+													}}
+													value={slippageTolAmount}
+													onChange={(e) => {
+														if (isNaN(e.target.value)) {
+															setSlippageTolAmount(prev => prev)
+														}
+														else {
+															setSlippageTolAmount(String(e.target.value))
+															if(Number(e.target.value) >= 0) {
+																try {
+																	setSlippageTol(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																}
+																catch(err) {
+																	if (err.code === 'NUMERIC_FAULT') {
+																		console.log('value too small')
+																	}
 																}
 															}
 														}
-													}
-												}}
-											/>
+													}}
+												/>
+											</Flex>
 										</Flex>
-									</Flex>
+									}
 
 									<Flex
 										pointerEvents={tabIndex === 1 ? 'none' : ''}
