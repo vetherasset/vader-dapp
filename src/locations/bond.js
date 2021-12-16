@@ -1006,7 +1006,7 @@ const Breakdown = (props) => {
 						{terms &&
 							<Box
 								textAlign='right'>
-							~ {prettifyNumber((Number(terms?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or <i>{(Number(terms?.vestingTerm))}</i> blocks
+							~ {prettifyNumber((Number(terms[1]) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or <i>{(Number(terms[1]))}</i> blocks
 							</Box>
 						}
 					</Container>
