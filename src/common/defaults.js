@@ -36,7 +36,6 @@ defaults.network.blockTime.hour = 262
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
-
 defaults.api = {}
 defaults.api.staleTime = 100000
 defaults.api.client = new QueryClient()
@@ -77,7 +76,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x1fd03e4ea209497910face52e5ca39124ef2e8be' :
+		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
 			undefined
 )
 defaults.address.vether = (

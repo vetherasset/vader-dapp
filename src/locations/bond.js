@@ -931,7 +931,7 @@ const Breakdown = (props) => {
 	}
 
 	const [purchaseValue, setPurchaseValue] = useState('')
-	const [bondTerms] = useBondTerms(String(props.bond?.[0]?.address).toLocaleLowerCase())
+	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
 
 	useEffect(() => {
 		if (Number(props.value) > 0) {
@@ -1003,10 +1003,10 @@ const Breakdown = (props) => {
 						</Box>
 					</Container>
 					<Container p='0'>
-						{bondTerms &&
+						{terms &&
 							<Box
 								textAlign='right'>
-							~ {prettifyNumber((Number(bondTerms?.term?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or <i>{(Number(bondTerms?.term?.vestingTerm))}</i> blocks
+							~ {prettifyNumber((Number(terms?.vestingTerm) / Number(defaults.network.blockTime.hour)) / 24, 0, 1)} days or <i>{(Number(terms?.vestingTerm))}</i> blocks
 							</Box>
 						}
 					</Container>

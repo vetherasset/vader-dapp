@@ -2,10 +2,11 @@ module.exports =
 	[
 		{
 			'name': 'Uniswap V2 VADER / ETH LP',
-			'address':'0x66BcC1c537509bA441ccc9DF39E18CC142C59775',
+			'address':'0xd932cc11f49df7638999e2a313e5808667363750',
+			'zapAddress': '0xd932cc11F49df7638999E2a313e5808667363750',
 			'maxPayout': '25040678586266968100000000',
 			'principal': {
-				'address':'0x38F19a5452B03262203cAe9532Fbfd211fa32FF1',
+				'address':'0xC42706E83433580dd8d865a30e2Ae61082056007',
 				'name':'Uniswap VADER/ETH LP',
 				'symbol':'UNI-V2',
 				'decimals':18,
