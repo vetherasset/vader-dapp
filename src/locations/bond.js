@@ -1053,7 +1053,7 @@ const Breakdown = (props) => {
 		value: PropTypes.any.isRequired,
 		useLPTokens: PropTypes.bool.isRequired,
 		treasuryBalance: PropTypes.object,
-		maxPayout: PropTypes.object.isRequired,
+		maxPayout: PropTypes.object,
 		bond: PropTypes.any.isRequired,
 	}
 
