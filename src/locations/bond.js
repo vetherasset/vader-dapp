@@ -1119,12 +1119,13 @@ const Breakdown = (props) => {
 						>
 							{props.treasuryBalance &&
 								<>
-									{prettifyCurrency(
-										ethers.utils.formatUnits(props.treasuryBalance, 18),
-										0,
-										2,
-										'VADER',
-									)}
+									{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
+										prettifyCurrency(
+											ethers.utils.formatUnits(props.treasuryBalance, 18),
+											0,
+											2,
+											'VADER',
+										)}
 									{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
 										'Sold Out'
 									}
