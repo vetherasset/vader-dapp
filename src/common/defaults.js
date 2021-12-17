@@ -218,12 +218,4 @@ defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
 
-defaults.swap = {}
-defaults.swap.slippage = 0.5
-defaults.swap.minSlippage = 0.05
-defaults.swap.maxSlippage = 1
-defaults.swap.deadline = 30
-defaults.swap.minDeadline = 1
-defaults.swap.maxDeadline = 180
-
 export default defaults
