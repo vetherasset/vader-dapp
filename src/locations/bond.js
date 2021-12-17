@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useLocalStorage, useSessionStorage } from 'react-use'
+import { useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
-	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt } from '@chakra-ui/react'
+	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
@@ -37,8 +37,10 @@ const Bond = (props) => {
 	const [purchaseValue, setPurchaseValue] = useState(ethers.BigNumber.from(0))
 	const { data: treasuryBalance, refetch: refetchTreasuryBalance } = useTreasuryBalance(bond?.[0]?.address, true)
 	const { data: bondPrice, refetch: refetchBondPrice } = useBondPrice(bond?.[0]?.address)
-	const [slippageTolAmount, setSlippageTolAmount] = useLocalStorage('bondSlippageTolAmount394610', '')
-	const [slippageTol, setSlippageTol] = useLocalStorage('bondSlippageTol394610', 2)
+	const [slippageTolAmount0, setSlippageTolAmount0] = useSessionStorage('bondSlippageTolAmount042334310', '')
+	const [slippageTol0, setSlippageTol0] = useSessionStorage('bondSlippageTol042434310', 6)
+	const [slippageTolAmount1, setSlippageTolAmount1] = useSessionStorage('bondSlippageTol1Amount142344310', '')
+	const [slippageTol1, setSlippageTol1] = useSessionStorage('bondSlippageTol142434310', 2)
 	const [useLPTokens, setUseLPTokens] = useSessionStorage('bondUseLPTokens', false)
 	const [working, setWorking] = useState(false)
 	const { data: bondInfo, refetch: refetchBondInfo } = useBondInfo(bond?.[0]?.address, wallet.account, true)
@@ -122,7 +124,7 @@ const Bond = (props) => {
 									p,
 								)
 									.div(100)
-									.mul(slippageTol)
+									.mul(slippageTol1)
 									.div(ethers.utils.parseUnits('1', 18))
 									.add(ethers.BigNumber.from(
 										p,
@@ -175,61 +177,70 @@ const Bond = (props) => {
 							}
 						}
 						else {
-							const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
-								purchaseValue
-							const minPayout =
+							const maxAvailable = ((treasuryBalance)
+								.lte(ethers.BigNumber.from(bond?.[0]?.maxPayout))) ?
+								(treasuryBalance) :
+								ethers.BigNumber.from(bond?.[0]?.maxPayout)
+							if (purchaseValue.lte(maxAvailable)) {
+								const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
+									purchaseValue
+								const minPayout =
 							p
 								.div(100)
-								.mul(defaults.bondZapSubmitWithMinPayoutPercent)
+								.mul(slippageTol0)
 								.sub(p)
 								.mul(-1)
-							if (minPayout?.gt(ethers.BigNumber.from(String(defaults.bondZapMinPayoutAllowed), defaults.vader.decimals))) {
-								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-								setWorking(true)
-								zapDeposit(
-									bond?.[0]?.zap,
-									value,
-									minPayout,
-									provider)
-									.then((tx) => {
-										tx.wait(
-											defaults.network.tx.confirmations,
-										).then((r) => {
-											setWorking(false)
-											refetchBondPrice()
-											refetchBondInfo()
-											refetchTreasuryBalance()
-											toast({
-												...bondConcluded,
-												description: <LinkExt
-													variant='underline'
-													_focus={{
-														boxShadow: '0',
-													}}
-													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-													isExternal>
-													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
-												duration: defaults.toast.txHashDuration,
+								if (minPayout?.gt(ethers.BigNumber.from(String(defaults.bondZapMinPayoutAllowed), defaults.vader.decimals))) {
+									const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+									setWorking(true)
+									zapDeposit(
+										bond?.[0]?.zap,
+										value,
+										minPayout,
+										provider)
+										.then((tx) => {
+											tx.wait(
+												defaults.network.tx.confirmations,
+											).then((r) => {
+												setWorking(false)
+												refetchBondPrice()
+												refetchBondInfo()
+												refetchTreasuryBalance()
+												toast({
+													...bondConcluded,
+													description: <LinkExt
+														variant='underline'
+														_focus={{
+															boxShadow: '0',
+														}}
+														href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+														isExternal>
+														<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+													duration: defaults.toast.txHashDuration,
+												})
 											})
 										})
-									})
-									.catch(err => {
-										setWorking(false)
-										if (err.code === 4001) {
-											console.log('Transaction rejected: Your have decided to reject the transaction..')
-											toast(rejected)
-										}
-										else if(err.code === -32016) {
-											toast(exception)
-										}
-										else {
-											console.log(err)
-											toast(failed)
-										}
-									})
+										.catch(err => {
+											setWorking(false)
+											if (err.code === 4001) {
+												console.log('Transaction rejected: Your have decided to reject the transaction..')
+												toast(rejected)
+											}
+											else if(err.code === -32016) {
+												toast(exception)
+											}
+											else {
+												console.log(err)
+												toast(failed)
+											}
+										})
+								}
+								else {
+									toast(bondAmountTooSmall)
+								}
 							}
 							else {
-								toast(bondAmountTooSmall)
+								toast(bondPurchaseValueExceeds)
 							}
 						}
 					}
@@ -377,7 +388,7 @@ const Bond = (props) => {
 					minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 					maxWidth={defaults.layout.container.md.width}
 					m='0 auto'
-					p={{ base: '5rem 1.1rem 6rem', md: '5rem 0 0' }}
+					p={{ base: '5rem 1.1rem 6rem', md: '5rem 0 6rem' }}
 					{...props}
 				>
 			 <Flex
@@ -426,7 +437,7 @@ const Bond = (props) => {
 						flexDir='column'
 						layerStyle='colorful'
 						height='auto'
-						minH='526.4px'
+						minH='541.217px'
 					>
 						<Flex
 							height='100%'
@@ -439,7 +450,7 @@ const Bond = (props) => {
 							>
 								<Flex
 									p={{ base: '1.8rem', md: '1.8rem 0.9rem 1.8rem 1.8rem' }}
-									minH='526.4px'
+									minH='541.217px'
 									justifyContent='space-between'
 									gridGap='5px'
 									flexDir='column'>
@@ -617,78 +628,113 @@ const Bond = (props) => {
 										</Flex>
 									</Flex>
 
-									{useLPTokens &&
-										<Flex
-											pointerEvents={tabIndex === 1 ? 'none' : ''}
-											opacity={tabIndex === 1 ? '0.55' : '1'}
-											flexDir='column'
-										>
-											<Text
-												as='h4'
-												fontWeight='bolder'>
+									<Flex
+										pointerEvents={tabIndex === 1 ? 'none' : ''}
+										opacity={tabIndex === 1 ? '0.55' : '1'}
+										flexDir='column'
+									>
+										<Text
+											as='h4'
+											fontWeight='bolder'>
 													Slippage Tolerance
-											</Text>
-											<Flex
-												mt='.6rem'
-												justifyContent='flex-start'
-												flexDir='row'
-											>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														setSlippageTolAmount('')
-														setSlippageTol(2)
-													}}>
+										</Text>
+										<Flex
+											mt='.6rem'
+											justifyContent='flex-start'
+											flexDir='row'
+										>
+											<Button
+												variant='outline'
+												size='sm'
+												mr='0.4rem'
+												style={{
+													border: useLPTokens && slippageTol1 === 2 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+														!useLPTokens && slippageTol0 === 4 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+												}}
+												onClick={() => {
+													if (useLPTokens) { setSlippageTol1(2), setSlippageTolAmount1('') }
+													if (!useLPTokens) { setSlippageTol0(4), setSlippageTolAmount0('') }
+												}}>
+												{useLPTokens &&
+													<>
 														2%
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														setSlippageTolAmount('')
-														setSlippageTol(3)
-													}}>
+													</>
+												}
+												{!useLPTokens &&
+													<>
+														4%
+													</>
+												}
+											</Button>
+											<Button
+												variant='outline'
+												size='sm'
+												mr='0.4rem'
+												style={{
+													border: useLPTokens && slippageTol1 === 3 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+														!useLPTokens && slippageTol0 === 6 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+												}}
+												onClick={() => {
+													if (useLPTokens) { setSlippageTol1(3), setSlippageTolAmount1('') }
+													if (!useLPTokens) { setSlippageTol0(6), setSlippageTolAmount0('') }
+												}}>
+												{useLPTokens &&
+													<>
 														3%
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: slippageTol === 5 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														setSlippageTolAmount('')
-														setSlippageTol(5)
-													}}>
+													</>
+												}
+												{!useLPTokens &&
+													<>
+														6%
+													</>
+												}
+											</Button>
+											<Button
+												variant='outline'
+												size='sm'
+												mr='0.4rem'
+												style={{
+													border: useLPTokens && slippageTol1 === 5 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+														!useLPTokens && slippageTol0 === 8 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+												}}
+												onClick={() => {
+													if (useLPTokens) { setSlippageTol1(5), setSlippageTolAmount1('') }
+													if (!useLPTokens) { setSlippageTol0(8), setSlippageTolAmount0('') }
+												}}>
+												{useLPTokens &&
+													<>
 														5%
-												</Button>
+													</>
+												}
+												{!useLPTokens &&
+													<>
+														8%
+													</>
+												}
+											</Button>
+											<InputGroup
+												size='sm'
+											>
 												<Input
-													size='sm'
 													variant='outline'
-													placeholder='Custom %'
+													placeholder='Custom'
 													style={{
-														border: (([2, 3, 5].indexOf(slippageTol) === -1) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
+														border: useLPTokens && ((([2, 3, 5].indexOf(slippageTol1) === -1)) || slippageTolAmount1) ? '2px solid #3fa3fa' :
+															!useLPTokens && ((([4, 6, 8].indexOf(slippageTol0) === -1)) || slippageTolAmount0) ? '2px solid #3fa3fa' : '',
 													}}
-													value={slippageTolAmount}
+													value={useLPTokens ? slippageTolAmount1 : slippageTolAmount0}
 													onChange={(e) => {
 														if (isNaN(e.target.value)) {
-															setSlippageTolAmount(prev => prev)
+															if (useLPTokens) setSlippageTolAmount1(prev => prev)
+															if (!useLPTokens) setSlippageTolAmount0(prev => prev)
 														}
 														else {
-															setSlippageTolAmount(String(e.target.value))
+															if (useLPTokens) setSlippageTolAmount1(String(e.target.value))
+															if (!useLPTokens) setSlippageTolAmount0(String(e.target.value))
 															if(Number(e.target.value) >= 0) {
 																try {
-																	setSlippageTol(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																	if (useLPTokens) setSlippageTol1(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																	if (!useLPTokens) setSlippageTol0(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
 																}
 																catch(err) {
 																	if (err.code === 'NUMERIC_FAULT') {
@@ -699,9 +745,14 @@ const Bond = (props) => {
 														}
 													}}
 												/>
-											</Flex>
+												<InputRightElement>
+													<>
+														%
+													</>
+												</InputRightElement>
+											</InputGroup>
 										</Flex>
-									}
+									</Flex>
 
 									<Flex
 										pointerEvents={tabIndex === 1 ? 'none' : ''}
@@ -912,7 +963,7 @@ const Overview = (props) => {
 				p='0 0.15rem'
 				marginBottom='.7rem'
 				opacity='0.87'
-				minH='133.767px'
+				minH='157.767px'
 			>
 				{props.bondInfo?.[0]?.gt(0) &&
 					<>
@@ -1049,12 +1100,42 @@ const Breakdown = (props) => {
 					fontWeight='bolder'>
 					Breakdown
 				</Text>
+
 				<Flex>
 					<Container p='0'>
 						<Box
 							textAlign='left'
 						>
-							Max available to buy
+							Total Bonds for Sale
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+							{props.treasuryBalance &&
+								<>
+									{prettifyCurrency(
+										ethers.utils.formatUnits(props.treasuryBalance, 18),
+										0,
+										2,
+										'VADER',
+									)}
+									{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+										'Sold Out'
+									}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							Transaction Cap
 						</Box>
 					</Container>
 					<Container p='0'>
@@ -1070,7 +1151,7 @@ const Breakdown = (props) => {
 											ethers.utils.formatUnits(props.treasuryBalance, 18) :
 											ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
 										0,
-										5,
+										2,
 										'VADER',
 									)}
 									{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
@@ -1135,7 +1216,7 @@ const Breakdown = (props) => {
 									prettifyCurrency(
 										purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
 										0,
-										5,
+										2,
 										'VADER')
 								}
 							</>

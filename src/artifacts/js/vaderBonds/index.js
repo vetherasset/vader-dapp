@@ -2,9 +2,9 @@ module.exports =
 	[
 		{
 			'name': 'Uniswap V2 VADER / ETH LP',
-			'address':'0xd932cc11f49df7638999e2a313e5808667363750',
-			'zap': '0x6D51Ef96C362fdea02c61Ce2dD1A263B5ABbd4B9',
-			'maxPayout': '25040678586266968100000000',
+			'address':'0x1B96d82b8b13C75d4cE347a53284B10d93B63684',
+			'zap': '0x781B2844605298FB45C653Dc1EF0d0b941293323',
+			'maxPayout': '0',
 			'principal': {
 				'address':'0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
 				'name':'Uniswap VADER/ETH LP',
@@ -26,6 +26,7 @@ module.exports =
 				'logoURI':'https://raw.githubusercontent.com/vetherasset/vader-dapp/65a55cc1d1e89e1549b3d119d296ac8d701a37ea/src/assets/png/eth-diamond-purple-purple.png',
 			},
 			'payout': {
+				'address':'0x2602278ee1882889b946eb11dc0e810075650983',
 				'name':'VADER',
 				'symbol':'VADER',
 				'decimals':18,

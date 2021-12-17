@@ -102,14 +102,6 @@ const Bonds = (props) => {
 											ROI
 										</Text>
 									</Flex>
-									<Flex>
-										<Text
-											as='h4'
-											fontSize='1.1rem'
-											fontWeight='bolder'>
-											TVB
-										</Text>
-									</Flex>
 								</Flex>
 							</>
 						</Flex>

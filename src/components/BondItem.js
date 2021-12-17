@@ -104,9 +104,6 @@ export const BondItem = (props) => {
 								{getPercentage(calculateDifference(marketPrice, bondPirce))}
 							</Tag>
 						}
-						<Tag colorScheme='gray'>
-							{prettifyCurrency(999999999, 0, 4)}
-						</Tag>
 					</Flex>
 				</Flex>
 			</Link>
