@@ -212,6 +212,15 @@ const bondPayoutFor = async (bondContractAddress, value) => {
 	return await contract.payoutFor(value)
 }
 
+const bondMaxPayout = async (bondContractAddress) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.maxPayout()
+}
+
 const bondPendingPayoutFor = async (bondContractAddress, depositorAccount) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
@@ -313,7 +322,7 @@ export {
 	bondDebtRatio, bondLastDecay, bondPayoutFor,
 	bondPendingPayoutFor, bondPayoutToken, bondPercentVestedFor,
 	bondPrincipalToken, bondTerms, bondTotalDebt, bondTreasury,
-	bondDeposit, bondRedeem,
+	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
 	zapDeposit,

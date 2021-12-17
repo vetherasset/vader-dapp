@@ -20,6 +20,7 @@ import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
 import { useBondInfo } from '../hooks/useBondInfo'
+import { useBondMaxPayout } from '../hooks/useBondMaxPayout'
 
 const Bond = (props) => {
 
@@ -45,6 +46,7 @@ const Bond = (props) => {
 	const [working, setWorking] = useState(false)
 	const { data: bondInfo, refetch: refetchBondInfo } = useBondInfo(bond?.[0]?.address, wallet.account, true)
 	const [pendingPayout, setPendingPayoutBlock] = useBondPendingPayout(bond?.[0]?.address)
+	const { data: maxPayout, refetch: refetchMaxPayout } = useBondMaxPayout(bond?.[0]?.address)
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -112,9 +114,9 @@ const Bond = (props) => {
 					if ((token0balance.gte(value))) {
 						if (!token0.isEther) {
 							const maxAvailable = ((treasuryBalance)
-								.lte(ethers.BigNumber.from(bond?.[0]?.maxPayout))) ?
+								.lte(maxPayout)) ?
 								(treasuryBalance) :
-								ethers.BigNumber.from(bond?.[0]?.maxPayout)
+								maxPayout
 							if (purchaseValue.lte(maxAvailable)) {
 								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
@@ -141,6 +143,7 @@ const Bond = (props) => {
 										).then((r) => {
 											setWorking(false)
 											refetchBondPrice()
+											refetchMaxPayout()
 											refetchBondInfo()
 											refetchTreasuryBalance()
 											toast({
@@ -178,9 +181,9 @@ const Bond = (props) => {
 						}
 						else {
 							const maxAvailable = ((treasuryBalance)
-								.lte(ethers.BigNumber.from(bond?.[0]?.maxPayout))) ?
+								.lte(maxPayout)) ?
 								(treasuryBalance) :
-								ethers.BigNumber.from(bond?.[0]?.maxPayout)
+								maxPayout
 							if (purchaseValue.lte(maxAvailable)) {
 								const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
 									purchaseValue
@@ -204,6 +207,7 @@ const Bond = (props) => {
 											).then((r) => {
 												setWorking(false)
 												refetchBondPrice()
+												refetchMaxPayout()
 												refetchBondInfo()
 												refetchTreasuryBalance()
 												toast({
@@ -800,6 +804,7 @@ const Bond = (props) => {
 											value={inputAmount}
 											useLPTokens={useLPTokens}
 											treasuryBalance={treasuryBalance}
+											maxPayout={maxPayout}
 											bond={bond}
 										/>
 									}
@@ -1048,8 +1053,7 @@ const Breakdown = (props) => {
 		value: PropTypes.any.isRequired,
 		useLPTokens: PropTypes.bool.isRequired,
 		treasuryBalance: PropTypes.object,
-		bondPrice: PropTypes.any,
-		marketPrice: PropTypes.any,
+		maxPayout: PropTypes.object.isRequired,
 		bond: PropTypes.any.isRequired,
 	}
 
@@ -1147,9 +1151,9 @@ const Breakdown = (props) => {
 									{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
 									prettifyCurrency(
 										props.treasuryBalance
-											.lte(ethers.BigNumber.from(props.bond?.[0]?.maxPayout)) ?
+											.lte(props.maxPayout) ?
 											ethers.utils.formatUnits(props.treasuryBalance, 18) :
-											ethers.utils.formatUnits(props.bond?.[0]?.maxPayout, 18),
+											ethers.utils.formatUnits(props.maxPayout, 18),
 										0,
 										2,
 										'VADER',
