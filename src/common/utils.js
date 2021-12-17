@@ -202,8 +202,12 @@ const getMerkleProofForAccount = (account, snapshot) => {
 	return proof
 }
 
+const calculateDifference = (value1, value2) => value1 > value2 ?
+	(value1 - value2) / value2 : (value1 - value2) / value1
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
+	calculateDifference,
 }

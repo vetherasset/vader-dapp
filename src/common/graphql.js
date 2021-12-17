@@ -41,20 +41,19 @@ const getXVaderPrice = async (type = 'Hour', first) => {
 	}
 }
 
-const getXVaderApr = async (type, days = 3) => {
-	const prices = await getXVaderPrice(type, days)
+const getXVaderApr = async (type, basedOnNumberOfRecords, days = 365) => {
+	const prices = await getXVaderPrice(type, basedOnNumberOfRecords)
 	const [currentPrice] = prices?.globals
 	const [oldestPrice] = prices?.globals?.slice(-1)
 	if(currentPrice && oldestPrice) {
 		const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
 		const oldestPriceBN = utils.parseUnits(oldestPrice.value, 'wei')
-		// const hoursDifferent = Math.floor((currentPrice.timestamp - previousPrice.timestamp) / 3600)
+		const daysDifferent = Math.floor((currentPrice.timestamp - oldestPrice.timestamp) / 86400)
 		const apr = ((((currentPriceBN.sub(oldestPriceBN))
 			.mul(utils.parseUnits('1', 18)))
 			.div(oldestPriceBN))
-			// .mul(365))
+			.div(daysDifferent)
 			.mul(days))
-			// .div(hoursDifferent)
 			.toString()
 		return utils.formatUnits(apr)
 	}

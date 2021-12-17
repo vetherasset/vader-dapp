@@ -6,7 +6,7 @@ export default {
 		track: {
 			bg: '#ffffffd6',
 			_checked: {
-				bg: 'accent.300',
+				bg: 'bluish.300',
 			},
 			_focus: {
 				boxShadow: '0 0 0 3px #7b7ce0',

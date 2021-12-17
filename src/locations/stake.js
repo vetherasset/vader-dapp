@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import useLocalStorageState from 'use-local-storage-state'
+import { useLocalStorage } from 'react-use'
+import { useXvaderPrice } from '../hooks/useXvaderPrice'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
 	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
 	ScaleFade, Fade, Tooltip,
@@ -15,25 +16,24 @@ import {
 	stakeVader,
 	unstakeVader,
 } from '../common/ethereum'
-import { getXVaderApr, getXVaderPrice } from '../common/graphql'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
 import { prettifyNumber, getPercentage } from '../common/utils'
+import { useXvaderAPR } from '../hooks/useXvaderAPR'
 
 const Stake = (props) => {
 
 	const wallet = useWallet()
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
-	const [xvdrExchangeRate, setXvdrExchangeRate] = useState(0)
-	const [stakingApr, setStakingApr] = useState(0)
-	const [daysApr, setDaysApr] = useLocalStorageState('daysApr7261499', 3)
+	const [daysApr, setDaysApr] = useLocalStorage('daysApr23049', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
+	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0, defaults.api.graphql.pollInterval)
+	const [stakingApr] = useXvaderAPR('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
 
 	const drawPeriod = () => {
 		let name
 		switch (daysApr) {
-		case 3: name = '3 days'; break
 		case 7: name = '7 days'; break
 		case 14: name = '2 weeks'; break
 		case 30: name = '1 month'; break
@@ -51,23 +51,6 @@ const Stake = (props) => {
 			100% { color: white; }
 		}
 	`
-
-	useEffect(() => {
-		getXVaderPrice().then(price => {
-			if(price?.global?.value) {
-				setXvdrExchangeRate(ethers.BigNumber.from(price.global.value))
-			}
-		})
-	}, [wallet.account, refreshDataToken])
-
-	useEffect(() => {
-		getXVaderApr('Day', daysApr)
-			.then(n => {
-				if(n) {
-					setStakingApr(n)
-				}
-			})
-	}, [wallet.account, daysApr, refreshDataToken, setXvdrExchangeRate])
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -153,28 +136,28 @@ const Stake = (props) => {
 					<Flex
 						minH='94.1167px'
 					>
-						{((xvdrExchangeRate >= 0) || (stakingApr >= 0)) &&
+						{((xvdrExchangeRate?.global?.value > 0) || (stakingApr > 0)) &&
 							<>
 								<Container p='0'>
-									{xvdrExchangeRate >= 0 &&
-								<ScaleFade
-									initialScale={0.9}
-									in={xvdrExchangeRate > 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Badge
-											fontSize={{ base: '0.9rem', md: '1rem' }}
-											colorScheme='accent'
-										>xVADER RATE</Badge>
-									</Box>
-									<Box
-										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-										lineHeight='1.2'
-										fontWeight='normal'
-										mb='23px'
-										textAlign={{ base: 'center', md: 'left' }}>
-										{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate, 18), 0, 5)}
-									</Box>
-								</ScaleFade>
+									{xvdrExchangeRate?.global?.value > 0 &&
+										<ScaleFade
+											initialScale={0.9}
+											in={!xvdrExchangeRateLoading}>
+											<Box textAlign={{ base: 'center', md: 'left' }}>
+												<Badge
+													fontSize={{ base: '0.9rem', md: '1rem' }}
+													colorScheme='accent'
+												>xVADER RATE</Badge>
+											</Box>
+											<Box
+												fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
+												lineHeight='1.2'
+												fontWeight='normal'
+												mb='23px'
+												textAlign={{ base: 'center', md: 'left' }}>
+												{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate?.global?.value, 18), 0, 5)}
+											</Box>
+										</ScaleFade>
 									}
 								</Container>
 
@@ -195,10 +178,7 @@ const Stake = (props) => {
 													cursor: 'pointer',
 												}}
 												onClick={() => {
-													if (daysApr === 3) {
-														setDaysApr(7)
-													}
-													else if (daysApr === 7) {
+													if (daysApr === 7) {
 														setDaysApr(14)
 													}
 													else if (daysApr === 14) {
@@ -214,7 +194,7 @@ const Stake = (props) => {
 														setDaysApr(365)
 													}
 													else if (daysApr === 365) {
-														setDaysApr(3)
+														setDaysApr(7)
 													}
 												}}
 												fontSize={{ base: '0.9rem', md: '1rem' }}
@@ -291,7 +271,7 @@ const Stake = (props) => {
 														<Image
 															width='24px'
 															height='24px'
-															mr='10px'
+															mr='5px'
 															src={defaults.unstakeable[0].logoURI}
 														/>
 														xVADER
@@ -400,14 +380,14 @@ const Stake = (props) => {
 							>
 								<TabPanel p='0'>
 									<StakePanel
-										exchangeRate={xvdrExchangeRate}
+										exchangeRate={xvdrExchangeRate?.global?.value}
 										balance={token0balance}
 										refreshData={setRefreshDataToken}
 									/>
 								</TabPanel>
 								<TabPanel p='0'>
 									<UnstakePanel
-										exchangeRate={xvdrExchangeRate}
+										exchangeRate={xvdrExchangeRate?.global?.value}
 										balance={token1balance}
 										refreshData={setRefreshDataToken}
 									/>
@@ -424,7 +404,7 @@ const Stake = (props) => {
 const ExchangeRate = (props) => {
 
 	ExchangeRate.propTypes = {
-		rate: PropTypes.any.isRequired,
+		rate: PropTypes.string,
 	}
 
 	return (
@@ -444,7 +424,7 @@ const ExchangeRate = (props) => {
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.any.isRequired,
+		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -637,7 +617,7 @@ const StakePanel = (props) => {
 									<Image
 										width='24px'
 										height='24px'
-										mr='10px'
+										mr='5px'
 										src={token0.logoURI}
 									/>
 									<Box
@@ -759,7 +739,7 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.any.isRequired,
+		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -950,7 +930,7 @@ const UnstakePanel = (props) => {
 									<Image
 										width='24px'
 										height='24px'
-										mr='10px'
+										mr='5px'
 										src={token0.logoURI}
 									/>
 									<Box

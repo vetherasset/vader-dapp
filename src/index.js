@@ -3,21 +3,19 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import theme from './themes/vader'
 import App from './App'
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import defaults from './common/defaults'
+import { ApolloProvider } from '@apollo/client'
+import { QueryClientProvider } from 'react-query'
 import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
-
-const client = new ApolloClient({
-	uri: defaults.api.graphUrl,
-	cache: new InMemoryCache(),
-})
 
 ReactDOM.render(
 	<StrictMode>
 		<ColorModeScript initialColorMode={theme.config.initialColorMode} />
-		<ApolloProvider client={client}>
-			<App />
+		<ApolloProvider client={defaults.api.graphql.client.vaderProtocol}>
+			<QueryClientProvider client={defaults.api.client}>
+				<App />
+			</QueryClientProvider>
 		</ApolloProvider>
 	</StrictMode>,
 	document.getElementById('root'),
