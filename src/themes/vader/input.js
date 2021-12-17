@@ -60,5 +60,18 @@ export default {
 				},
 			},
 		}),
+		outline: () => ({
+			field: {
+				color: '#fff',
+				borderRadius: '0.8rem',
+				_placeholder: {
+					color: '#fff',
+				},
+				_focus: {
+					borderColor: '#7b7ce0',
+					boxShadow: '0 0 0 3px #7b7ce0',
+				},
+			},
+		}),
 	},
 }

@@ -583,7 +583,7 @@ const Burn = (props) => {
 												<Image
 													width='24px'
 													height='24px'
-													mr='10px'
+													mr='5px'
 													src={tokenSelect.logoURI}
 												/>
 												<Box

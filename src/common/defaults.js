@@ -1,5 +1,8 @@
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { QueryClient } from 'react-query'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
+import vaderBonds from '../artifacts/js/vaderBonds'
 import vaderTokens from '../artifacts/json/vaderTokens'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
@@ -22,13 +25,21 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	],
 )
 
+defaults.network.pollInterval = 100000
+
 defaults.network.tx = {}
 defaults.network.tx.confirmations = 1
+
+defaults.network.blockTime = {}
+defaults.network.blockTime.hour = 262
 
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 defaults.api = {}
+defaults.api.staleTime = 100000
+defaults.api.client = new QueryClient()
+
 defaults.api.graphql = {}
 defaults.api.graphql.uri = {}
 defaults.api.graphql.uri.vaderProtocol = (
@@ -36,6 +47,25 @@ defaults.api.graphql.uri.vaderProtocol = (
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
+defaults.api.graphql.uri.uniswapV2 = (
+	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+		defaults.network.chainId === 42 ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
+			undefined
+)
+
+defaults.api.graphql.cache = new InMemoryCache()
+
+defaults.api.graphql.client = {}
+defaults.api.graphql.client.vaderProtocol = new ApolloClient({
+	uri: defaults.api.graphql.uri.vaderProtocol,
+	cache: defaults.api.graphql.cache,
+})
+defaults.api.graphql.client.uniswapV2 = new ApolloClient({
+	uri: defaults.api.graphql.uri.uniswapV2,
+	cache: defaults.api.graphql.cache,
+})
+
+defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
 	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
@@ -46,7 +76,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x1fd03e4eA209497910fACE52e5ca39124ef2E8BE' :
+		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
 			undefined
 )
 defaults.address.vether = (
@@ -75,14 +105,42 @@ defaults.address.linearVesting = (
 			undefined
 )
 
+defaults.address.uniswapV2 = {}
+defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
+defaults.address.uniswapV2.usdcEthPair = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
 defaults.tokenList.sources = tokenListSources
 
-defaults.vader = {}
+defaults.ether = {
+	'name':'ETHER',
+	'symbol':'ETH',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/vader-dapp/65a55cc1d1e89e1549b3d119d296ac8d701a37ea/src/assets/png/eth-diamond-purple-purple.png',
+	'isEther': true,
+}
+
+defaults.vader = {
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.vader,
+	'name':'VADER',
+	'symbol':'VADER',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+},
 defaults.vader.conversionRate = 10000
 
-defaults.nativeAsset = {
+defaults.xvader = {
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.xvader,
+	'name':'xVADER',
+	'symbol':'xVADER',
+	'decimals':18,
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/xvader/xvader-symbol-w-ring.png',
+},
+
+defaults.usdv = {
 	'chainId':defaults.network.chainId,
 	'address':defaults.address.usdv,
 	'name':'USDV',
@@ -91,23 +149,18 @@ defaults.nativeAsset = {
 	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
 }
 
-defaults.tokenDefault = {
+defaults.vether = {
 	'chainId':defaults.network.chainId,
-	'address':defaults.address.usdv,
-	'name':'USDV',
-	'symbol':'USDV',
+	'address':defaults.address.vether,
+	'name':'VETHER',
+	'symbol':'VETH',
 	'decimals':18,
-	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
 }
 
 defaults.redeemables = [
 	{
-		'chainId':defaults.network.chainId,
-		'address':defaults.address.vether,
-		'name':'VETHER',
-		'symbol':'VETH',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
+		...defaults.vether,
 		'convertsTo':'VADER',
 		'snapshot':snapshot,
 		'salt':(
@@ -117,48 +170,28 @@ defaults.redeemables = [
 		),
 	},
 	{
-		'chainId':defaults.network.chainId,
-		'address':defaults.address.usdv,
-		'name':'USDV',
-		'symbol':'USDV',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+		...defaults.usdv,
 		'convertsTo':'VADER',
 		'disabled': true,
 	},
 	{
-		'chainId':defaults.network.chainId,
-		'address':defaults.address.vader,
-		'name':'VADER',
-		'symbol':'VADER',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+		...defaults.vader,
 		'convertsTo':'USDV',
 		'disabled': true,
 	},
 ]
 
 defaults.stakeable = [
-	{
-		'chainId':defaults.network.chainId,
-		'address':defaults.address.vader,
-		'name':'VADER',
-		'symbol':'VADER',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
-	},
+	...[defaults.vader],
 ]
 
 defaults.unstakeable = [
-	{
-		'chainId':defaults.network.chainId,
-		'address':defaults.address.xvader,
-		'name':'xVADER',
-		'symbol':'xVADER',
-		'decimals':18,
-		'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/xvader/xvader-symbol-w-ring.png',
-	},
+	...[defaults.xvader],
 ]
+
+defaults.bonds = vaderBonds
+defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
+defaults.bondZapMinPayoutAllowed = '10000000000000000'
 
 defaults.xVaderAPRBasedNumberOfRecords = 7
 
@@ -184,13 +217,5 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
-
-defaults.swap = {}
-defaults.swap.slippage = 0.5
-defaults.swap.minSlippage = 0.05
-defaults.swap.maxSlippage = 1
-defaults.swap.deadline = 30
-defaults.swap.minDeadline = 1
-defaults.swap.maxDeadline = 180
 
 export default defaults

@@ -4,7 +4,7 @@ import defaults from '../common/defaults'
 import { Button, Box, Image, Modal, ModalHeader, ModalCloseButton, ModalOverlay, ModalContent, ModalBody,
 	ModalFooter, Input, Switch, Flex, useToast,
 } from '@chakra-ui/react'
-import useLocalStorageState from 'use-local-storage-state'
+import { useLocalStorage } from 'react-use'
 import { FixedSizeList as List } from 'react-window'
 import { EditIcon, ArrowBackIcon } from '@chakra-ui/icons'
 import { getCombinedTokenListFromSources, searchFor } from '../common/utils'
@@ -235,7 +235,7 @@ export const TokenSelector = (props) => {
 	const initialRef = useRef()
 	const [dialog, setDialog] = useState(0)
 
-	const [tokenListSources, setTokenListSources] = useLocalStorageState('tokenListSources', defaults.tokenList.sources)
+	const [tokenListSources, setTokenListSources] = useLocalStorage('tokenListSources', defaults.tokenList.sources)
 	const [tokenListCombined, setTokenListCombined] = useState(false)
 	const tokenList = useMemo(() => tokenListCombined, [tokenListCombined])
 
