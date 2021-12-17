@@ -54,7 +54,10 @@ export const BondItem = (props) => {
 					}}
 				>
 					<Flex
-						mb={{ base: '0.5rem', md: '0' }}
+						mb={{
+							base: bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '0.5rem' : '',
+							md: '0',
+						}}
 						fontWeight='bolder'>
 						<Image
 							width='23px'
