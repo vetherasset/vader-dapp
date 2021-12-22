@@ -267,9 +267,8 @@ const Burn = (props) => {
 	useEffect(() => {
 		if (wallet.account && defaults.redeemables[0].snapshot[wallet.account] &&
 			Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			const leaf = getMerkleLeaf(wallet.account, defaults.redeemables[0].snapshot[wallet.account])
-			getClaimed(leaf, provider)
+			getClaimed(leaf, defaults.network.provider)
 				.then(r => {
 					if(r) setVethAccountLeafClaimed(true)
 				})
@@ -288,12 +287,11 @@ const Burn = (props) => {
 	useEffect(() => {
 		if(wallet.account && tokenSelect) {
 			setWorking(true)
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
 				tokenSelect.address,
 				wallet.account,
 				defaults.address.converter,
-				provider,
+				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
 				if(!tokenSelect.symbol === 'VETH') {
@@ -317,12 +315,11 @@ const Burn = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && tokenSelect) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			setWorking(true)
 			getERC20BalanceOf(
 				tokenSelect.address,
 				wallet.account,
-				provider,
+				defaults.network.provider,
 			)
 				.then(data => {
 					setTokenBalance(data)
@@ -824,7 +821,7 @@ const VethBreakdown = (props) => {
 								</>
 				}
 
-				{wallet.account && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
+				{wallet.account && props.claimable && vester?.[0] && defaults.redeemables[0].snapshot[wallet.account] &&
 							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 && props.vethAccountLeafClaimed &&
 								<>
 									<Flex>
@@ -838,9 +835,12 @@ const VethBreakdown = (props) => {
 											<Box
 												textAlign='right'>
 												{vester?.[0] &&
-									<>
-										{prettifyCurrency(ethers.utils.formatUnits(vester?.[0], 18), 0, 4, 'VADER')}
-									</>
+													<>
+														{prettifyCurrency(
+															ethers.utils.formatUnits(
+																vester?.[0]?.sub(props.claimable), 18), 0, 4, 'VADER',
+														)}
+													</>
 												}
 											</Box>
 										</Container>
@@ -868,10 +868,10 @@ const VethBreakdown = (props) => {
 									)}
 								</>
 							}
-							{props.claimable.lte(0) && !props.vethAccountLeafClaimed &&
+							{props.claimable?.lte(0) && !props.vethAccountLeafClaimed &&
 								<>
 									{prettifyCurrency(
-										((Number(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], 18) * defaults.vader.conversionRate)) / 2),
+										((Number(ethers.utils.formatUnits(defaults.redeemables?.[0]?.snapshot[wallet.account], 18) * defaults.vader.conversionRate)) / 2),
 										0,
 										5,
 										'VADER',
