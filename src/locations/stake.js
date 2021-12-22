@@ -199,7 +199,7 @@ const Stake = (props) => {
 												}}
 												fontSize={{ base: '0.9rem', md: '1rem' }}
 												colorScheme='accent'
-											>{drawPeriod()} APR</Badge>
+											>{drawPeriod()} RETURN</Badge>
 										</Tooltip>
 									</Box>
 									<Box
