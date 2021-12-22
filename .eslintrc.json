@@ -56,5 +56,10 @@
         "spaced-comment": "error",
         "yoda": "error",
         "no-unused-vars": "warn"
-    }
+    },
+      "settings": {
+          "react": {
+              "version": "detect" // React version. "detect" automatically picks the version you have installed.
+          }
+      }
 }
