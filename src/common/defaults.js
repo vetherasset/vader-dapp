@@ -9,7 +9,6 @@ import snapshot from '../artifacts/json/vetherSnapshot'
 const defaults = {}
 
 defaults.network = {}
-defaults.network.connector = undefined
 defaults.network.chainId = Number(process.env.REACT_APP_CHAIN_ID)
 defaults.network.provider = new ethers.providers.FallbackProvider(
 	[
@@ -36,12 +35,12 @@ defaults.network.connectors = {
 		},
 	},
 	walletconnect: {
-	 rpcUrl: (
+	 rpcUrl: String(
 			defaults.network.chainId === 1 ?
 				`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
 				defaults.network.chainId === 42 ?
 					`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-					undefined
+					undefined,
 		),
 		meta: {
 			key: 'walletconnect',
