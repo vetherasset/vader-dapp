@@ -71,7 +71,7 @@ export const WalletConnectionModal = props => {
 				<ModalContent overflow='hidden'>
 					<ModalHeader>Choose Wallet</ModalHeader>
 					<ModalCloseButton top='1.29rem' />
-					<ModalBody>
+					<ModalBody minH='162px'>
 						<Box p='1.5rem'>
 							<Grid templateColumns='repeat(3, 1fr)' gap={3}>
 								{wallets.map(w => (
@@ -80,6 +80,7 @@ export const WalletConnectionModal = props => {
 											flexDir='column'
 											alignItems='center'
 											p='1rem'
+											minH='114px'
 											_hover={{
 												background: '#F3F5FA',
 												borderRadius: '20px',
@@ -87,7 +88,9 @@ export const WalletConnectionModal = props => {
 											}}
 											onClick={() => connect(w.key)}
 										>
-											<Image src={w.logo} width='50px'/>
+											<Flex minH='50px'>
+												<Image src={w.logo} width='50px'/>
+											</Flex>
 											<Text mt='0.5rem' fontWeight='bold'>
 												{w.name}
 											</Text>
