@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading } from '@chakra-ui/react'
 import { BondItem } from '../components/BondItem'
 import defaults from '../common/defaults'
 
@@ -13,6 +13,17 @@ const Bonds = (props) => {
 			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
+			<Flex
+				flexDir='column'
+				textAlign='center'
+			>
+				<Heading
+					as='h1'
+					size='md'
+					fontSize={{ base: '1.10rem', md: '1.25rem' }}>VADER BONDS AVAILABLE.</Heading>
+					The first step of Vader Protocol&apos;s long-term roadmap to awaken our sustainable Protocol-Owned Liquidity (POL) growth.<br/>
+					Users can purchase discounted Vader by way of Vader Bonds, which are vested over a short duration, by supplying various LP units according to the protocol&apos;s growth needs.
+			</Flex>
 			<Flex
 				m='0 auto'
 				p='1.8rem'
@@ -89,14 +100,6 @@ const Bonds = (props) => {
 											fontSize='1.1rem'
 											fontWeight='bolder'>
 											ROI
-										</Text>
-									</Flex>
-									<Flex>
-										<Text
-											as='h4'
-											fontSize='1.1rem'
-											fontWeight='bolder'>
-											TVB
 										</Text>
 									</Flex>
 								</Flex>

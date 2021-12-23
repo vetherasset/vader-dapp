@@ -5,6 +5,7 @@ import defaults from './defaults'
 import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
 import vaderBond from '../artifacts/abi/vaderBond'
+import zapEth from '../artifacts/abi/zapEth'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -148,13 +149,13 @@ const unstakeVader = async (shares, provider) => {
 	return await contract.leave(shares)
 }
 
-const bondInfo = async (address, bondContractAddress, provider) => {
+const bondInfo = async (bondContractAddress, depositorAddress) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
 		vaderBond,
-		provider.getSigner(0),
+		defaults.network.provider,
 	)
-	return await contract.bondInfo(address)
+	return await contract.bondInfo(depositorAddress)
 }
 
 const bondPrice = async (bondContractAddress) => {
@@ -202,22 +203,31 @@ const bondLastDecay = async (bondContractAddress) => {
 	return await contract.lastDecay()
 }
 
-const bondPayoutFor = async (bondContractAddress) => {
+const bondPayoutFor = async (bondContractAddress, value) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
 		vaderBond,
 		defaults.network.provider,
 	)
-	return await contract.payoutFor()
+	return await contract.payoutFor(value)
 }
 
-const bondPendingPayoutFor = async (bondContractAddress) => {
+const bondMaxPayout = async (bondContractAddress) => {
 	const contract = new ethers.Contract(
 		bondContractAddress,
 		vaderBond,
 		defaults.network.provider,
 	)
-	return await contract.pendingPayoutFor()
+	return await contract.maxPayout()
+}
+
+const bondPendingPayoutFor = async (bondContractAddress, depositorAccount) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		defaults.network.provider,
+	)
+	return await contract.pendingPayoutFor(depositorAccount)
 }
 
 const bondPercentVestedFor = async (bondContractAddress) => {
@@ -283,6 +293,27 @@ const bondDeposit = async (amount, maxPrice, depositor, bondContractAddress, pro
 	return await contract.deposit(amount, maxPrice, depositor)
 }
 
+const bondRedeem = async (bondContractAddress, depositor, provider) => {
+	const contract = new ethers.Contract(
+		bondContractAddress,
+		vaderBond,
+		provider.getSigner(0),
+	)
+	return await contract.redeem(depositor)
+}
+
+const zapDeposit = async (zapContractAddress, amount, minPayout, provider) => {
+	const contract = new ethers.Contract(
+		zapContractAddress,
+		zapEth,
+		provider.getSigner(0),
+	)
+	const options = {
+		value: amount,
+	}
+	return await contract.zap(minPayout, options)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -291,7 +322,8 @@ export {
 	bondDebtRatio, bondLastDecay, bondPayoutFor,
 	bondPendingPayoutFor, bondPayoutToken, bondPercentVestedFor,
 	bondPrincipalToken, bondTerms, bondTotalDebt, bondTreasury,
-	bondDeposit,
+	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
+	zapDeposit,
 }

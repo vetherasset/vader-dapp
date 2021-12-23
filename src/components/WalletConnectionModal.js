@@ -47,9 +47,9 @@ export const WalletConnectionModal = props => {
 		wallet
 			.connect(key)
 			.catch(err => {
+				console.log(err)
 				toast({
 					...walletNotConnected,
-					title: 'Cannot connect wallet',
 					description: err.message,
 				})
 			})
@@ -63,23 +63,23 @@ export const WalletConnectionModal = props => {
 			<Modal
 				onClose={props.onClose}
 				isOpen={props.isOpen}
-				scrollBehavior="inside"
+				scrollBehavior='inside'
 				isCentered
-				size="xl"
+				size='xl'
 			>
 				<ModalOverlay />
-				<ModalContent overflow="hidden">
+				<ModalContent overflow='hidden'>
 					<ModalHeader>Choose Wallet</ModalHeader>
-					<ModalCloseButton top="1.29rem" />
+					<ModalCloseButton top='1.29rem' />
 					<ModalBody>
-						<Box p="1.5rem">
-							<Grid templateColumns="repeat(3, 1fr)" gap={3}>
+						<Box p='1.5rem'>
+							<Grid templateColumns='repeat(3, 1fr)' gap={3}>
 								{wallets.map(w => (
 									<GridItem key={w.key}>
 										<Flex
-											flexDir="column"
-											alignItems="center"
-											p="1rem"
+											flexDir='column'
+											alignItems='center'
+											p='1rem'
 											_hover={{
 												background: '#F3F5FA',
 												borderRadius: '20px',
@@ -87,8 +87,8 @@ export const WalletConnectionModal = props => {
 											}}
 											onClick={() => connect(w.key)}
 										>
-											<Image src={w.logo} width="50px" />
-											<Text mt="0.5rem" fontWeight="bold">
+											<Image src={w.logo} width='50px'/>
+											<Text mt='0.5rem' fontWeight='bold'>
 												{w.name}
 											</Text>
 										</Flex>

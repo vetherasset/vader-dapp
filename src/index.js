@@ -5,6 +5,7 @@ import theme from './themes/vader'
 import App from './App'
 import defaults from './common/defaults'
 import { ApolloProvider } from '@apollo/client'
+import { QueryClientProvider } from 'react-query'
 import reportWebVitals from './reportWebVitals'
 import * as serviceWorker from './serviceWorker'
 
@@ -12,7 +13,9 @@ ReactDOM.render(
 	<StrictMode>
 		<ColorModeScript initialColorMode={theme.config.initialColorMode} />
 		<ApolloProvider client={defaults.api.graphql.client.vaderProtocol}>
-			<App />
+			<QueryClientProvider client={defaults.api.client}>
+				<App />
+			</QueryClientProvider>
 		</ApolloProvider>
 	</StrictMode>,
 	document.getElementById('root'),

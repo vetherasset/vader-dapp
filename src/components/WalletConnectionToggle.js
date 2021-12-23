@@ -40,15 +40,15 @@ export const WalletConnectionToggle = props => {
 	return (
 		<>
 			<Button
-				size="md"
-				minWidth="initial"
+				size='md'
+				minWidth='initial'
 				fontSize={{ base: '0.65rem', sm: 'sm' }}
-				variant="solidRounded"
-				aria-label="Wallet Connection Status"
+				variant='solidRounded'
+				aria-label='Wallet Connection Status'
 				isLoading={working}
 				onClick={toggle}
-				display="flex"
-				flexDirection="row"
+				display='flex'
+				flexDirection='row'
 				ref={ref}
 				{...props}
 				style={{

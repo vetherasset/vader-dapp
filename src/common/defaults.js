@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { QueryClient } from 'react-query'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
 import vaderBonds from '../artifacts/js/vaderBonds'
@@ -23,7 +24,6 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 		},
 	],
 )
-defaults.network.rpcUrl = defaults.network.chainId === 1 ? `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}` : defaults.network.chainId === 42 ? `https://kovan.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}` : undefined
 
 defaults.network.connectors = {
 	injected: {
@@ -34,68 +34,22 @@ defaults.network.connectors = {
 		},
 	},
 	walletconnect: {
-		rpc: { [defaults.network.chainId]: defaults.network.rpcUrl },
+	 rpcUrl: (
+			defaults.network.chainId === 1 ?
+				`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+				defaults.network.chainId === 42 ?
+					`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+					undefined
+		),
 		meta: {
 			key: 'walletconnect',
 			name: 'WalletConnect',
 			logo: 'https://app.1inch.io/assets/images/wallet-logos/wallet-connect.svg',
 		},
 	},
-	ledger: {
-		url: defaults.network.rpcUrl,
-		meta: {
-			key: 'ledger',
-			name: 'Ledger',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/ledger_2.svg',
-		},
-	},
-	fortmatic: {
-		apiKey: process.env.REACT_APP_FORTMATIC_API_KEY,
-		chainId: defaults.network.chainId,
-		meta: {
-			key: 'fortmatic',
-			name: 'Fortmatic',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/fortmatic.svg',
-		},
-	},
-	torus: {
-		chainId: defaults.network.chainId,
-		initOptions: {
-			showTorusButton: false,
-		},
-		meta: {
-			key: 'torus',
-			name: 'Torus',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/torus.svg',
-		},
-	},
-	portis: {
-		dAppId: process.env.REACT_APP_PORTIS_DAPP_ID,
-		chainId: [defaults.network.chainId],
-		meta: {
-			key: 'portis',
-			name: 'Portis',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/portis.svg',
-		},
-	},
-	// trezor: {
-	// 	url: defaults.network.rpcUrl,
-	// 	manifestEmail: 'supports@vaderprotocol.io',
-	// 	manifestAppUrl: 'https://vaderprotocol.app',
-	// 	meta: {
-	// 		key: 'trezor',
-	// 		name: 'Trezor',
-	// 		logo: 'https://app.1inch.io/assets/images/wallet-logos/trezor.svg',
-	// 	},
-	// },
-	// authereum: {
-	// 	meta: {
-	// 		key: 'authereum',
-	// 		name: 'Authereum',
-	// 		logo: 'https://app.1inch.io/assets/images/wallet-logos/authereum.svg',
-	// 	},
-	// },
 }
+
+defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
 defaults.network.tx.confirmations = 1
@@ -107,6 +61,9 @@ defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
 
 defaults.api = {}
+defaults.api.staleTime = 100000
+defaults.api.client = new QueryClient()
+
 defaults.api.graphql = {}
 defaults.api.graphql.uri = {}
 defaults.api.graphql.uri.vaderProtocol = (
@@ -116,7 +73,7 @@ defaults.api.graphql.uri.vaderProtocol = (
 )
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+		defaults.network.chainId === 42 ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
 			undefined
 )
 
@@ -143,7 +100,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0x1fd03e4ea209497910face52e5ca39124ef2e8be' :
+		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
 			undefined
 )
 defaults.address.vether = (
@@ -257,8 +214,10 @@ defaults.unstakeable = [
 ]
 
 defaults.bonds = vaderBonds
+defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
+defaults.bondZapMinPayoutAllowed = '10000000000000000'
 
-defaults.xVaderAPRBasedNumberOfRecords = 7
+defaults.xVaderAPRBasedNumberOfRecords = 8
 
 defaults.layout = {}
 defaults.layout.header = {}
@@ -282,13 +241,5 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
-
-defaults.swap = {}
-defaults.swap.slippage = 0.5
-defaults.swap.minSlippage = 0.05
-defaults.swap.maxSlippage = 1
-defaults.swap.deadline = 30
-defaults.swap.minDeadline = 1
-defaults.swap.maxDeadline = 180
 
 export default defaults
