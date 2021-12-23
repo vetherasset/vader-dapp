@@ -72,7 +72,7 @@ defaults.network.connectors = {
 		},
 	},
 }
-
+defaults.network.autoConnect = true
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}

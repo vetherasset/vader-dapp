@@ -20,6 +20,7 @@ const App = () => {
 				<UseWalletProvider
 					chainId={defaults.network.chainId}
 					connectors={defaults.network.connectors}
+					autoConnect={defaults.network.autoConnect}
 				>
 					<Header
 						width={defaults.layout.header.width}
