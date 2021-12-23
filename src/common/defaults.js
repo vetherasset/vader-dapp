@@ -25,6 +25,34 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 	],
 )
 
+defaults.network.connectors = {
+	injected: {
+		meta: {
+			key: 'injected',
+			name: 'Metamask',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
+			'src/assets/svg/icons/metamask.svg',
+		},
+	},
+	walletconnect: {
+	 rpcUrl: (
+			defaults.network.chainId === 1 ?
+				`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+				defaults.network.chainId === 42 ?
+					`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+					undefined
+		),
+		meta: {
+			key: 'walletconnect',
+			name: 'WalletConnect',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
+			'src/assets/svg/icons/walletconnect.svg',
+		},
+	},
+}
+
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
