@@ -69,7 +69,7 @@ export const WalletConnectionModal = props => {
 			>
 				<ModalOverlay />
 				<ModalContent overflow='hidden'>
-					<ModalHeader>Choose Wallet</ModalHeader>
+					<ModalHeader>Connect Wallet</ModalHeader>
 					<ModalCloseButton top='1.29rem' />
 					<ModalBody minH='162px'>
 						<Box p='1.5rem'>
