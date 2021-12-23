@@ -39,15 +39,17 @@ defaults.network.connectors = {
 			key: 'injected',
 			name: 'Coinbase Wallet',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
-			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
-			'src/assets/svg/icons/metamask.svg',
+			'vader-dapp/add_more_connectors/src/assets/svg/icons/' +
+			'coinbasewallet.svg',
 		},
 	},
 	walletconnect: {
 		rpc: {
 			[defaults.network.chainId]: (
-				defaults.network.chainId === 1 ? `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-					defaults.network.chainId === 42 ? `https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+				defaults.network.chainId === 1 ?
+					`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+					defaults.network.chainId === 42 ?
+						`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
 						undefined
 			),
 		},

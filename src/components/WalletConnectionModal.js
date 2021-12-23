@@ -10,6 +10,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	Box,
+	Button,
 	Flex,
 	Grid,
 	GridItem,
@@ -62,6 +63,7 @@ export const WalletConnectionModal = props => {
 			<Modal
 				onClose={props.onClose}
 				isOpen={props.isOpen}
+				autoFocus={false}
 				scrollBehavior='inside'
 				isCentered
 				size='xl'
@@ -74,26 +76,23 @@ export const WalletConnectionModal = props => {
 						<Box p='1.5rem'>
 							<Grid templateColumns='repeat(3, 1fr)' gap={3}>
 								{wallets.map(w => (
-									<GridItem key={w.key}>
-										<Flex
+									<GridItem
+										key={w.name}>
+										<Button
+											variant='modalCentricLarge'
+											display='flex'
+											width='100%'
 											flexDir='column'
 											alignItems='center'
-											p='1rem'
-											minH='114px'
-											_hover={{
-												background: '#F3F5FA',
-												borderRadius: '20px',
-												cursor: 'pointer',
-											}}
 											onClick={() => connect(w.key)}
 										>
 											<Flex minH='50px'>
 												<Image src={w.logo} width='50px'/>
 											</Flex>
-											<Text mt='0.5rem' fontWeight='bold'>
+											<Text mt='0.5rem'>
 												{w.name}
 											</Text>
-										</Flex>
+										</Button>
 									</GridItem>
 								))}
 							</Grid>
