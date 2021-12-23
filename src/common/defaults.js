@@ -30,8 +30,8 @@ defaults.network.connectors = {
 			key: 'injected',
 			name: 'Metamask',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
-			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
-			'src/assets/svg/icons/metamask.svg',
+			'vader-dapp/main/src/assets/svg/icons/' +
+			'metamask.svg',
 		},
 	},
 	walletlink: {
@@ -49,7 +49,7 @@ defaults.network.connectors = {
 			key: 'walletlink',
 			name: 'Coinbase Wallet',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
-			'vader-dapp/add_more_connectors/src/assets/svg/icons/' +
+			'vader-dapp/main/src/assets/svg/icons/' +
 			'coinbasewallet.svg',
 		},
 	},
@@ -67,8 +67,8 @@ defaults.network.connectors = {
 			key: 'walletconnect',
 			name: 'WalletConnect',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
-			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
-			'src/assets/svg/icons/walletconnect.svg',
+			'vader-dapp/main/src/assets/svg/icons/' +
+			'walletconnect.svg',
 		},
 	},
 }
