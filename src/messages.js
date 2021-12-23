@@ -210,7 +210,7 @@ const bondPurchaseValueExceeds = {
 
 const bondSoldOut = {
 	title: 'Bond sale has been sold out',
-	description: 'This sale has been sold out and can not be purchased.',
+	description: 'This sale has been sold out and cannot be purchased.',
 	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,

@@ -35,7 +35,6 @@ export const WalletConnectionModal = props => {
 		if (wallet.error) {
 			return toast({
 				...walletNotConnected,
-				title: 'Cannot connect wallet',
 				description: wallet.error.message,
 			})
 		}
