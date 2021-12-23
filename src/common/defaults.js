@@ -193,7 +193,7 @@ defaults.bonds = vaderBonds
 defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
 defaults.bondZapMinPayoutAllowed = '10000000000000000'
 
-defaults.xVaderAPRBasedNumberOfRecords = 8
+defaults.xVaderAPRBasedNumberOfRecords = 14
 
 defaults.layout = {}
 defaults.layout.header = {}
