@@ -85,7 +85,7 @@ const exception = {
 const walletNotConnected = {
 	title: 'Wallet not connected',
 	description: 'Please connect a wallet.',
-	status: 'error',
+	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
 	position: defaults.toast.position,
