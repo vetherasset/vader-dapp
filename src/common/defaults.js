@@ -25,7 +25,7 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 )
 
 defaults.network.connectors = {
-	injected: {
+	metamask: {
 		meta: {
 			key: 'injected',
 			name: 'Metamask',
@@ -34,11 +34,32 @@ defaults.network.connectors = {
 			'src/assets/svg/icons/metamask.svg',
 		},
 	},
+	walletlink: {
+		// WalletLink supports only ChainID 1
+		chainId: defaults.network.chainId,
+		url: (
+			defaults.network.chainId === 1 ?
+				`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+				undefined
+		),
+		appName: 'Vader Protocol',
+		appLogoUrl: 'https://raw.githubusercontent.com/vetherasset/' +
+			'branding/main/vader/vader-logo-wo-ring.svg',
+		meta: {
+			key: 'walletlink',
+			name: 'Coinbase Wallet',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/add_more_connectors/src/assets/svg/icons/' +
+			'coinbasewallet.svg',
+		},
+	},
 	walletconnect: {
 		rpc: {
 			[defaults.network.chainId]: (
-				defaults.network.chainId === 1 ? `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-					defaults.network.chainId === 42 ? `https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+				defaults.network.chainId === 1 ?
+					`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
+					defaults.network.chainId === 42 ?
+						`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
 						undefined
 			),
 		},

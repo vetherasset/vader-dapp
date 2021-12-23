@@ -108,6 +108,18 @@ export default {
 				background: 'linear-gradient(90deg, rgb(128, 79, 110) 0%, rgb(4, 54, 89) 100%)',
 			},
 		}),
+		modalCentricLarge: () => ({
+			background: 'transparent',
+			width: '100%',
+			minH: '114px',
+			borderRadius: '20px',
+			lineHeight: 'unset',
+			cursor: 'pointer',
+			padding: '1rem',
+			_hover: {
+				background: '#F3F5FA',
+			},
+		}),
 		link: () => ({
 			color: 'accent.200',
 			height: 'auto',
