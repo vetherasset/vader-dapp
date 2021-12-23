@@ -35,13 +35,9 @@ defaults.network.connectors = {
 		},
 	},
 	walletconnect: {
-	 rpcUrl: String(
-			defaults.network.chainId === 1 ?
-				`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-				defaults.network.chainId === 42 ?
-					`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-					undefined,
-		),
+		rpc: {
+			[defaults.network.chainId]: `https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}`,
+		},
 		meta: {
 			key: 'walletconnect',
 			name: 'WalletConnect',
