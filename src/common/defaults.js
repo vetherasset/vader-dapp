@@ -30,7 +30,9 @@ defaults.network.connectors = {
 		meta: {
 			key: 'injected',
 			name: 'Metamask',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/metamask.svg',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
+			'src/assets/svg/icons/metamask.svg',
 		},
 	},
 	walletconnect: {
@@ -44,7 +46,9 @@ defaults.network.connectors = {
 		meta: {
 			key: 'walletconnect',
 			name: 'WalletConnect',
-			logo: 'https://app.1inch.io/assets/images/wallet-logos/wallet-connect.svg',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
+			'src/assets/svg/icons/walletconnect.svg',
 		},
 	},
 }
