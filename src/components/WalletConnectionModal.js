@@ -72,8 +72,9 @@ export const WalletConnectionModal = props => {
 				<ModalContent overflow='hidden'>
 					<ModalHeader>Connect Wallet</ModalHeader>
 					<ModalCloseButton top='1.29rem' />
-					<ModalBody minH='162px'>
-						<Box p='1.5rem'>
+					<ModalBody minH='138px'>
+						<Box
+							p='0 1.5rem 1.5rem'>
 							<Grid templateColumns='repeat(3, 1fr)' gap={3}>
 								{wallets.map(w => (
 									<GridItem
