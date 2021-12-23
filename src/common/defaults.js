@@ -25,10 +25,19 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 )
 
 defaults.network.connectors = {
-	injected: {
+	metamask: {
 		meta: {
 			key: 'injected',
 			name: 'Metamask',
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
+			'src/assets/svg/icons/metamask.svg',
+		},
+	},
+	coinbasewallet: {
+		meta: {
+			key: 'injected',
+			name: 'Coinbase Wallet',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
 			'vader-dapp/5086359a230b7fc2b8292e7f23c8c0e234fc025f/' +
 			'src/assets/svg/icons/metamask.svg',
