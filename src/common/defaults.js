@@ -28,7 +28,7 @@ defaults.network.connectors = {
 	metamask: {
 		meta: {
 			key: 'injected',
-			name: 'Metamask',
+			name: 'MetaMask',
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
 			'vader-dapp/main/src/assets/svg/icons/' +
 			'metamask.svg',
@@ -69,6 +69,13 @@ defaults.network.connectors = {
 			logo: 'https://raw.githubusercontent.com/vetherasset/' +
 			'vader-dapp/main/src/assets/svg/icons/' +
 			'walletconnect.svg',
+		},
+	},
+	other: {
+		meta: {
+			key: 'injected',
+			name: 'Other',
+			logo: '',
 		},
 	},
 }
