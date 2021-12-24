@@ -75,8 +75,8 @@ defaults.network.connectors = {
 		meta: {
 			key: 'injected',
 			name: 'Other',
-			logo: 'https://github.com/vetherasset/vader-dapp/' +
-			'main/src/assets/svg/icons/' +
+			logo: 'https://raw.githubusercontent.com/vetherasset/' +
+			'vader-dapp/main/src/assets/svg/icons/' +
 			'otherwallets.svg',
 		},
 	},
