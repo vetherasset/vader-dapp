@@ -83,8 +83,6 @@ const App = () => {
 	)
 }
 
-console.log(location.pathname)
-
 const maskTransform = () => {
 	const location = useLocation()
 	if(
