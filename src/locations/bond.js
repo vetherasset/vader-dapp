@@ -554,6 +554,7 @@ const Bond = (props) => {
 																	borderRadius='50%'
 																	mr='5px'
 																	src={token0?.logoURI}
+																	alt={`${token0?.name} token`}
 																/>
 															}
 															{token0?.address && !token0?.logoURI &&

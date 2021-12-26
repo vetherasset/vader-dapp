@@ -409,6 +409,7 @@ const Burn = (props) => {
 								width='24px'
 								height='24px'
 								src={tokenSelect.logoURI}
+								alt={`${tokenSelect.name} token`}
 							/> : '' }
 							rightIcon={<ChevronDownIcon />}
 							onClick={() => {
@@ -582,6 +583,7 @@ const Burn = (props) => {
 													height='24px'
 													mr='5px'
 													src={tokenSelect.logoURI}
+													alt={`${tokenSelect.name} token`}
 												/>
 												<Box
 													as='h3'

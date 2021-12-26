@@ -65,6 +65,7 @@ export const BondItem = (props) => {
 							borderRadius='50%'
 							mr='7px'
 							src={props.token0?.logoURI}
+							alt={`${props.token0?.name} token`}
 						/>
 						<Image
 							width='23px'
@@ -72,6 +73,7 @@ export const BondItem = (props) => {
 							borderRadius='50%'
 							mr='10px'
 							src={props.token1?.logoURI}
+							alt={`${props.token1?.name} token`}
 						/>
 						{props.token0?.symbol}{props.token1 ? ` / ${props.token1.symbol}` : ''}
 						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&

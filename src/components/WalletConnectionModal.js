@@ -88,7 +88,7 @@ export const WalletConnectionModal = props => {
 											onClick={() => connect(w.key)}
 										>
 											<Flex minH='50px'>
-												<Image src={w.logo} width='50px'/>
+												<Image src={w.logo} alt={`${w.name} logo`} width='50px'/>
 											</Flex>
 											<Text mt='0.5rem'>
 												{w.name}

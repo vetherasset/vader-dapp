@@ -57,6 +57,7 @@ const TokenSelectButton = ({ data, index, style }) => {
 							background='white'
 							mr='10px'
 							src={data.tokenList[index].logoURI}
+							alt={`${data.tokenList[index].name} token`}
 						/>
 						{data.tokenList[index].symbol}
 					</Box>
@@ -193,7 +194,9 @@ const TokenListSelectDialog = (props) => {
 								width='33px'
 								height='33px'
 								objectFit='contain'
-								src={source.logoURI}/>
+								src={source.logoURI}
+								alt={`${source.name} token`}
+							/>
 							<Box
 								as='h3'
 								m='0'
