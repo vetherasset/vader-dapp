@@ -5,7 +5,7 @@ import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
-	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement } from '@chakra-ui/react'
+	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement, FormControl, FormLabel } from '@chakra-ui/react'
 import { ArrowBackIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
@@ -412,6 +412,7 @@ const Bond = (props) => {
 								width='32px'
 								height='32px'
 								p='0'
+								aria-label="Back to bond"
 							>
 								<ArrowBackIcon
 									width='26px'
@@ -759,7 +760,8 @@ const Bond = (props) => {
 										</Flex>
 									</Flex>
 
-									<Flex
+									<FormControl
+										d='flex'
 										pointerEvents={tabIndex === 1 ? 'none' : ''}
 										opacity={tabIndex === 1 ? '0.55' : '1'}
 										borderTop='1px solid rgb(102, 101, 129)'
@@ -770,17 +772,18 @@ const Bond = (props) => {
 										flexDir='row'
 										justifyContent='space-between'
 									>
-										<Box
-											as='h4'
+										<FormLabel
+											htmlFor='useLPTokens'
 											fontWeight='bolder'
 										>
 											Use LP tokens instead
-										</Box>
+										</FormLabel>
 										<Switch
+											id='useLPTokens'
 											size='lg'
 											isChecked={useLPTokens}
 											onChange={() => setUseLPTokens(!useLPTokens)}/>
-									</Flex>
+									</FormControl>
 								</Flex>
 							</Flex>
 
