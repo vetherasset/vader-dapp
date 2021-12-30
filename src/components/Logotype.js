@@ -19,6 +19,7 @@ export const Logotype = (props) => {
 			<Image
 				style={{ maxWidth: width }}
 				src={useColorModeValue(inverted, primary)}
+				alt="Vader Protocol Logo"
 				{...props}
 			/>
 		</Link>

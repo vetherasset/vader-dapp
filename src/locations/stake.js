@@ -273,6 +273,7 @@ const Stake = (props) => {
 															height='24px'
 															mr='5px'
 															src={defaults.unstakeable[0].logoURI}
+															alt={`${defaults.unstakeable[0].name} token`}
 														/>
 														xVADER
 													</Flex>
@@ -313,6 +314,7 @@ const Stake = (props) => {
 															height='24px'
 															mr='20px'
 															src={defaults.stakeable[0].logoURI}
+															alt={`${defaults.stakeable[0].name} token`}
 														/>
 														VADER
 													</Flex>
@@ -619,6 +621,7 @@ const StakePanel = (props) => {
 										height='24px'
 										mr='5px'
 										src={token0.logoURI}
+										alt={`${token0.name} token`}
 									/>
 									<Box
 										as='h3'
@@ -932,6 +935,7 @@ const UnstakePanel = (props) => {
 										height='24px'
 										mr='5px'
 										src={token0.logoURI}
+										alt={`${token0.name} token`}
 									/>
 									<Box
 										as='h3'

@@ -49,6 +49,7 @@ export const Position = (props) => {
 						background='#fff'
 						mr='10px'
 						src={token.logoURI}
+						alt={`${token.name} token`}
 					/>
 					<Image
 						width='23px'
@@ -58,6 +59,7 @@ export const Position = (props) => {
 						background='#fff'
 						mr='10px'
 						src={defaults.nativeAsset.logoURI}
+						alt={`${defaults.nativeAsset.name} token`}
 					/>
 					{token.symbol}/{defaults.nativeAsset.symbol}
 				</Flex>
