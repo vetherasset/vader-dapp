@@ -907,7 +907,6 @@ const VethAllowLessOption = (props) => {
 				onClick={() => {
 					if(defaults.redeemables[0].snapshot[wallet.account] && Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 						if(!props.allow) {
-							console.log('test')
 							setIsOpen(true)
 						}
 					}
