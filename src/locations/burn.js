@@ -900,28 +900,34 @@ const VethAllowLessOption = (props) => {
 
 	return (
 		<>
-			<Checkbox
+			<Box
 				maxW='236.95px'
-				colorScheme='pink'
-				size='lg'
 				mt='0.7rem'
-				disabled={((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))}
-				isChecked={props.allow}
-				onChange={() => {
-					if(props.allow === true) {
-						props.setAllow(false)
-					}
-				}}
+				lineHeight='normal'
 				onClick={() => {
 					if(defaults.redeemables[0].snapshot[wallet.account] && Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
 						if(!props.allow) {
+							console.log('test')
 							setIsOpen(true)
 						}
 					}
 				}}
 			>
-				Allow me to adjust amount
-			</Checkbox>
+				<Checkbox
+					maxW='236.95px'
+					colorScheme='pink'
+					size='lg'
+					disabled={((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))}
+					isChecked={props.allow}
+					onChange={() => {
+						if(props.allow === true) {
+							props.setAllow(false)
+						}
+					}}
+				>
+					Allow me to adjust amount
+				</Checkbox>
+			</Box>
 
 			<AlertDialog
 				isCentered={useBreakpointValue({ base: true, md: false })}
