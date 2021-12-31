@@ -6,10 +6,17 @@ import vaderBonds from '../artifacts/js/vaderBonds'
 import vaderTokens from '../artifacts/json/vaderTokens'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
-const defaults = {}
+const defaults = {
+	network: {
+		chainId: Number(process.env.REACT_APP_CHAIN_ID),
+		connectors: {},
+		provider: null,
+	},
+}
 
-defaults.network = {}
-defaults.network.chainId = Number(process.env.REACT_APP_CHAIN_ID)
+const isEthMainnet = defaults.network.chainId === 1
+const isEthTestnet = defaults.network.chainId === 42
+
 defaults.network.provider = new ethers.providers.FallbackProvider(
 	[
 		{
@@ -38,7 +45,7 @@ defaults.network.connectors = {
 		// WalletLink supports only ChainID 1
 		chainId: defaults.network.chainId,
 		url: (
-			defaults.network.chainId === 1 ?
+			isEthMainnet ?
 				`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
 				undefined
 		),
@@ -56,9 +63,9 @@ defaults.network.connectors = {
 	walletconnect: {
 		rpc: {
 			[defaults.network.chainId]: (
-				defaults.network.chainId === 1 ?
+				isEthMainnet ?
 					`https://eth-mainnet.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
-					defaults.network.chainId === 42 ?
+					isEthTestnet ?
 						`https://eth-kovan.alchemyapi.io/v2/${process.env.REACT_APP_ALCHEMY_KEY}` :
 						undefined
 			),
@@ -100,13 +107,13 @@ defaults.api.client = new QueryClient()
 defaults.api.graphql = {}
 defaults.api.graphql.uri = {}
 defaults.api.graphql.uri.vaderProtocol = (
-	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet' :
-		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
+	isEthMainnet ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet' :
+		isEthTestnet ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
 defaults.api.graphql.uri.uniswapV2 = (
-	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
+	isEthMainnet ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
+		isEthTestnet ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
 			undefined
 )
 
@@ -125,40 +132,40 @@ defaults.api.graphql.client.uniswapV2 = new ApolloClient({
 defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
-	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
-		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+	isEthMainnet ? 'https://etherscan.io/' :
+		isEthTestnet ? 'https://kovan.etherscan.io/' :
 			undefined
 )
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
+	isEthMainnet ? '0x2602278EE1882889B946eb11DC0E810075650983' :
+		isEthTestnet ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
 			undefined
 )
 defaults.address.vether = (
-	defaults.network.chainId === 1 ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
-		defaults.network.chainId === 42 ? '0x4402a7c8829489705852e54da50ebec60c8c86a8' :
+	isEthMainnet ? '0x4Ba6dDd7b89ed838FEd25d208D4f644106E34279' :
+		isEthTestnet ? '0x4402a7c8829489705852e54da50ebec60c8c86a8' :
 			undefined
 )
 defaults.address.xvader = (
-	defaults.network.chainId === 1 ? '0x665ff8fAA06986Bd6f1802fA6C1D2e7d780a7369' :
-		defaults.network.chainId === 42 ? '0x0AA1056Ee563C14484fCC530625cA74575C97512' :
+	isEthMainnet ? '0x665ff8fAA06986Bd6f1802fA6C1D2e7d780a7369' :
+		isEthTestnet ? '0x0AA1056Ee563C14484fCC530625cA74575C97512' :
 			undefined
 )
 defaults.address.usdv = (
-	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+	isEthMainnet ? undefined :
+		isEthTestnet ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
 			undefined
 ),
 defaults.address.converter = (
-	defaults.network.chainId === 1 ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
-		defaults.network.chainId === 42 ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
+	isEthMainnet ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
+		isEthTestnet ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
 			undefined
 )
 defaults.address.linearVesting = (
-	defaults.network.chainId === 1 ? '0xb3C600C04AaF603b0f422b73Db244216C2e491f6' :
-		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
+	isEthMainnet ? '0xb3C600C04AaF603b0f422b73Db244216C2e491f6' :
+		isEthTestnet ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
 
@@ -221,8 +228,8 @@ defaults.redeemables = [
 		'convertsTo':'VADER',
 		'snapshot':snapshot,
 		'salt':(
-			defaults.network.chainId === 1 ? '13662469' :
-				defaults.network.chainId === 42 ? '13662469' :
+			isEthMainnet ? '13662469' :
+				isEthTestnet ? '13662469' :
 					undefined
 		),
 	},
