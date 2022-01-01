@@ -312,7 +312,7 @@ const Stake = (props) => {
 														<Image
 															width='24px'
 															height='24px'
-															mr='20px'
+															mr='14px'
 															src={defaults.stakeable[0].logoURI}
 															alt={`${defaults.stakeable[0].name} token`}
 														/>
