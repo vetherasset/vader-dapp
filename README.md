@@ -19,7 +19,7 @@
 
 Find out more on [docs.vaderprotocol.io](https://docs.vaderprotocol.io)
 
-![credit:@viccccx1](https://docs.vaderprotocol.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FRFvKilIVGQ0D3dlOWt1v%2Fuploads%2FCi6OQ6KLPZxxyJY9i7is%2FVader%20Infograph%20Thumbnail.png?alt=media&token=8029e648-25f7-450c-85a4-a6572116593a)
+![credit:@viccccx1](https://raw.githubusercontent.com/vetherasset/branding/main/materials/vader-liquidity-protocol-infograph.png)
 
 ### Requirements
 
