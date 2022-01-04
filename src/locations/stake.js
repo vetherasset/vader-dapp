@@ -702,7 +702,7 @@ const StakePanel = (props) => {
 						disabled={working}
 						onClick={() => submit()}
 					>
-						<Text fontWeight="bold">
+						<Text as="span" fontWeight="bold">
 							{wallet.account &&
 								<>
 									{!working &&
@@ -1016,7 +1016,7 @@ const UnstakePanel = (props) => {
 						disabled={working}
 						onClick={() => submit()}
 					>
-						<Text fontWeight="bold">
+						<Text as="span" fontWeight="bold">
 							{wallet.account &&
 								<>
 									{!working &&
