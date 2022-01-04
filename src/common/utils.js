@@ -70,10 +70,11 @@ const prettifyCurrency = (amount, minFractionDigits = 0, maxFractionDigits = 2, 
 	)
 }
 
-const prettifyNumber = (amount, minFractionDigits = 0, maxFractionDigits = 0, locales = 'en-US') => {
+const prettifyNumber = (amount, minFractionDigits = 0, maxFractionDigits = 0, locales = 'en-US', notation = 'standard') => {
 	const options = {
 		minimumFractionDigits: minFractionDigits,
 		maximumFractionDigits: maxFractionDigits,
+		notation: notation,
 	}
 	const value = isFinite(amount) ? amount : 0
 	return (new Intl.NumberFormat(locales, options).format(value))
