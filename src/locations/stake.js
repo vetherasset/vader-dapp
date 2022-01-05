@@ -88,14 +88,13 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
+			minHeight='634.95px'
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 1.2rem 0' }}
 			{...props}
 		>
 			<Flex
-				pb={{ base: '6rem', md: '0' }}
 				flexDir={{ base: 'column', md: 'row' }}
 			>
 				<Flex
