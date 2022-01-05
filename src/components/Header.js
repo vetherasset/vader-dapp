@@ -5,6 +5,7 @@ import defaults from '../common/defaults'
 import { Link } from 'react-router-dom'
 import { Logotype } from './Logotype'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
+import { BalanceIndicator } from '../components/BalanceIndicator'
 import { BurgerMenu } from './BurgerMenu'
 
 export const Header = (props) => {
@@ -40,7 +41,7 @@ export const Header = (props) => {
 			style={{ justifyContent: 'space-between', alignItems: 'center' }}
 			minH={defaults.layout.header.minHeight}
 			{...props}>
-			<Flex w={{ md: '20%', sm: '30%' }}>
+			<Flex w={{ md: '30%', sm: '30%' }}>
 				<Logotype margin='0 8px 0' />
 			</Flex>
 			<Flex w='auto'
@@ -70,7 +71,16 @@ export const Header = (props) => {
 					</Link>)
 				}
 			</Flex>
-			<Flex w='20%' justifyContent='flex-end'>
+			<Flex
+ 				w={{ md: '30%', sm: '70%' }}
+ 				justifyContent='flex-end'
+				gridGap={{ base: '7.3px', sm: '17.3px' }}
+			>
+				{useBreakpointValue({
+					base:	<BalanceIndicator/>,
+					md: '',
+					lg: <BalanceIndicator/>,
+				})}
 				{useBreakpointValue({
 					base: <BurgerMenu pages={pages}/>,
 					md: <WalletConnectionToggle />,

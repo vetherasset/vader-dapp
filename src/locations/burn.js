@@ -360,7 +360,6 @@ const Burn = (props) => {
 	return (
 		<>
 			<Box
-				minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 				maxWidth={defaults.layout.container.sm.width}
 				m='0 auto'
 				p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
@@ -371,7 +370,6 @@ const Burn = (props) => {
 					maxW='49ch'
 					m='0 auto'
 					minH={{ base: 'auto', md: '478.65px' }}
-					mb='5rem'
 					p={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
 					layerStyle='colorful'
 					flexDir='column'

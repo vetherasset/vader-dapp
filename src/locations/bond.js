@@ -389,10 +389,9 @@ const Bond = (props) => {
 		return (
 			<>
 				<Box
-					minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 					maxWidth={defaults.layout.container.md.width}
 					m='0 auto'
-					p={{ base: '5rem 1.1rem 6rem', md: '5rem 0 6rem' }}
+					p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 					{...props}
 				>
 			 <Flex

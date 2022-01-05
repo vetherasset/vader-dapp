@@ -28,7 +28,7 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [daysApr, setDaysApr] = useLocalStorage('daysApr23049', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
-	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0, defaults.api.graphql.pollInterval)
+	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0)
 	const [stakingApr] = useXvaderAPR('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
 
 	const drawPeriod = () => {
@@ -88,14 +88,13 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
+			minHeight='634.95px'
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 1.2rem 0', md: '5rem 1.2rem 0' }}
 			{...props}
 		>
 			<Flex
-				pb={{ base: '6rem', md: '0' }}
 				flexDir={{ base: 'column', md: 'row' }}
 			>
 				<Flex
