@@ -28,7 +28,7 @@ const Stake = (props) => {
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
 	const [daysApr, setDaysApr] = useLocalStorage('daysApr23049', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
-	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0, defaults.api.graphql.pollInterval)
+	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0)
 	const [stakingApr] = useXvaderAPR('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
 
 	const drawPeriod = () => {

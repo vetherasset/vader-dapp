@@ -1,6 +1,7 @@
 import { useQuery, gql } from '@apollo/client'
+import defaults from '../common/defaults'
 
-export const useXvaderPrice = (first = 0, pollInterval = 0, type = 'Day') => {
+export const useXvaderPrice = (first = 0, pollInterval = defaults.api.pollInterval, type = 'Day') => {
 
 	const query = first > 0 ? gql`
 	query {

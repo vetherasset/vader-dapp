@@ -85,9 +85,9 @@ export default {
 			color: '#fff',
 			textTransform: 'uppercase',
 			borderRadius: '12px',
-			border: '1px solid',
+			border: '0',
 			borderColor: 'rgba(255,255,255,0.16)',
-			backgroundSize: '150%',
+			padding: '0 1px',
 			backgroundImage: 'linear-gradient(90deg, rgb(255, 157, 219) 0%, rgb(38, 164, 254) 100%)',
 			_hover: {
 				backgroundSize: '150%',

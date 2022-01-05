@@ -16,6 +16,7 @@ import { extendTheme } from '@chakra-ui/react'
 import spinner from './spinner'
 import modal from './modal'
 import tag from './tag'
+import popover from './popover'
 
 const overrides = {
 	config: {
@@ -58,6 +59,9 @@ const overrides = {
 			'img:not([src])': {
 				opacity: '0',
 			},
+			'*:focus-visible': {
+				outline: 'none',
+			},
 		}),
 	},
 	fonts: fonts,
@@ -77,6 +81,7 @@ const overrides = {
 		Modal: modal,
 		Switch: switchComp,
 		Tag: tag,
+		Popover: popover,
 	},
 	layerStyles: {
 		opaque: {
