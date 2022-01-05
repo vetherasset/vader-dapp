@@ -56,7 +56,7 @@ const App = () => {
 						justifyContent='space-between'
 						alignContent='center'
 						flexWrap='wrap'
-						padding='0rem 2rem 3rem'
+						padding='8.53rem 2rem 6.53rem'
 						style={{
 							gap: '0 2rem',
 						}}

@@ -7,7 +7,6 @@ const Bonds = (props) => {
 
 	return (
 		<Box
-			minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.md.width}
 			m='0 auto'
 			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
@@ -43,7 +42,6 @@ const Bonds = (props) => {
 				p='1px'
 				flexDir='column'
 				height='auto'
-				mb='98.4px'
 				layerStyle='colorful'
 				backgroundImage='linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)'
 			>
