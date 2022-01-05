@@ -4,12 +4,56 @@ import { useQuery } from 'react-query'
 import { BigNumber, utils } from 'ethers'
 import { Button, Box, Image, Fade, Popover, PopoverTrigger,
 	Portal, PopoverContent, PopoverCloseButton,
-	PopoverBody, Flex, Container } from '@chakra-ui/react'
+	PopoverBody, Flex, Container, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 import { useXvaderPrice } from '../hooks/useXvaderPrice'
 import { getERC20BalanceOf } from '../common/ethereum'
 import { prettifyNumber } from '../common/utils'
+
+const Item = (props) => {
+
+	Item.propTypes = {
+		name: PropTypes.string.isRequired,
+		token: PropTypes.object.isRequired,
+		value: PropTypes.any.isRequired,
+	}
+
+	return (
+		<Box>
+			<Box>
+				{props.name}
+			</Box>
+			<Flex>
+				<Container p='0'>
+					<Box>
+						<Flex
+							justifyContent='flex-start'
+							fontWeight='bolder'>
+							<Image
+								width='24px'
+								height='24px'
+								mr='5px'
+								src={props.token.logoURI}
+								alt={`${props.token.name} token`}
+							/>
+							{props.token.symbol}
+						</Flex>
+					</Box>
+				</Container>
+				<Container p='0'>
+					<Box
+						fontSize={{ base: '1rem', md: '1.2rem' }}
+						fontWeight='bold'
+						textAlign='right'
+					>
+						{props.value}
+					</Box>
+				</Container>
+			</Flex>
+		</Box>
+	)
+}
 
 export const BalanceIndicator = () => {
 
@@ -54,58 +98,17 @@ export const BalanceIndicator = () => {
 		}
 	}
 
-	const Item = (props) => {
-
-		Item.propTypes = {
-			name: PropTypes.string.isRequired,
-			token: PropTypes.object.isRequired,
-			value: PropTypes.any.isRequired,
-		}
-
-		return (
-			<Box>
-				<Box>
-					{props.name}
-				</Box>
-				<Flex>
-					<Container p='0'>
-						<Box>
-							<Flex
-								justifyContent='flex-start'
-								fontWeight='bolder'>
-								<Image
-									width='24px'
-									height='24px'
-									mr='5px'
-									src={props.token.logoURI}
-									alt={`${props.token.name} token`}
-								/>
-								{props.token.symbol}
-							</Flex>
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							fontSize='1.2rem'
-							fontWeight='bold'
-							textAlign='right'
-						>
-							{props.value}
-						</Box>
-					</Container>
-				</Flex>
-			</Box>
-		)
-	}
+	const placement = useBreakpointValue({ base: 'bottom-end', md: 'auto' })
 
 	return (
 		<>
 			{Number(totalBalance()) > 0 &&
 				<>
 					<Popover
-						autoFocus={false}
-						preventOverflow={true}
 						closeOnEsc={true}
+						closeOnBlur={true}
+						matchWidth={true}
+						placement={placement}
 					>
 						<PopoverTrigger>
 							<Fade
@@ -155,7 +158,9 @@ export const BalanceIndicator = () => {
 							</Fade>
 						</PopoverTrigger>
 						<Portal>
-							<PopoverContent>
+							<PopoverContent
+								maxW='304px'
+							>
 								<PopoverCloseButton
 									top='0.53rem'
 								/>
