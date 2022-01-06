@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import {
-	Box, Flex, Badge, Text, Button, Image, Divider, IconButton,
-	useBreakpointValue, useMediaQuery, useToast,
+	Box, Flex, Badge, Text, Button, Image, Divider,
+	useMediaQuery, useToast, useClipboard,
 } from '@chakra-ui/react'
-import { ChevronDownIcon, CopyIcon } from '@chakra-ui/icons'
+import { CopyIcon } from '@chakra-ui/icons'
 
 import defaults from '../common/defaults'
-import { copiedAddress } from '../messages'
+import { copiedContractAddress } from '../messages'
 
 // import { ethers } from 'ethers'
 // import { useWallet } from 'use-wallet'
@@ -44,19 +44,13 @@ const Row = ({ children, ...rest }) => {
 
 Row.propTypes = { children: PropTypes.node.isRequired }
 
-// const Container = () => {
-// 	return (
-// 		<>row here bro?</>
-// 	)
-// }
-
-const Token = ({ name, logo, address, decimals, symbol }) => {
+const Token = ({ name, logo, address, decimals, symbol, ...rest }) => {
 	const [isLargerThan400] = useMediaQuery('(min-width: 380px)')
 
 	console.log('token is larger: ', isLargerThan400)
 
 	return (
-		<Row direction={isLargerThan400 ? 'row' : 'column'}>
+		<Row direction={isLargerThan400 ? 'row' : 'column'} {...rest}>
 			<Flex marginBottom={!isLargerThan400 ? '10px' : null}>
 				<Image
 					src={logo}
@@ -70,6 +64,7 @@ const Token = ({ name, logo, address, decimals, symbol }) => {
 				</Box>
 			</Flex>
 
+			{/* #TODO */}
 			{/* <Badge colorScheme='green' variant='solid'>Added</Badge> */}
 
 			<Button
@@ -93,8 +88,8 @@ Token.propTypes = {
 	symbol: PropTypes.string.isRequired,
 }
 
-const Card = ({ children, ...rest }) => {
-	return (
+const Container = ({ children, inverted = false, ...rest }) => {
+	return !inverted ? (
 		<Flex
 			w='100%'
 			minH={{ base: 'auto', md: '478.65px' }}
@@ -107,15 +102,7 @@ const Card = ({ children, ...rest }) => {
 		>
 			{children}
 		</Flex>
-	)
-}
-
-Card.propTypes = {
-	children: PropTypes.node.isRequired,
-}
-
-const Container = ({ children, ...rest }) => {
-	return (
+	) : (
 		<Flex
 			maxW='50ch'
 			m='0 auto'
@@ -129,7 +116,6 @@ const Container = ({ children, ...rest }) => {
 				position='relative'
 				width='100%'
 				minH='430.4px'
-				// p='1.5rem 0 4.5rem'
 				padding={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
 				flexDir='column'
 				justifyContent='center'
@@ -145,36 +131,34 @@ const Container = ({ children, ...rest }) => {
 
 Container.propTypes = {
 	children: PropTypes.node.isRequired,
+	inverted: PropTypes.bool,
 }
 
 const Tokens = ({ inverted = false, ...props }) => {
-	const wallet = null; // useWallet()
+	const [isSmallDevice] = useMediaQuery('(min-width: 500px)')
 	const toast = useToast()
+	const wallet = null // useWallet()
 
-	const [isLargerThan500] = useMediaQuery('(min-width: 500px)')
-	const variant = useBreakpointValue({ base: 'test', lg: 'haha' })
-	// const wallet = null
+	const [activeToken, setToken] = useState(CUSTOM_TOKENS[0])
+	const { hasCopied, onCopy } = useClipboard(activeToken.address)
 
-	const testCopyPasta = () => {
-		console.log('@@@ COPY ME ! @@@')
-		toast(copiedAddress)
-	}
+	const onTokenHover = token => { setToken(token) }
 
-	console.log('[TOKENS] wallet : ', { wallet, variant })
+	useEffect(() => {
+		// trigger copy-pasta toast notification
+		if (hasCopied) { toast(copiedContractAddress) }
+	}, [hasCopied])
 
-	const Node = inverted ? Container : Card;
+	console.log('[TOKENS] debug : ', { activeToken })
 
 	return (
 		<Box
-			// minHeight={`calc(90vh - ${defaults.layout.header.minHeight})`}
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
 			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
-			{/* <Card padding='2rem 0.9rem'> */}
-			{/* <Container padding='2rem 0.9rem'> */}
-			<Node padding='2rem 0.9rem'>
+			<Container inverted={inverted} padding='2rem 0.9rem'>
 				<Text
 					align='center'
 					fontSize={{ base: '1.25rem', md: '1.55rem' }}
@@ -189,7 +173,7 @@ const Tokens = ({ inverted = false, ...props }) => {
 					Add tokens to your Web3 wallet
 				</Text>
 
-				{/* TOKENS */}
+				{/* TOKENS list / add buttons */}
 				<Box
 					margin="2rem 1rem 0"
 				>
@@ -201,6 +185,7 @@ const Tokens = ({ inverted = false, ...props }) => {
 							address={token.address}
 							decimals={token.decimals}
 							symbol={token.symbol}
+							onMouseEnter={() => onTokenHover(token)}
 						/>
 					))}
 				</Box>
@@ -232,23 +217,23 @@ const Tokens = ({ inverted = false, ...props }) => {
 					/>
 				</Flex>
 
-				{/* <Row> */}
+				{/* #DIY instructions */}
 				<Row>
 					<Flex
 						width='100%'
 						margin='20px 0'
-						direction={isLargerThan500 ? 'row' : 'column'}
-						alignItems={!isLargerThan500 ? 'center' : null}
+						direction={isSmallDevice ? 'row' : 'column'}
+						alignItems={!isSmallDevice ? 'center' : null}
 					>
 						{/* LOGO */}
 						<Box
 							flexShrink='0'
-							marginRight={isLargerThan500 ? '8px' : null}
-							marginBottom={!isLargerThan500 ? '16px' : null}
+							marginRight={isSmallDevice ? '8px' : null}
+							marginBottom={!isSmallDevice ? '16px' : null}
 						>
 							<Image
-								src={CUSTOM_TOKENS[0].logoURI}
-								alt={`${CUSTOM_TOKENS[0].name} token`}
+								src={activeToken.logoURI}
+								alt={`${activeToken.name} token`}
 								width='60px'
 								height='60px'
 							/>
@@ -259,12 +244,11 @@ const Tokens = ({ inverted = false, ...props }) => {
 							width='100%'
 							flexWrap='wrap'
 							alignContent='center'
-							justifyContent={!isLargerThan500 ? 'space-evenly' : null}
 							gridGap='4px'
 						>
 							<Badge
 								width="100%"
-								onClick={testCopyPasta}
+								onClick={onCopy}
 								background='rgba(0, 0, 0, 0.16)'
 								border='1px solid transparent'
 								_hover={{
@@ -275,7 +259,6 @@ const Tokens = ({ inverted = false, ...props }) => {
 							>
 								<span style={{ userSelect: 'none' }}>
 									<CopyIcon color='#fff' _hover={{ color: '#f79ddc' }}/>
-									{/* <IconButton variant='' aria-label='Copy address' icon={<CopyIcon color='#fff' _hover={{ color: '#f79ddc' }}/>} /> */}
 									&nbsp;
 									Address:
 								</span>
@@ -284,39 +267,30 @@ const Tokens = ({ inverted = false, ...props }) => {
 									style={{
 										textOverflow: 'clip',
 										overflow: 'hidden',
-										// MozSelection: { background: 'magenta' },
-										// '::-moz-selection': { background: 'yellow' },
-										// '::selection': { background: 'yellow' },
 									}}>
-									0x2602278EE1882889B946eb11DC0E810075650983
+									{activeToken.address}
 								</div>
 							</Badge>
-							<Badge background='rgba(0, 0, 0, 0.16)'>Name: Vader</Badge>
-							<Badge background='rgba(0, 0, 0, 0.16)'>Symbol: VADER</Badge>
-							<Badge background='rgba(0, 0, 0, 0.16)'>Decimals: 18</Badge>
+							<Flex
+								width='100%'
+								flexWrap='wrap'
+								gridGap={!isSmallDevice ? '4px' : null}
+								justifyContent='space-around'
+							>
+								<Badge background='rgba(0, 0, 0, 0.16)'>
+									Name: {activeToken.name}
+								</Badge>
+								<Badge background='rgba(0, 0, 0, 0.16)'>
+									Symbol: {activeToken.symbol}
+								</Badge>
+								<Badge background='rgba(0, 0, 0, 0.16)'>
+									Decimals: {activeToken.decimals}
+								</Badge>
+							</Flex>
 						</Flex>
 					</Flex>
 				</Row>
-				{/* </Row> */}
-
-				{/* <Flex marginTop='0.7rem'>
-					<Button
-						variant='outline'
-						size='lg'
-						textTransform='none'
-						leftIcon={<Image
-							width='24px'
-							height='24px'
-							src={defaults.xvader.logoURI}
-							alt={`${defaults.xvader.name} token`}
-						/>}
-					>
-						wtf??
-					</Button>
-				</Flex> */}
-				{/* </Card> */}
-				{/* </Container> */}
-			</Node>
+			</Container>
 		</Box>
 	)
 }
