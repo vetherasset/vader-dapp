@@ -184,7 +184,7 @@ defaults.vader = {
 	'name':'VADER',
 	'symbol':'VADER',
 	'decimals':18,
-	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.png',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vader/vader-symbol-w-ring.svg',
 },
 defaults.vader.conversionRate = 10000
 
@@ -194,7 +194,7 @@ defaults.xvader = {
 	'name':'xVADER',
 	'symbol':'xVADER',
 	'decimals':18,
-	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/xvader/xvader-symbol-w-ring.png',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/xvader/xvader-symbol-w-ring.svg',
 },
 
 defaults.usdv = {
