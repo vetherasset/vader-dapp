@@ -235,6 +235,15 @@ const unstaked = {
 	position: defaults.toast.position,
 }
 
+const copiedContractAddress = {
+	title: 'Contract Address',
+	description: 'Address copied! Go pasta!',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
@@ -242,4 +251,5 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
+	copiedContractAddress,
 }
