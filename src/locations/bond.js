@@ -315,12 +315,11 @@ const Bond = (props) => {
 		if (wallet.account && token0) {
 			if (!token0.isEther && bond?.[0]?.address && token0.address) {
 				setWorking(true)
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				getERC20Allowance(
 					token0.address,
 					wallet.account,
 					bond?.[0]?.address,
-					provider,
+					defaults.network.provider,
 				).then((n) => {
 					setWorking(false)
 					if(n.gt(0))	setToken0Approved(true)
