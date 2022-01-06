@@ -54,11 +54,10 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		if (wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(
 				defaults.address.xvader,
 				wallet.account,
-				provider,
+				defaults.network.provider,
 			)
 				.then(data => {
 					setToken1balance(data)
@@ -71,11 +70,10 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		if (wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(
 				defaults.address.vader,
 				wallet.account,
-				provider,
+				defaults.network.provider,
 			)
 				.then(data => {
 					setToken0balance(data)
