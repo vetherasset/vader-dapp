@@ -117,7 +117,13 @@ export default {
 			cursor: 'pointer',
 			padding: '1rem',
 			_hover: {
-				background: '#F3F5FA',
+				background: '#ffffff91',
+			},
+			_active: {
+				background: '#ffffff91',
+			},
+			_focus: {
+				background: '#ffffff91',
 			},
 		}),
 		link: () => ({
@@ -153,7 +159,7 @@ export default {
 			p: '0',
 			borderRadius: '0',
 			_hover: {
-				background: '#ffffff30',
+				background: '#ffffff91',
 			},
 			_active: {
 				background: '#ffffff50',
