@@ -113,6 +113,9 @@ const overrides = {
 			width: '100%',
 			justifyContent: 'center',
 		},
+		menuIcon: {
+			marginTop: '0.67px',
+		},
 	},
 }
 
