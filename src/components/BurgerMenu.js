@@ -22,11 +22,11 @@ export const BurgerMenu = (props) => {
 					key={p.name}
 					to={p.link}
 				>
-					<MenuItem key={p.name} pb='1rem'>
+					<MenuItem key={p.name}>
 						{p.text}
 					</MenuItem>
 				</Link>)}
-				<WalletConnectionToggle w='100%' />
+				<WalletConnectionToggle w='90%' m='0.6rem auto' />
 			</MenuList>
 		</Menu>
 	)

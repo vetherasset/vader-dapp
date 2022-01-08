@@ -54,11 +54,10 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		if (wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(
 				defaults.address.xvader,
 				wallet.account,
-				provider,
+				defaults.network.provider,
 			)
 				.then(data => {
 					setToken1balance(data)
@@ -71,11 +70,10 @@ const Stake = (props) => {
 
 	useEffect(() => {
 		if (wallet.account) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20BalanceOf(
 				defaults.address.vader,
 				wallet.account,
-				provider,
+				defaults.network.provider,
 			)
 				.then(data => {
 					setToken0balance(data)
@@ -538,12 +536,11 @@ const StakePanel = (props) => {
 	useEffect(() => {
 		if(wallet.account && token0) {
 			setWorking(true)
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
 				token0.address,
 				wallet.account,
 				defaults.address.xvader,
-				provider,
+				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
 				if(n.gt(0))	setToken0Approved(true)
@@ -853,12 +850,11 @@ const UnstakePanel = (props) => {
 	useEffect(() => {
 		if(wallet.account && token0) {
 			setWorking(true)
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			getERC20Allowance(
 				token0.address,
 				wallet.account,
 				defaults.address.xvader,
-				provider,
+				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
 				if(n.gt(0))	setToken0Approved(true)

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { useQuery } from 'react-query'
 import { BigNumber, utils } from 'ethers'
 import { Button, Box, Image, Fade, Popover, PopoverTrigger,
-	Portal, PopoverContent, PopoverCloseButton,
+	Portal, PopoverContent,
 	PopoverBody, Flex, Container, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -161,9 +161,6 @@ export const BalanceIndicator = () => {
 							<PopoverContent
 								maxW='304px'
 							>
-								<PopoverCloseButton
-									top='0.53rem'
-								/>
 								<PopoverBody
 									display='flex'
 									flexDir='column'

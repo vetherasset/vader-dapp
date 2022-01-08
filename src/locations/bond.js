@@ -315,12 +315,11 @@ const Bond = (props) => {
 		if (wallet.account && token0) {
 			if (!token0.isEther && bond?.[0]?.address && token0.address) {
 				setWorking(true)
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				getERC20Allowance(
 					token0.address,
 					wallet.account,
 					bond?.[0]?.address,
-					provider,
+					defaults.network.provider,
 				).then((n) => {
 					setWorking(false)
 					if(n.gt(0))	setToken0Approved(true)
@@ -342,12 +341,11 @@ const Bond = (props) => {
 
 	useEffect(() => {
 		if (wallet.account && token0) {
-			const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 			if (!token0.isEther && token0.address) {
 				getERC20BalanceOf(
 					token0?.address,
 					wallet?.account,
-					provider,
+					defaults.network.provider,
 				)
 					.then(n => {
 						setToken0balance(n)
@@ -357,6 +355,7 @@ const Bond = (props) => {
 					})
 			}
 			else {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				provider.getSigner().getBalance()
 					.then(
 						(n) => setToken0balance(n))

@@ -57,7 +57,6 @@ const App = () => {
 						opacity='0.8'
 						position='relative'
 						zIndex='1'
-						justifyContent='space-between'
 						alignContent='center'
 						flexWrap='wrap'
 						padding='8.53rem 2rem 6.53rem'
