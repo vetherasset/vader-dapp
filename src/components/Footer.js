@@ -19,11 +19,12 @@ export const Footer = (props) => {
 		display: 'inline-block',
 		marginInlineEnd: '0.5rem',
 		fontSize: '0.83rem',
-		verticalAlign: 'text-top',
+		verticalAlign: 'baseline',
 	}
 
 	const soloIconStyle = {
 		...iconStyle,
+		verticalAlign: 'text-top',
 		fontSize: '1.2rem',
 		marginInlineEnd: '0',
 	}
