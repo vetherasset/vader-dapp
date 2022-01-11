@@ -6,6 +6,7 @@ import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
 import vaderBond from '../artifacts/abi/vaderBond'
 import zapEth from '../artifacts/abi/zapEth'
+import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -314,6 +315,15 @@ const zapDeposit = async (zapContractAddress, amount, minPayout, provider) => {
 	return await contract.zap(minPayout, options)
 }
 
+const getStaleVaderPrice = async () => {
+	const contract = new ethers.Contract(
+		defaults.address.uniswapTWAP,
+		uniswapTWAP,
+		defaults.network.provider,
+	)
+	return await contract.getStaleVaderPrice()
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -325,5 +335,5 @@ export {
 	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
-	zapDeposit,
+	zapDeposit, getStaleVaderPrice,
 }

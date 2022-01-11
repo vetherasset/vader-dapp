@@ -46,6 +46,7 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	nomorethaneligible,
 } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
+import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
 
 const Burn = (props) => {
 
@@ -65,6 +66,8 @@ const Burn = (props) => {
 	const [vethAccountLeafClaimed, setVethAccountLeafClaimed] = useState(false)
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
+
+	const { data: uniswapTWAP, refetch: uniswapTWAPrefetch } = useUniswapTWAP()
 
 	const DrawAmount = () => {
 		return (
@@ -280,6 +283,14 @@ const Burn = (props) => {
 			setConversionFactor(
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
+		}
+		return () => setConversionFactor(ethers.BigNumber.from('0'))
+	}, [tokenSelect, wallet.account])
+
+	useEffect(() => {
+		if (tokenSelect.symbol === 'USDV' || tokenSelect.symbol === 'VADER') {
+			uniswapTWAPrefetch()
+			setConversionFactor(uniswapTWAP)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect, wallet.account])

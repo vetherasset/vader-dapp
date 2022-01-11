@@ -91,7 +91,7 @@ defaults.network.connectors = {
 		},
 	},
 }
-defaults.network.autoConnect = true
+defaults.network.autoConnect = false
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
@@ -171,6 +171,11 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
+defaults.address.uniswapTWAP = (
+	defaults.network.chainId === 1 ? undefined :
+		defaults.network.chainId === 42 ? '0xbaa8665dcfcfb4c3428585832755E60C7CA9E857' :
+			undefined
+)
 
 defaults.address.uniswapV2 = {}
 defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
@@ -239,12 +244,12 @@ defaults.redeemables = [
 	{
 		...defaults.usdv,
 		'convertsTo':'VADER',
-		'disabled': true,
+		'disabled': false,
 	},
 	{
 		...defaults.vader,
 		'convertsTo':'USDV',
-		'disabled': true,
+		'disabled': false,
 	},
 ]
 
