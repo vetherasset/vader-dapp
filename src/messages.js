@@ -172,7 +172,7 @@ const unstaked = createToast({
 
 const copiedContractAddress = createToast({
 	title: 'Contract Address',
-	description: 'Address copied! Go pasta!',
+	description: 'Address copied! Go paste!',
 	status: 'success',
 })
 
