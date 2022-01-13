@@ -27,11 +27,6 @@ export const Header = (props) => {
 			text: 'Acquire',
 			link: '/acquire',
 		},
-		// {
-		// 	name: 'Tokens',
-		// 	text: 'Tokens',
-		// 	link: '/tokens',
-		// },
 	]
 
 	const current = {
