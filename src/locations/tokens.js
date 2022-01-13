@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react'
+/* eslint-disable no-inline-comments */
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import {
 	Box, Flex, Badge, Text, Button, Image, Divider,
@@ -6,54 +7,80 @@ import {
 } from '@chakra-ui/react'
 import { CopyIcon } from '@chakra-ui/icons'
 
+import Container from '../components/Container'
+import Row from '../components/Row'
+
 import defaults from '../common/defaults'
 import { copiedContractAddress } from '../messages'
 
-// import { ethers } from 'ethers'
-// import { useWallet } from 'use-wallet'
+import useDetectMetaMask from '../hooks/useDetectMetamask'
+import { useWallet } from 'use-wallet'
 
 const CUSTOM_TOKENS = [ defaults.vader, defaults.xvader ]
-
-const Row = ({ children, ...rest }) => {
-	return (
-		<Flex
-			width='100%'
-			alignItems='center'
-			justifyContent='space-between'
-			p={{ base: '12px 24px', md: '0 24px' }}
-			minH='60px'
-			// cursor='pointer'
-			animation='2.3s ease-in-out infinite bgAnimation'
-			transition='all 0.3s ease 0s'
-			background='rgba(244, 155, 202, 0.08) none repeat scroll 0% 0%'
-			mb='16px'
-			borderRadius='16px'
-			border='1px solid #ffffff10'
-			flexWrap='wrap'
-			_hover={{
-				// cursor: 'pointer',
-				background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
-				border: '1px solid #ffffff10',
-			}}
-			{...rest}
-		>
-			{children}
-		</Flex>
-	)
+const WALLET_STATUS = {
+	DISCONNECTED: 'disconnected',	// no wallet connected (default state)
+	CONNECTING: 'connecting',		// trying to connect to the wallet
+	CONNECTED: 'connected',			// connected to the wallet (i.e. the account is available)
+	ERROR: 'error',					// a connection error occured
 }
 
-Row.propTypes = { children: PropTypes.node.isRequired }
+const addTokenToMetaMask = async (
+	{ address, decimals, logoURI, symbol },
+	wallet,
+) => {
+	if (address && wallet && wallet.ethereum) {
+		try {
+			// #bug atm: doesn't wait for actual confirmation.. :(
+			/* eslint-disable no-unused-vars */
+			const wasAdded = await wallet.ethereum.request({
+				method: 'wallet_watchAsset',
+				params: {
+					type: 'ERC20',
+					options: {
+						address,
+						symbol,
+						decimals,
+						image: logoURI,
+					},
+				},
+			})
 
-const Token = ({ name, logo, address, decimals, symbol, ...rest }) => {
+			// if (wasAdded) { do magic } // #sadface
+		}
+		catch (ex) {
+			console.log(ex)
+		}
+	}
+	else {
+		console.warn('No Web3 provider/wallet detected...?')
+	}
+}
+
+const Token = ({ token, wallet, isMetaMask, ...rest }) => {
 	const [isLargerThan400] = useMediaQuery('(min-width: 380px)')
+	const [isLoading, setLoading] = useState(false)
 
-	console.log('token is larger: ', isLargerThan400)
+	const { name, logoURI, symbol } = token
+	const { isConnected: getConnected, status } = wallet
+
+	// wait for wallet to connect...
+	const isConnected = getConnected()
+	const isConnecting = status === WALLET_STATUS.CONNECTING
+
+	const addToWallet = useCallback(() => {
+		setLoading(true)
+
+		if (isMetaMask && wallet) { addTokenToMetaMask(token, wallet) }
+
+		// auto-timeout, re-enable button...
+		setTimeout(() => setLoading(false), 3000)
+	}, [isMetaMask, wallet])
 
 	return (
 		<Row direction={isLargerThan400 ? 'row' : 'column'} {...rest}>
 			<Flex marginBottom={!isLargerThan400 ? '10px' : null}>
 				<Image
-					src={logo}
+					src={logoURI}
 					alt={`${name} token`}
 					width='24px'
 					height='24px'
@@ -64,101 +91,69 @@ const Token = ({ name, logo, address, decimals, symbol, ...rest }) => {
 				</Box>
 			</Flex>
 
-			{/* #TODO */}
-			{/* <Badge colorScheme='green' variant='solid'>Added</Badge> */}
-
 			<Button
 				variant='solidRounded'
 				size='xs'
 				textTransform='uppercase'
 				padding="0 10px"
-				// disabled
+
+				isLoading={isConnecting || isLoading}
+				loadingText={isLoading ? 'Requesting...' : 'Connecting...'}
+
+				disabled={!isMetaMask || !isConnected || isLoading}
+
+				onClick={addToWallet}
 			>
-				Add to wallet
+				{isMetaMask
+					? isConnected ? 'Add to wallet' : 'Connect wallet'
+					: 'Only in MetaMask'
+				}
 			</Button>
+
+			{/* #TODO: can't detect confirmation on added token (always true) #bug :< */}
+			{/* <Badge colorScheme='green' variant='solid'>Added</Badge> */}
 		</Row>
 	)
 }
 
 Token.propTypes = {
-	name: PropTypes.string.isRequired,
-	logo: PropTypes.string.isRequired,
-	address: PropTypes.string.isRequired,
-	decimals: PropTypes.number.isRequired,
-	symbol: PropTypes.string.isRequired,
-}
-
-const Container = ({ children, inverted = false, ...rest }) => {
-	return !inverted ? (
-		<Flex
-			w='100%'
-			minH={{ base: 'auto', md: '478.65px' }}
-			maxW='50ch'
-			margin='0 auto'
-			padding={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
-			layerStyle='colorful'
-			flexDir='column'
-			{...rest}
-		>
-			{children}
-		</Flex>
-	) : (
-		<Flex
-			maxW='50ch'
-			m='0 auto'
-			p='1px'
-			flexDir='column'
-			height='auto'
-			layerStyle='colorful'
-			backgroundImage='linear-gradient(90deg,rgb(100, 71, 101) 0%,rgb(33, 74, 112) 100%)'
-		>
-			<Flex
-				position='relative'
-				width='100%'
-				minH='430.4px'
-				padding={{ base: '2rem 0.9rem', md: '2rem 2.6rem' }}
-				flexDir='column'
-				justifyContent='center'
-				layerStyle='colorful'
-				background='#000000c4;'
-				{...rest}
-			>
-				{children}
-			</Flex>
-		</Flex>
-	)
-}
-
-Container.propTypes = {
-	children: PropTypes.node.isRequired,
-	inverted: PropTypes.bool,
+	token: PropTypes.shape({
+		name: PropTypes.string.isRequired,
+		logoURI: PropTypes.string.isRequired,
+		symbol: PropTypes.string.isRequired,
+		// address: PropTypes.string,
+		// decimals: PropTypes.number,
+	}),
+	wallet: PropTypes.object.isRequired,
+	isMetaMask: PropTypes.bool,
 }
 
 const Tokens = ({ inverted = false, ...props }) => {
+	const wallet = useWallet()
+	const isMetaMask = useDetectMetaMask()
+
 	const [isSmallDevice] = useMediaQuery('(min-width: 500px)')
 	const toast = useToast()
-	const wallet = null // useWallet()
 
 	const [activeToken, setToken] = useState(CUSTOM_TOKENS[0])
 	const { hasCopied, onCopy } = useClipboard(activeToken.address)
 
 	const onTokenHover = token => { setToken(token) }
 
-	useEffect(() => {
+	useEffect(async () => {
 		// trigger copy-pasta toast notification
 		if (hasCopied) { toast(copiedContractAddress) }
 	}, [hasCopied])
-
-	console.log('[TOKENS] debug : ', { activeToken })
 
 	return (
 		<Box
 			maxWidth={defaults.layout.container.sm.width}
 			m='0 auto'
-			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
+			p={{ base: '3rem 1.1rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Container inverted={inverted} padding='2rem 0.9rem'>
+
 				<Text
 					align='center'
 					fontSize={{ base: '1.25rem', md: '1.55rem' }}
@@ -180,11 +175,9 @@ const Tokens = ({ inverted = false, ...props }) => {
 					{CUSTOM_TOKENS.map(token => (
 						<Token
 							key={token.symbol}
-							name={token.name}
-							logo={token.logoURI}
-							address={token.address}
-							decimals={token.decimals}
-							symbol={token.symbol}
+							token={token}
+							wallet={wallet}
+							isMetaMask={isMetaMask}
 							onMouseEnter={() => onTokenHover(token)}
 						/>
 					))}
