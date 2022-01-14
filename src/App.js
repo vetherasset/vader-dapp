@@ -43,7 +43,7 @@ const App = () => {
 							<Burn position='relative' zIndex='1'/>
 						}/>
 						<Route path='/tokens' exact render={() =>
-							<Tokens position='relative' zIndex='1'/>
+							<Tokens inverted position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />
