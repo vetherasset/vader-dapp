@@ -109,101 +109,135 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved && tokenBalance && !vethAccountLeafClaimed) {
+			else if (!tokenApproved) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				if ((tokenBalance > 0 && value > 0)) {
-					if(tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
-					(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				if (tokenSelect.symbol === 'VETH' &&
+				tokenBalance &&
+				!vethAccountLeafClaimed) {
+					if ((tokenBalance > 0 && value > 0)) {
+						if((!defaults.redeemables[0].snapshot[wallet.account]) ||
+						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
+							toast(notBurnEligible)
+						}
+						else {
+							setWorking(true)
+							approveERC20ToSpend(
+								tokenSelect.address,
+								defaults.address.converter,
+								vethAllowLess ? value : tokenBalance,
+								provider,
+							).then((tx) => {
+								tx.wait(defaults.network.tx.confirmations)
+									.then(() => {
+										setWorking(false)
+										setTokenApproved(true)
+										toast(approved)
+									})
+									.catch(e => {
+										setWorking(false)
+										if (e.code === 4001) toast(rejected)
+										if (e.code === -32016) toast(exception)
+									})
+							})
+								.catch(err => {
+									setWorking(false)
+									if(err.code === 4001) {
+										console.log('Transaction rejected: Your have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+					}
+					else if (
+						((!defaults.redeemables[0].snapshot[wallet.account]) ||
+						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) &&
+						!vethAllowLess) {
 						toast(notBurnEligible)
 					}
+					else if (vethAllowLess && !value > 0) {
+						toast(noAmount)
+					}
 					else {
-						setWorking(true)
-						approveERC20ToSpend(
-							tokenSelect.address,
-							defaults.address.converter,
-							vethAllowLess ? value : tokenBalance,
-							provider,
-						).then((tx) => {
-							tx.wait(defaults.network.tx.confirmations)
-								.then(() => {
-									setWorking(false)
-									setTokenApproved(true)
-									toast(approved)
-								})
-								.catch(e => {
-									setWorking(false)
-									if (e.code === 4001) toast(rejected)
-									if (e.code === -32016) toast(exception)
-								})
-						})
-							.catch(err => {
-								setWorking(false)
-								if(err.code === 'INSUFFICIENT_FUNDS') {
-									console.log('Insufficient balance: Your account balance is insufficient.')
-									toast(insufficientBalance)
-								}
-								else if(err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
+						toast(insufficientBalance)
 					}
 				}
-				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) && !vethAllowLess) {
-					toast(notBurnEligible)
-				}
-				else if (vethAllowLess && !value > 0) {
-					toast(noAmount)
-				}
-				else {
-					toast(insufficientBalance)
+				if (tokenSelect.symbol !== 'VETH') {
+					setWorking(true)
+					approveERC20ToSpend(
+						tokenSelect.address,
+						tokenSelect.convertsTo.address,
+						defaults.network.erc20.maxApproval,
+						provider,
+					).then((tx) => {
+						tx.wait(defaults.network.tx.confirmations)
+							.then(() => {
+								setWorking(false)
+								setTokenApproved(true)
+								toast(approved)
+							})
+							.catch(e => {
+								setWorking(false)
+								if (e.code === 4001) toast(rejected)
+								if (e.code === -32016) toast(exception)
+							})
+					})
+						.catch(err => {
+							setWorking(false)
+							if(err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
 				}
 			}
-			else if (vethAccountLeafClaimed) {
-				if (tokenSelect.symbol === 'VETH') {
-					if(vester?.[0]?.gt(0)) {
-						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-						setWorking(true)
-						claim(provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									setWorking(false)
-									setVethAccountLeafClaimed(true)
-									toast({
-										...vaderclaimed,
-										description: <Link
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-										duration: defaults.toast.txHashDuration,
-									})
+			else if (tokenSelect.symbol === 'VETH' &&
+			vethAccountLeafClaimed) {
+				if(vester?.[0]?.gt(0)) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					setWorking(true)
+					claim(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								setVethAccountLeafClaimed(true)
+								toast({
+									...vaderclaimed,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
 								})
 							})
-							.catch(err => {
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
-					}
-					else {
-						toast(nothingtoclaim)
-					}
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(nothingtoclaim)
 				}
 			}
 			else if ((value > 0)) {
@@ -258,7 +292,9 @@ const Burn = (props) => {
 					toast(insufficientBalance)
 				}
 			}
-			else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+			else if (tokenSelect.symbol === 'VETH' &&
+			((!defaults.redeemables[0].snapshot[wallet.account]) ||
+			(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
 				toast(notBurnEligible)
 			}
 			else {
@@ -301,12 +337,12 @@ const Burn = (props) => {
 			getERC20Allowance(
 				tokenSelect.address,
 				wallet.account,
-				defaults.address.converter,
+				tokenSelect.symbol === 'VETH' ? defaults.address.converter : tokenSelect.convertsTo.address,
 				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
-				if(!tokenSelect.symbol === 'VETH') {
-					if (n.gt(0) && n.gte(value))	setTokenApproved(true)
+				if(tokenSelect.symbol !== 'VETH') {
+					if (n.gt(0)) setTokenApproved(true)
 				}
 				if (tokenSelect.symbol === 'VETH') {
 					if (n.eq(value)) {
@@ -666,7 +702,7 @@ const Burn = (props) => {
 					>
 						{wallet.account &&
 								<>
-									{!working && tokenSelect && !tokenSelect.symbol === 'VETH' &&
+									{!working && tokenSelect && tokenSelect.symbol !== 'VETH' &&
 										<>
 											{!tokenApproved &&
 												<>
