@@ -2,14 +2,14 @@ import defaults from '../common/defaults'
 import { useXvaderPrice } from './useXvaderPrice'
 import { utils } from 'ethers'
 
-export const useXvaderAPR = (type, basedOnNumberOfRecords, days = 365, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useXvaderAPR = (type = 'Day', basedOnNumberOfRecords, days = 365, pollInterval = defaults.api.graphql.pollInterval) => {
 
-	const [xvaderPrices] = useXvaderPrice(basedOnNumberOfRecords, pollInterval, 'Day')
+	const [xvaderPrices] = useXvaderPrice(basedOnNumberOfRecords, pollInterval, type)
 
 	if(xvaderPrices) {
 		const [currentPrice] = xvaderPrices?.globals
 		const [oldestPrice] = xvaderPrices?.globals?.slice(-1)
-		if(currentPrice && oldestPrice) {
+		if(Number(currentPrice.value) && Number(oldestPrice.value)) {
 			const currentPriceBN = utils.parseUnits(currentPrice.value, 'wei')
 			const oldestPriceBN = utils.parseUnits(oldestPrice.value, 'wei')
 			const daysDifferent = Math.floor((currentPrice.timestamp - oldestPrice.timestamp) / 86400)

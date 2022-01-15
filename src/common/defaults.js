@@ -91,7 +91,7 @@ defaults.network.connectors = {
 		},
 	},
 }
-defaults.network.autoConnect = false
+defaults.network.autoConnect = true
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
@@ -142,7 +142,7 @@ defaults.api.etherscanUrl = (
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
+	defaults.network.chainId === 1 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
 		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
 			undefined
 )
@@ -158,7 +158,7 @@ defaults.address.xvader = (
 )
 defaults.address.usdv = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+		defaults.network.chainId === 42 ? '0x0de905dfb036521f5A45Da90B2D9e8a74a9CE42E' :
 			undefined
 ),
 defaults.address.converter = (
@@ -171,9 +171,19 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
+defaults.address.unlockValidator = (
+	defaults.network.chainId === 1 ? undefined :
+		defaults.network.chainId === 42 ? '0xb2a110fE104bbD0Cf63777234080d9B33a60b935' :
+			undefined
+)
 defaults.address.uniswapTWAP = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xbaa8665dcfcfb4c3428585832755E60C7CA9E857' :
+		defaults.network.chainId === 42 ? '0xf0733c42640a93d7216c45fec99b2ba839afff94' :
+			undefined
+)
+defaults.address.minter = (
+	defaults.network.chainId === 1 ? undefined :
+		defaults.network.chainId === 42 ? '0x17c7309d59514A18Fa623fb0371256a976E5DCE7' :
 			undefined
 )
 
