@@ -243,7 +243,7 @@ defaults.vether = {
 defaults.redeemables = [
 	{
 		...defaults.vether,
-		'convertsTo':'VADER',
+		'convertsTo':defaults.vader,
 		'snapshot':snapshot,
 		'salt':(
 			defaults.network.chainId === 1 ? '13662469' :

@@ -59,7 +59,7 @@ const Burn = (props) => {
 	const [tokenBalance, setTokenBalance] = useState(ethers.BigNumber.from('0'))
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
-	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
 	const [working, setWorking] = useState(false)
 
 	const [vethAllowLess, setVethAllowLess] = useState(false)
@@ -68,38 +68,6 @@ const Burn = (props) => {
 	const [vester, setVester] = useState([])
 
 	const { data: uniswapTWAP, refetch: uniswapTWAPrefetch } = useUniswapTWAP()
-
-	const DrawAmount = () => {
-		return (
-			<>
-				{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
-					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
-					<>
-						{prettifyCurrency(
-							(Number(inputAmount) * Number(conversionFactor)) / 2,
-							0,
-							5,
-							tokenSelect.convertsTo,
-						)}
-						<Box
-							as='h3'
-							fontWeight='bold'
-							textAlign='center'
-							fontSize='1rem'
-						>
-							<Badge
-								as='div'
-								fontSize={{ base: '0.6rem', md: '0.75rem' }}
-								background='rgb(214, 188, 250)'
-								color='rgb(128, 41, 251)'
-							>What You Get
-							</Badge>
-						</Box>
-					</>
-				}
-			</>
-		)
-	}
 
 	const submit = () => {
 		if(!working) {
@@ -320,11 +288,7 @@ const Burn = (props) => {
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
 		}
-		return () => setConversionFactor(ethers.BigNumber.from('0'))
-	}, [tokenSelect, wallet.account])
-
-	useEffect(() => {
-		if (tokenSelect.symbol === 'USDV' || tokenSelect.symbol === 'VADER') {
+		else {
 			uniswapTWAPrefetch()
 			setConversionFactor(uniswapTWAP)
 		}
@@ -358,7 +322,10 @@ const Burn = (props) => {
 			setWorking(false)
 			setTokenApproved(false)
 		}
-	}, [wallet.account, tokenSelect, value])
+	}, [wallet.account,
+		tokenSelect,
+		(tokenSelect.symbol === 'VETH' ? value : ''),
+	])
 
 	useEffect(() => {
 		if (wallet.account && tokenSelect) {
@@ -531,11 +498,25 @@ const Burn = (props) => {
 									}
 								</>
 							}
+							{tokenSelect.symbol !== 'VETH' &&
+								<>
+									<Alert
+										m='1rem 0 1rem'
+										status='warning'>
+										<AlertIcon />
+										<Box flex='1'>
+											<AlertTitle mr={2}>1 burn per 24 hours only</AlertTitle>
+											<AlertDescription>It is allowed to submit only 1 burn transaction per 24 hours.</AlertDescription>
+										</Box>
+									</Alert>
+								</>
+							}
 						</>
 					}
 
 					{((!tokenSelect) ||
-					(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed)) &&
+					(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed)) ||
+					(tokenSelect.symbol !== 'VETH') &&
 						<>
 							<Text
 								as='h4'
@@ -657,13 +638,26 @@ const Burn = (props) => {
 						fontWeight='bolder'
 						justifyContent='center' alignItems='center' flexDir='column'>
 						{inputAmount &&
-								<>
-									{!vethAccountLeafClaimed &&
+							<>
+								{tokenSelect.symbol === 'VETH' &&
+									<>
+										{!vethAccountLeafClaimed &&
 										<>
-											<DrawAmount/>
+											{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
+												Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
+												<>
+													{prettifyCurrency(
+														(Number(inputAmount) * Number(conversionFactor)) / 2,
+														0,
+														5,
+														tokenSelect.convertsTo.symbol,
+													)}
+													<WhatYouGetTag/>
+												</>
+											}
 										</>
-									}
-									{vethAccountLeafClaimed &&
+										}
+										{vethAccountLeafClaimed &&
 										<>
 											{prettifyCurrency(
 												ethers.utils.formatUnits(claimableVeth, 18),
@@ -671,23 +665,25 @@ const Burn = (props) => {
 												5,
 												'VADER',
 											)}
-											<Box
-												as='h3'
-												fontWeight='bold'
-												textAlign='center'
-												fontSize='1rem'
-											>
-												<Badge
-													as='div'
-													fontSize={{ base: '0.6rem', md: '0.75rem' }}
-													background='rgb(214, 188, 250)'
-													color='rgb(128, 41, 251)'
-												>What You Get
-												</Badge>
-											</Box>
+											<WhatYouGetTag/>
 										</>
-									}
-								</>
+										}
+									</>
+								}
+							</>
+						}
+						{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
+							<>
+								{prettifyCurrency(
+									tokenSelect?.symbol === 'USDV' ?
+										(Number(inputAmount) * Number(conversionFactor)) :
+										(Number(inputAmount) * Number(conversionFactor)),
+									0,
+									5,
+									tokenSelect?.convertsTo?.symbol,
+								)}
+								<WhatYouGetTag/>
+							</>
 						}
 					</Flex>
 
@@ -774,6 +770,25 @@ const Burn = (props) => {
 				onClose={onClose}
 			/>
 		</>
+	)
+}
+
+const WhatYouGetTag = () => {
+	return (
+		<Box
+			as='h3'
+			fontWeight='bold'
+			textAlign='center'
+			fontSize='1rem'
+		>
+			<Badge
+				as='div'
+				fontSize={{ base: '0.6rem', md: '0.75rem' }}
+				background='rgb(214, 188, 250)'
+				color='rgb(128, 41, 251)'
+			>What You Get
+			</Badge>
+		</Box>
 	)
 }
 
