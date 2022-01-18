@@ -277,6 +277,7 @@ const Burn = (props) => {
 								tx.wait(
 									defaults.network.tx.confirmations,
 								).then((r) => {
+									uniswapTWAPrefetch()
 									publicFeeRefetch()
 									setWorking(false)
 									toast({
@@ -294,6 +295,7 @@ const Burn = (props) => {
 								})
 							})
 							.catch(err => {
+								uniswapTWAPrefetch()
 								publicFeeRefetch()
 								setWorking(false)
 								if (err.code === 4001) {
@@ -301,6 +303,7 @@ const Burn = (props) => {
 									toast(rejected)
 								}
 								else {
+									uniswapTWAPrefetch()
 									publicFeeRefetch()
 									console.log(err)
 									toast(failed)
@@ -342,6 +345,7 @@ const Burn = (props) => {
 		}
 		else {
 			uniswapTWAPrefetch()
+			publicFeeRefetch()
 			if(uniswapTWAP) setConversionFactor(uniswapTWAP)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
