@@ -760,7 +760,7 @@ const Burn = (props) => {
 						}
 						{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
 							<>
-								{fee && prettifyCurrency(
+								{!isNaN(fee) && prettifyCurrency(
 									tokenSelect?.symbol === 'USDV' ?
 										(ethers.utils.formatEther(
 											ethers.utils.parseEther(String(Number(inputAmount) /
