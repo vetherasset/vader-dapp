@@ -8,6 +8,7 @@ import vaderBond from '../artifacts/abi/vaderBond'
 import zapEth from '../artifacts/abi/zapEth'
 import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 import minter from '../artifacts/abi/minter'
+import IUSDV from '../artifacts/abi/IUSDV'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -352,6 +353,15 @@ const getPublicFee = async () => {
 	return await contract.getPublicFee()
 }
 
+const usdvClaim = async (lockIndex, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		provider.getSigner(0),
+	)
+	return await contract.claim(lockIndex)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -364,5 +374,5 @@ export {
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
 	zapDeposit, getStaleVaderPrice, minterMint,
-	minterBurn, getPublicFee,
+	minterBurn, getPublicFee, usdvClaim,
 }

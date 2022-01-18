@@ -32,7 +32,9 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim, minterMint, minterBurn } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf,
+	getClaimed, getVester, claim, minterMint, minterBurn,
+	usdvClaim } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -791,6 +793,50 @@ const Burn = (props) => {
 							</>
 						}
 					</Flex>
+
+					<Button
+						onClick={() => {
+							setWorking(true)
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+							usdvClaim(
+								'0',
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										uniswapTWAPrefetch()
+										publicFeeRefetch()
+										setWorking(false)
+										toast({
+											...vaderconverted,
+											description: <Link
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+											duration: defaults.toast.txHashDuration,
+										})
+									})
+								})
+								.catch(err => {
+									uniswapTWAPrefetch()
+									publicFeeRefetch()
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: You have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}}
+					>Claim</Button>
 
 					<Button
 						variant='solidRadial'
