@@ -600,9 +600,10 @@ const Burn = (props) => {
 						</>
 					}
 
-					{((!tokenSelect) ||
-					(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed)) ||
-					(tokenSelect.symbol !== 'VETH') &&
+					{(!tokenSelect ||
+						(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed) ||
+						(tokenSelect.symbol !== 'VETH')
+					) &&
 						<>
 							<Text
 								as='h4'
@@ -756,24 +757,36 @@ const Burn = (props) => {
 										}
 									</>
 								}
+								{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
+									<>
+										{fee &&
+											<>
+												{prettifyCurrency(
+													tokenSelect?.symbol === 'USDV' ?
+														(ethers.utils.formatEther(
+															ethers.utils.parseEther(String(Number(inputAmount) /
+													Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+														)) :
+														(ethers.utils.formatEther(
+															ethers.utils.parseEther(String(Number(inputAmount) *
+													Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+														)),
+													0,
+													5,
+													tokenSelect?.convertsTo?.symbol,
+												)}
+											</>
+										}
+										<WhatYouGetTag/>
+									</>
+								}
 							</>
 						}
-						{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
+						{((!tokenSelect) ||
+						(!inputAmount))
+						&&
 							<>
-								{!isNaN(fee) && prettifyCurrency(
-									tokenSelect?.symbol === 'USDV' ?
-										(ethers.utils.formatEther(
-											ethers.utils.parseEther(String(Number(inputAmount) /
-											Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
-										)) :
-										(ethers.utils.formatEther(
-											ethers.utils.parseEther(String(Number(inputAmount) *
-											Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
-										)),
-									0,
-									5,
-									tokenSelect?.convertsTo?.symbol,
-								)}
+								<span>👻</span>
 								<WhatYouGetTag/>
 							</>
 						}
