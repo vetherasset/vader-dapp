@@ -138,7 +138,7 @@ const Burn = (props) => {
 						toast(insufficientBalance)
 					}
 				}
-				if (tokenSelect.symbol !== 'VETH') {
+				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
 					setWorking(true)
 					approveERC20ToSpend(
 						tokenSelect.address,
@@ -397,8 +397,11 @@ const Burn = (props) => {
 				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
-				if(tokenSelect.symbol !== 'VETH') {
+				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
 					if (n.gt(0)) setTokenApproved(true)
+				}
+				if (tokenSelect.symbol === 'USDV') {
+					setTokenApproved(true)
 				}
 				if (tokenSelect.symbol === 'VETH') {
 					if (n.eq(value)) {
