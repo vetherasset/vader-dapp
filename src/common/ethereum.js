@@ -334,6 +334,15 @@ const minterMint = async (vaderAmount, usdvAmountMinOut, provider) => {
 	return await contract.mint(vaderAmount, usdvAmountMinOut)
 }
 
+const minterBurn = async (usdvAmount, vaderAmountMinOut, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.minter,
+		minter,
+		provider.getSigner(0),
+	)
+	return await contract.burn(usdvAmount, vaderAmountMinOut)
+}
+
 const getPublicFee = async () => {
 	const contract = new ethers.Contract(
 		defaults.address.minter,
@@ -355,5 +364,5 @@ export {
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
 	zapDeposit, getStaleVaderPrice, minterMint,
-	getPublicFee,
+	minterBurn, getPublicFee,
 }
