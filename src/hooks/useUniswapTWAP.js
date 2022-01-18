@@ -11,14 +11,14 @@ export const useUniswapTWAP = (rpc = true, pollInterval = defaults.api.graphql.p
 	}
 	else {
 
-		const terms = useQuery('getStaleVaderPrice', async () => {
+		const twap = useQuery('getStaleVaderPrice', async () => {
 			return await getStaleVaderPrice()
 		}, {
 			staleTime: staleTime,
 		},
 		)
 
-		return terms
+		return twap
 	}
 
 }

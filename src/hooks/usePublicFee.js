@@ -11,14 +11,14 @@ export const usePublicFee = (rpc = true, pollInterval = defaults.api.graphql.pol
 	}
 	else {
 
-		const terms = useQuery('getPublicFee', async () => {
+		const fee = useQuery('getPublicFee', async () => {
 			return await getPublicFee()
 		}, {
 			staleTime: staleTime,
 		},
 		)
 
-		return terms
+		return fee
 	}
 
 }
