@@ -32,7 +32,7 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim } from '../common/ethereum'
+import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim, minterMint } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -44,9 +44,11 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	notBurnEligible,
 	nothingtoclaim,
 	nomorethaneligible,
+	vaderconverted,
 } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
+import { usePublicFee } from '../hooks/usePublicFee'
 
 const Burn = (props) => {
 
@@ -68,6 +70,9 @@ const Burn = (props) => {
 	const [vester, setVester] = useState([])
 
 	const { data: uniswapTWAP, refetch: uniswapTWAPrefetch } = useUniswapTWAP()
+	const { data: publicFee, refetch: publicFeeRefetch } = usePublicFee()
+
+	const fee = publicFee?.mul(value).div(1e4)
 
 	const submit = () => {
 		if(!working) {
@@ -211,23 +216,71 @@ const Burn = (props) => {
 			else if ((value > 0)) {
 				if ((tokenBalance.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					if (tokenSelect.symbol === 'VETH' && defaults.redeemables[0].snapshot[wallet.account] &&
-					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+					if (tokenSelect.symbol === 'VETH') {
+						if (defaults.redeemables[0].snapshot[wallet.account] &&
+							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+							setWorking(true)
+							const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
+							convert(
+								proof,
+								defaults.redeemables[0].snapshot[wallet.account],
+								value.mul(ethers.BigNumber.from(conversionFactor)),
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										setWorking(false)
+										setVethAccountLeafClaimed(true)
+										toast({
+											...vethupgraded,
+											description: <Link
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+											duration: defaults.toast.txHashDuration,
+										})
+									})
+								})
+								.catch(err => {
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: You have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+						else {
+							toast(notBurnEligible)
+						}
+					}
+					else if (tokenSelect.symbol === 'USDV') {
+						// 2DO USDV
+					}
+					else {
+						const min = ethers.utils.parseEther(String(Number(inputAmount) *
+						Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee)
 						setWorking(true)
-						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
-						convert(
-							proof,
-							defaults.redeemables[0].snapshot[wallet.account],
-							value.mul(ethers.BigNumber.from(conversionFactor)),
+						minterMint(
+							value,
+							min,
 							provider)
 							.then((tx) => {
 								tx.wait(
 									defaults.network.tx.confirmations,
 								).then((r) => {
+									publicFeeRefetch()
 									setWorking(false)
-									setVethAccountLeafClaimed(true)
 									toast({
-										...vethupgraded,
+										...vaderconverted,
 										description: <Link
 											variant='underline'
 											_focus={{
@@ -241,19 +294,18 @@ const Burn = (props) => {
 								})
 							})
 							.catch(err => {
+								publicFeeRefetch()
 								setWorking(false)
 								if (err.code === 4001) {
 									console.log('Transaction rejected: You have decided to reject the transaction..')
 									toast(rejected)
 								}
 								else {
+									publicFeeRefetch()
 									console.log(err)
 									toast(failed)
 								}
 							})
-					}
-					else {
-						toast(notBurnEligible)
 					}
 				}
 				else {
@@ -290,7 +342,7 @@ const Burn = (props) => {
 		}
 		else {
 			uniswapTWAPrefetch()
-			setConversionFactor(uniswapTWAP)
+			if(uniswapTWAP) setConversionFactor(uniswapTWAP)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect, wallet.account])
@@ -343,7 +395,11 @@ const Burn = (props) => {
 							if(!vethAllowLess) {
 								if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
 									setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
-									setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
+									setInputAmount(
+										ethers.utils.formatUnits(
+											defaults.redeemables[0].snapshot[wallet.account],
+											tokenSelect.decimals,
+										))
 								}
 								else {
 									setValue(data)
@@ -496,19 +552,6 @@ const Burn = (props) => {
 										Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
 										<VethBreakdown claimable={claimableVeth} vethAccountLeafClaimed={vethAccountLeafClaimed} />
 									}
-								</>
-							}
-							{tokenSelect.symbol !== 'VETH' &&
-								<>
-									<Alert
-										m='1rem 0 1rem'
-										status='warning'>
-										<AlertIcon />
-										<Box flex='1'>
-											<AlertTitle mr={2}>1 burn per 24 hours only</AlertTitle>
-											<AlertDescription>It is allowed to submit only 1 burn transaction per 24 hours.</AlertDescription>
-										</Box>
-									</Alert>
 								</>
 							}
 						</>
@@ -674,10 +717,16 @@ const Burn = (props) => {
 						}
 						{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
 							<>
-								{prettifyCurrency(
+								{fee && prettifyCurrency(
 									tokenSelect?.symbol === 'USDV' ?
-										(Number(inputAmount) * Number(conversionFactor)) :
-										(Number(inputAmount) * Number(conversionFactor)),
+										(ethers.utils.formatEther(
+											ethers.utils.parseEther(String(Number(inputAmount) /
+											Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+										)) :
+										(ethers.utils.formatEther(
+											ethers.utils.parseEther(String(Number(inputAmount) *
+											Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+										)),
 									0,
 									5,
 									tokenSelect?.convertsTo?.symbol,

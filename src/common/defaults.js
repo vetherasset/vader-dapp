@@ -135,8 +135,8 @@ defaults.api.graphql.client.uniswapV2 = new ApolloClient({
 defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
-	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
-		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+	defaults.network.chainId === 1 ? 'https://etherscan.io' :
+		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io' :
 			undefined
 )
 
