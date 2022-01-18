@@ -150,6 +150,12 @@ export const WalletConnectionToggle = props => {
 							wallet={wallet}
 							token={defaults.xvader}
 						/>
+						<AddTokenItem
+							name='Add'
+							icon={<AddIcon layerStyle='menuIcon' />}
+							wallet={wallet}
+							token={defaults.usdv}
+						/>
 						<MenuDivider />
 						<MenuItem
 							icon={<CloseIcon layerStyle='menuIcon' />}
