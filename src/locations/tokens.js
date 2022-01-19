@@ -16,7 +16,7 @@ import { copiedContractAddress } from '../messages'
 import useDetectMetaMask from '../hooks/useDetectMetamask'
 import { useWallet } from 'use-wallet'
 
-const CUSTOM_TOKENS = [ defaults.vader, defaults.xvader ]
+const CUSTOM_TOKENS = [ defaults.vader, defaults.xvader, defaults.usdv ]
 const WALLET_STATUS = {
 	DISCONNECTED: 'disconnected',	// no wallet connected (default state)
 	CONNECTING: 'connecting',		// trying to connect to the wallet

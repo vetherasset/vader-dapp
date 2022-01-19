@@ -110,6 +110,13 @@ export const WalletConnectionToggle = props => {
 												src={defaults.xvader.logoURI}
 												alt={`${defaults.xvader.name} token`}
 											/>
+											<Image
+												width='24px'
+												height='24px'
+												mr='5px'
+												src={defaults.usdv.logoURI}
+												alt={`${defaults.usdv.name} token`}
+											/>
 										</Flex>
 										in wallet
 									</Flex>
