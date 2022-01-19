@@ -213,7 +213,7 @@ defaults.usdv = {
 	'name':'USDV',
 	'symbol':'USDV',
 	'decimals':18,
-	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.png',
+	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/usdv/usdv-symbol-w-ring.svg',
 }
 
 defaults.vether = {
