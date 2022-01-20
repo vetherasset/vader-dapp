@@ -35,7 +35,7 @@ import { ChevronDownIcon } from '@chakra-ui/icons'
 import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf,
 	getClaimed, getVester, claim, minterMint, minterBurn,
 	usdvClaim } from '../common/ethereum'
-import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
+import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency, getPercentage } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
 	tokenValueTooSmall,
@@ -599,6 +599,29 @@ const Burn = (props) => {
 									}
 								</>
 							}
+
+							{tokenSelect.symbol !== 'VETH' &&
+								uniswapTWAP &&
+								publicFee &&
+								<>
+									<Breakdown
+										twap={prettifyCurrency(
+											ethers.utils.formatUnits(
+												tokenSelect.symbol === 'USDV' ?
+													ethers.utils.parseEther(
+														String(
+															1 /
+															Number(ethers.utils.formatUnits(uniswapTWAP, 18)),
+														),
+													) : uniswapTWAP,
+												tokenSelect.decimals),
+											0,
+											tokenSelect.symbol === 'USDV' ? 5 : 2,
+											tokenSelect.convertsTo.symbol,
+										)}
+									/>
+								</>
+							}
 						</>
 					}
 
@@ -940,6 +963,66 @@ const WhatYouGetTag = () => {
 			>What You Get
 			</Badge>
 		</Box>
+	)
+}
+
+const Breakdown = (props) => {
+
+	Breakdown.propTypes = {
+		twap: PropTypes.object.string,
+	}
+
+	const { data: publicFee } = usePublicFee()
+
+	return (
+		<>
+			<Text
+				as='h4'
+				fontSize='1.1rem'
+				fontWeight='bolder'
+				mr='0.66rem'
+			>
+				Breakdown
+			</Text>
+
+			<Flex
+				flexDir='column'
+				p='0 0.15rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+			>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							TWAP
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+							{props.twap}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Fee
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{getPercentage(Number(publicFee) * 0.0001, 0, 2)}
+						</Box>
+					</Container>
+				</Flex>
+			</Flex>
+		</>
 	)
 }
 

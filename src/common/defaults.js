@@ -143,7 +143,7 @@ defaults.api.etherscanUrl = (
 defaults.address = {}
 defaults.address.vader = (
 	defaults.network.chainId === 1 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
-		defaults.network.chainId === 42 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
+		defaults.network.chainId === 42 ? '0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F' :
 			undefined
 )
 defaults.address.vether = (
@@ -158,7 +158,7 @@ defaults.address.xvader = (
 )
 defaults.address.usdv = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0x0de905dfb036521f5A45Da90B2D9e8a74a9CE42E' :
+		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
 defaults.address.converter = (
@@ -178,12 +178,12 @@ defaults.address.unlockValidator = (
 )
 defaults.address.uniswapTWAP = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xf0733c42640a93d7216c45fec99b2ba839afff94' :
+		defaults.network.chainId === 42 ? '0xF0733C42640a93D7216c45fec99B2Ba839Afff94' :
 			undefined
 )
 defaults.address.minter = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0x17c7309d59514A18Fa623fb0371256a976E5DCE7' :
+		defaults.network.chainId === 42 ? '0xBeF6975EdB6485965e49eaad5505aFD6b11b5958' :
 			undefined
 )
 
