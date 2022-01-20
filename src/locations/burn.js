@@ -51,6 +51,7 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
 import { usePublicFee } from '../hooks/usePublicFee'
+import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
 
 const Burn = (props) => {
 
@@ -605,20 +606,7 @@ const Burn = (props) => {
 								publicFee &&
 								<>
 									<Breakdown
-										twap={prettifyCurrency(
-											ethers.utils.formatUnits(
-												tokenSelect.symbol === 'USDV' ?
-													ethers.utils.parseEther(
-														String(
-															1 /
-															Number(ethers.utils.formatUnits(uniswapTWAP, 18)),
-														),
-													) : uniswapTWAP,
-												tokenSelect.decimals),
-											0,
-											tokenSelect.symbol === 'USDV' ? 5 : 2,
-											tokenSelect.convertsTo.symbol,
-										)}
+										token={tokenSelect}
 									/>
 								</>
 							}
@@ -969,10 +957,12 @@ const WhatYouGetTag = () => {
 const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
-		twap: PropTypes.object.string,
+		token: PropTypes.object.isRequired,
 	}
 
+	const { data: uniswapTWAP } = useUniswapTWAP()
 	const { data: publicFee } = usePublicFee()
+	const { data: limits } = useMinterDailyLimits()
 
 	return (
 		<>
@@ -1003,7 +993,20 @@ const Breakdown = (props) => {
 						<Box
 							textAlign='right'
 						>
-							{props.twap}
+							{prettifyCurrency(
+								ethers.utils.formatUnits(
+									props.token.symbol === 'USDV' ?
+										ethers.utils.parseEther(
+											String(
+												1 /
+												Number(ethers.utils.formatUnits(uniswapTWAP, 18)),
+											),
+										) : uniswapTWAP,
+									props.token.decimals),
+								0,
+								props.token.symbol === 'USDV' ? 5 : 2,
+								props.token.convertsTo.symbol,
+							)}
 						</Box>
 					</Container>
 				</Flex>
@@ -1017,7 +1020,52 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='right'>
-							{getPercentage(Number(publicFee) * 0.0001, 0, 2)}
+							{getPercentage(Number(publicFee ? publicFee * 0.0001 : 0), 0, 2)}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Daily limit
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{props.token.symbol === 'VADER' &&
+								<>
+									{limits?.[1] &&
+										<>
+											{prettifyCurrency(ethers.utils.formatUnits(limits?.[1], 18), 0, 2, 'USDV')}
+										</>
+									}
+								</>
+							}
+							{props.token.symbol === 'USDV' &&
+								<>
+									{limits?.[2] &&
+										<>
+											{prettifyCurrency(ethers.utils.formatUnits(limits?.[2], 18), 0, 2, 'USDV')}
+										</>
+									}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Lock duration
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
 						</Box>
 					</Container>
 				</Flex>
