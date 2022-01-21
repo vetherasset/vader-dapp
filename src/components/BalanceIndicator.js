@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useQuery } from 'react-query'
 import { BigNumber, utils } from 'ethers'
 import { Button, Box, Image, Fade, Popover, PopoverTrigger,
 	Portal, PopoverContent,
 	PopoverBody, Flex, Container, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
-import { useWallet } from 'use-wallet'
 import { useXvaderPrice } from '../hooks/useXvaderPrice'
-import { getERC20BalanceOf } from '../common/ethereum'
 import { prettifyNumber } from '../common/utils'
+import { useERC20Balance } from '../hooks/useERC20Balance'
 
 const Item = (props) => {
 
@@ -57,39 +55,14 @@ const Item = (props) => {
 
 export const BalanceIndicator = () => {
 
-	const wallet = useWallet()
 	const xvdrExchangeRate = useXvaderPrice()
-
-	const vaderBalance = useQuery(`${defaults.vader.address}_erc20Balanceof_${wallet?.account}`,
-		async () => {
-			if (wallet.account) {
-				return await getERC20BalanceOf(
-					defaults.vader.address,
-					wallet.account,
-					defaults.network.provider,
-				)
-			}
-		}, {
-			staleTime: defaults.api.staleTime,
-		},
-	)
-
-	const xvaderBalance = useQuery(`${defaults.xvader.address}_erc20Balanceof_${wallet?.account}`,
-		async () => {
-			if (wallet.account) {
-				return await getERC20BalanceOf(
-					defaults.xvader.address,
-					wallet.account,
-					defaults.network.provider,
-				)
-			}
-		}, {
-			staleTime: defaults.api.staleTime,
-		},
-	)
+	const vaderBalance = useERC20Balance(defaults.vader.address)
+	const xvaderBalance = useERC20Balance(defaults.xvader.address)
 
 	const totalBalance = (total = true) => {
-		if (xvdrExchangeRate?.[0]?.global.value && xvaderBalance.data && vaderBalance.data) {
+		if (xvdrExchangeRate?.[0]?.global.value &&
+			xvaderBalance.data &&
+			vaderBalance.data) {
 			return utils.formatEther(
 				BigNumber.from(xvdrExchangeRate?.[0]?.global?.value)
 					.mul(xvaderBalance?.data)

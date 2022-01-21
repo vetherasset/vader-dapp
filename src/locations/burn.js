@@ -53,6 +53,7 @@ import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
 import { usePublicFee } from '../hooks/usePublicFee'
 import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
 import { useMinter } from '../hooks/useMinter'
+import { useERC20Balance } from '../hooks/useERC20Balance'
 
 const Burn = (props) => {
 
@@ -63,6 +64,7 @@ const Burn = (props) => {
 	const [tokenSelect, setTokenSelect] = useState(false)
 	const [tokenApproved, setTokenApproved] = useState(false)
 	const [tokenBalance, setTokenBalance] = useState(ethers.BigNumber.from('0'))
+	const balance = useERC20Balance(tokenSelect?.address)
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
 	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
@@ -76,7 +78,6 @@ const Burn = (props) => {
 	const { data: minter } = useMinter()
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
-
 	const fee = publicFee?.data?.mul(value).div(1e4)
 
 	const submit = () => {
@@ -281,6 +282,7 @@ const Burn = (props) => {
 								).then((r) => {
 									uniswapTWAP?.refetch()
 									publicFee?.refetch()
+									balance?.refetch()
 									setWorking(false)
 									toast({
 										...vaderconverted,
@@ -324,6 +326,7 @@ const Burn = (props) => {
 								).then((r) => {
 									uniswapTWAP?.refetch()
 									publicFee?.refetch()
+									balance?.refetch()
 									setWorking(false)
 									toast({
 										...vaderconverted,
