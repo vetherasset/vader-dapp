@@ -58,11 +58,12 @@ export const BalanceIndicator = () => {
 	const xvdrExchangeRate = useXvaderPrice()
 	const vaderBalance = useERC20Balance(defaults.vader.address)
 	const xvaderBalance = useERC20Balance(defaults.xvader.address)
+	const usdvBalance = useERC20Balance(defaults.usdv.address)
 
 	const totalBalance = (total = true) => {
 		if (xvdrExchangeRate?.[0]?.global.value &&
-			xvaderBalance.data &&
-			vaderBalance.data) {
+			xvaderBalance?.data &&
+			vaderBalance?.data) {
 			return utils.formatEther(
 				BigNumber.from(xvdrExchangeRate?.[0]?.global?.value)
 					.mul(xvaderBalance?.data)
@@ -108,6 +109,7 @@ export const BalanceIndicator = () => {
 										borderRadius='12px'
 										background='#000'
 										p='7px 11px'
+										gridGap='13px'
 									>
 										<Box d='flex' alignItems='center'>
 											<Image
@@ -124,6 +126,23 @@ export const BalanceIndicator = () => {
 												fontWeight='bold'
 												textTransform='capitalize'>
 												{prettifyNumber(totalBalance(true), 0, 2)}
+											</Box>
+										</Box>
+										<Box d='flex' alignItems='center'>
+											<Image
+												width='24px'
+												height='24px'
+												mr='5px'
+												src={defaults.usdv.logoURI}
+												alt={`${defaults.usdv.name} token`}
+											/>
+											<Box
+												as='h3'
+												m='0'
+												fontSize='1.02rem'
+												fontWeight='bold'
+												textTransform='capitalize'>
+												{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2)}
 											</Box>
 										</Box>
 									</Box>
@@ -161,6 +180,14 @@ export const BalanceIndicator = () => {
 											name={'Balance'}
 											token={defaults.vader}
 											value={prettifyNumber(utils.formatEther(vaderBalance.data), 0, 2)}
+										/>
+									}
+
+									{usdvBalance.data.gt(0) &&
+										<Item
+											name={'Balance'}
+											token={defaults.usdv}
+											value={prettifyNumber(utils.formatEther(usdvBalance.data), 0, 2)}
 										/>
 									}
 								</PopoverBody>
