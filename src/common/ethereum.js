@@ -317,13 +317,22 @@ const zapDeposit = async (zapContractAddress, amount, minPayout, provider) => {
 	return await contract.zap(minPayout, options)
 }
 
-const getStaleVaderPrice = async () => {
+const getStaleVaderPrice = async (twapAddress) => {
 	const contract = new ethers.Contract(
-		defaults.address.uniswapTWAP,
+		twapAddress,
 		uniswapTWAP,
 		defaults.network.provider,
 	)
 	return await contract.getStaleVaderPrice()
+}
+
+const getMinterLbt = async () => {
+	const contract = new ethers.Contract(
+		defaults.address.minter,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.lbt()
 }
 
 const minterMint = async (vaderAmount, usdvAmountMinOut, provider) => {
@@ -382,7 +391,7 @@ export {
 	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
-	zapDeposit, getStaleVaderPrice, minterMint,
-	minterBurn, getPublicFee, usdvClaim,
+	zapDeposit, getStaleVaderPrice, getMinterLbt,
+	minterMint, minterBurn, getPublicFee, usdvClaim,
 	getMinterDailyLimits,
 }

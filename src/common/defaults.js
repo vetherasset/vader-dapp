@@ -176,11 +176,6 @@ defaults.address.unlockValidator = (
 		defaults.network.chainId === 42 ? '0xb2a110fE104bbD0Cf63777234080d9B33a60b935' :
 			undefined
 )
-defaults.address.uniswapTWAP = (
-	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xF0733C42640a93D7216c45fec99B2Ba839Afff94' :
-			undefined
-)
 defaults.address.minter = (
 	defaults.network.chainId === 1 ? undefined :
 		defaults.network.chainId === 42 ? '0xBeF6975EdB6485965e49eaad5505aFD6b11b5958' :
