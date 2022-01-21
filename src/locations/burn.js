@@ -52,6 +52,7 @@ import { useClaimableVeth } from '../hooks/useClaimableVeth'
 import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
 import { usePublicFee } from '../hooks/usePublicFee'
 import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
+import { useMinter } from '../hooks/useMinter'
 
 const Burn = (props) => {
 
@@ -72,6 +73,7 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
+	const { data: minter } = useMinter()
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 
@@ -271,6 +273,7 @@ const Burn = (props) => {
 							value,
 							ethers.utils.parseEther(String(Number(inputAmount) /
 							Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+							minter,
 							provider)
 							.then((tx) => {
 								tx.wait(
@@ -313,6 +316,7 @@ const Burn = (props) => {
 							value,
 							ethers.utils.parseEther(String(Number(inputAmount) *
 							Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+							minter,
 							provider)
 							.then((tx) => {
 								tx.wait(
