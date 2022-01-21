@@ -32,7 +32,7 @@ import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf,
+import { getERC20Allowance, convert, approveERC20ToSpend,
 	getClaimed, getVester, claim, minterMint, minterBurn,
 	usdvClaim } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency, getPercentage } from '../common/utils'
@@ -63,7 +63,6 @@ const Burn = (props) => {
 	const [isSelect, setIsSelect] = useState(-1)
 	const [tokenSelect, setTokenSelect] = useState(false)
 	const [tokenApproved, setTokenApproved] = useState(false)
-	const [tokenBalance, setTokenBalance] = useState(ethers.BigNumber.from('0'))
 	const balance = useERC20Balance(tokenSelect?.address)
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
@@ -91,9 +90,9 @@ const Burn = (props) => {
 			else if (!tokenApproved) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if (tokenSelect.symbol === 'VETH' &&
-				tokenBalance &&
+				balance?.data &&
 				!vethAccountLeafClaimed) {
-					if ((tokenBalance > 0 && value > 0)) {
+					if ((balance?.data > 0 && value > 0)) {
 						if((!defaults.redeemables[0].snapshot[wallet.account]) ||
 						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
 							toast(notBurnEligible)
@@ -103,7 +102,7 @@ const Burn = (props) => {
 							approveERC20ToSpend(
 								tokenSelect.address,
 								defaults.address.converter,
-								vethAllowLess ? value : tokenBalance,
+								vethAllowLess ? value : balance?.data,
 								provider,
 							).then((tx) => {
 								tx.wait(defaults.network.tx.confirmations)
@@ -220,7 +219,7 @@ const Burn = (props) => {
 				}
 			}
 			else if ((value > 0)) {
-				if ((tokenBalance.gte(value))) {
+				if ((balance?.data?.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					if (tokenSelect.symbol === 'VETH') {
 						if (defaults.redeemables[0].snapshot[wallet.account] &&
@@ -433,41 +432,24 @@ const Burn = (props) => {
 	])
 
 	useEffect(() => {
-		if (wallet.account && tokenSelect) {
-			setWorking(true)
-			getERC20BalanceOf(
-				tokenSelect.address,
-				wallet.account,
-				defaults.network.provider,
-			)
-				.then(data => {
-					setTokenBalance(data)
-					if (tokenSelect.symbol === 'VETH') {
-						setWorking(false)
-						if (defaults.redeemables[0].snapshot[wallet.account]) {
-							if(!vethAllowLess) {
-								if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
-									setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
-									setInputAmount(
-										ethers.utils.formatUnits(
-											defaults.redeemables[0].snapshot[wallet.account],
-											tokenSelect.decimals,
-										))
-								}
-								else {
-									setValue(data)
-									setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
-								}
-							}
-						}
+		if (tokenSelect.symbol === 'VETH') {
+			if (defaults.redeemables[0].snapshot[wallet.account]) {
+				if(!vethAllowLess) {
+					if (balance.data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
+						setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
+						setInputAmount(
+							ethers.utils.formatUnits(
+								defaults.redeemables[0].snapshot[wallet.account],
+								tokenSelect.decimals,
+							))
 					}
-				})
-				.catch((err) => {
-					setWorking(false)
-					console.log(err)
-				})
+					else {
+						setValue(balance.data)
+						setInputAmount(ethers.utils.formatUnits(balance.data, tokenSelect.decimals))
+					}
+				}
+			}
 		}
-		return () => setTokenBalance(ethers.BigNumber.from('0'))
 	}, [wallet.account, tokenSelect, vethAllowLess])
 
 	useEffect(() => {
