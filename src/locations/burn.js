@@ -72,10 +72,10 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
-	const { data: uniswapTWAP, refetch: uniswapTWAPrefetch } = useUniswapTWAP()
-	const { data: publicFee, refetch: publicFeeRefetch } = usePublicFee()
+	const uniswapTWAP = useUniswapTWAP()
+	const publicFee = usePublicFee()
 
-	const fee = publicFee?.mul(value).div(1e4)
+	const fee = publicFee?.data?.mul(value).div(1e4)
 
 	const submit = () => {
 		if(!working) {
@@ -276,8 +276,8 @@ const Burn = (props) => {
 								tx.wait(
 									defaults.network.tx.confirmations,
 								).then((r) => {
-									uniswapTWAPrefetch()
-									publicFeeRefetch()
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
 									setWorking(false)
 									toast({
 										...vaderconverted,
@@ -294,8 +294,8 @@ const Burn = (props) => {
 								})
 							})
 							.catch(err => {
-								uniswapTWAPrefetch()
-								publicFeeRefetch()
+								uniswapTWAP?.refetch()
+								publicFee?.refetch()
 								setWorking(false)
 								if (err.code === 4001) {
 									console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -318,8 +318,8 @@ const Burn = (props) => {
 								tx.wait(
 									defaults.network.tx.confirmations,
 								).then((r) => {
-									uniswapTWAPrefetch()
-									publicFeeRefetch()
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
 									setWorking(false)
 									toast({
 										...vaderconverted,
@@ -336,8 +336,8 @@ const Burn = (props) => {
 								})
 							})
 							.catch(err => {
-								uniswapTWAPrefetch()
-								publicFeeRefetch()
+								uniswapTWAP?.refetch()
+								publicFee?.refetch()
 								setWorking(false)
 								if (err.code === 4001) {
 									console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -382,10 +382,10 @@ const Burn = (props) => {
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
 		}
-		else {
-			uniswapTWAPrefetch()
-			publicFeeRefetch()
-			if(uniswapTWAP) setConversionFactor(uniswapTWAP)
+		else if (tokenSelect) {
+			uniswapTWAP?.refetch()
+			publicFee?.refetch()
+			if(uniswapTWAP.data) setConversionFactor(uniswapTWAP.data)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
 	}, [tokenSelect, wallet.account])
@@ -816,8 +816,8 @@ const Burn = (props) => {
 									tx.wait(
 										defaults.network.tx.confirmations,
 									).then((r) => {
-										uniswapTWAPrefetch()
-										publicFeeRefetch()
+										uniswapTWAP?.refetch()
+										publicFee?.refetch()
 										setWorking(false)
 										toast({
 											...vaderconverted,
@@ -834,8 +834,8 @@ const Burn = (props) => {
 									})
 								})
 								.catch(err => {
-									uniswapTWAPrefetch()
-									publicFeeRefetch()
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
 									setWorking(false)
 									if (err.code === 4001) {
 										console.log('Transaction rejected: You have decided to reject the transaction..')

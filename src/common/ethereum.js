@@ -326,36 +326,45 @@ const getStaleVaderPrice = async (twapAddress) => {
 	return await contract.getStaleVaderPrice()
 }
 
-const getMinterLbt = async () => {
+const getMinter = async () => {
 	const contract = new ethers.Contract(
-		defaults.address.minter,
+		defaults.usdv.address,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.minter()
+}
+
+const getMinterLbt = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
 		minter,
 		defaults.network.provider,
 	)
 	return await contract.lbt()
 }
 
-const minterMint = async (vaderAmount, usdvAmountMinOut, provider) => {
+const minterMint = async (vaderAmount, usdvAmountMinOut, minterAddress, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.minter,
+		minterAddress,
 		minter,
 		provider.getSigner(0),
 	)
 	return await contract.mint(vaderAmount, usdvAmountMinOut)
 }
 
-const minterBurn = async (usdvAmount, vaderAmountMinOut, provider) => {
+const minterBurn = async (usdvAmount, vaderAmountMinOut, minterAddress, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.minter,
+		minterAddress,
 		minter,
 		provider.getSigner(0),
 	)
 	return await contract.burn(usdvAmount, vaderAmountMinOut)
 }
 
-const getPublicFee = async () => {
+const getPublicFee = async (minterAddress) => {
 	const contract = new ethers.Contract(
-		defaults.address.minter,
+		minterAddress,
 		minter,
 		defaults.network.provider,
 	)
@@ -371,9 +380,9 @@ const usdvClaim = async (lockIndex, provider) => {
 	return await contract.claim(lockIndex)
 }
 
-const getMinterDailyLimits = async () => {
+const getMinterDailyLimits = async (minterAddress) => {
 	const contract = new ethers.Contract(
-		defaults.address.minter,
+		minterAddress,
 		minter,
 		defaults.network.provider,
 	)
@@ -391,7 +400,7 @@ export {
 	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
-	zapDeposit, getStaleVaderPrice, getMinterLbt,
-	minterMint, minterBurn, getPublicFee, usdvClaim,
-	getMinterDailyLimits,
+	zapDeposit, getStaleVaderPrice, getMinter,
+	getMinterLbt, minterMint, minterBurn,
+	getPublicFee, usdvClaim, getMinterDailyLimits,
 }

@@ -171,16 +171,6 @@ defaults.address.linearVesting = (
 		defaults.network.chainId === 42 ? '0xDaA4B82D5Bdd315a3191B080E26ff7A88eb8034E' :
 			undefined
 )
-defaults.address.unlockValidator = (
-	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xb2a110fE104bbD0Cf63777234080d9B33a60b935' :
-			undefined
-)
-defaults.address.minter = (
-	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xBeF6975EdB6485965e49eaad5505aFD6b11b5958' :
-			undefined
-)
 
 defaults.address.uniswapV2 = {}
 defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
