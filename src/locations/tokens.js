@@ -104,9 +104,9 @@ const Token = ({ token, wallet, isMetaMask, ...rest }) => {
 
 				onClick={addToWallet}
 			>
-				{isMetaMask
-					? isConnected ? 'Add to wallet' : 'Connect wallet'
-					: 'Only in MetaMask'
+				{isConnected
+					? isMetaMask ? 'Add to wallet' : 'Only in MetaMask'
+					: 'Connect wallet'
 				}
 			</Button>
 
@@ -121,8 +121,8 @@ Token.propTypes = {
 		name: PropTypes.string.isRequired,
 		logoURI: PropTypes.string.isRequired,
 		symbol: PropTypes.string.isRequired,
-		// address: PropTypes.string,
-		// decimals: PropTypes.number,
+		address: PropTypes.string,
+		decimals: PropTypes.number,
 	}),
 	wallet: PropTypes.object.isRequired,
 	isMetaMask: PropTypes.bool,
