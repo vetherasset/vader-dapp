@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 
-export const detectWeb3Provider = async (timeout = 1000, options = {}) => {
+export const detectWeb3Provider = async (timeout = 3000, options = {}) => {
 	const provider = await detectEthereumProvider({ timeout, ...options })
 	return provider ? provider : false
 }
 
-export const detectMetaMask = async (timeout = 1000) => {
+export const detectMetaMask = async (timeout = 3000) => {
 	const metamask = await detectWeb3Provider(timeout, { mustBeMetaMask: true })
 	return metamask ? true : false
 }
