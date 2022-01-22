@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useWallet } from 'use-wallet'
 import { detectMetaMask } from './useDetectProvider'
 
-const useDetectMetaMask = () => {
+export const useDetectMetaMaskAnytime = () => {
 	const [isMetaMaskInstalled, setInstall] = useState()
 
 	useEffect(() => {
@@ -14,6 +15,19 @@ const useDetectMetaMask = () => {
 	}, [])
 
 	return isMetaMaskInstalled
+}
+
+export const useDetectMetaMask = () => {
+	const wallet = useWallet()
+	const [isMetaMask, setMetamask] = useState()
+
+	const { providerInfo } = wallet
+
+	useEffect(() => {
+		setMetamask(providerInfo?.id === 'metamask')
+	}, [providerInfo])
+
+	return isMetaMask
 }
 
 export default useDetectMetaMask
