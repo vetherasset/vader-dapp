@@ -643,6 +643,14 @@ const Burn = (props) => {
 												tokenSelect !== 'VETH' && submitOption ? 'not-allowed' :
 													''
 								}
+								opacity={
+									!tokenSelect ? '0.5' :
+										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
+										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? '0.5' :
+											tokenSelect.symbol === 'VETH' && !vethAllowLess ? '0.5' :
+												tokenSelect !== 'VETH' && submitOption ? '0.5' :
+													'1'
+								}
 							>
 								<Box flex='1'>
 									<InputGroup>
@@ -701,9 +709,7 @@ const Burn = (props) => {
 										borderBottomLeftRadius='0.375rem'
 										paddingInlineStart='0.5rem'
 										paddingInlineEnd='0.5rem'
-										transitionProperty='var(--chakra-transition-property-common)'
-										transitionDuration='var(--chakra-transition-duration-normal)'
-										opacity={tokenSelect !== 'VETH' && submitOption ? '0' : '1'}
+										display={tokenSelect !== 'VETH' && submitOption ? 'none' : 'flex'}
 									>
 										<Flex
 											cursor='default'
@@ -731,10 +737,20 @@ const Burn = (props) => {
 								</Box>
 							</Flex>
 
-							<SubmitOptions
-								set={setSubmitOption}
-								setting={submitOption}
-							/>
+							{tokenSelect?.symbol !== 'VETH' &&
+								<>
+									<SubmitOptions
+										pointerEvents={!tokenSelect ? 'none' :
+											''}
+										opacity={
+											!tokenSelect ? '0.5' :
+												'1'
+										}
+										set={setSubmitOption}
+										setting={submitOption}
+									/>
+								</>
+							}
 
 							{tokenSelect && tokenSelect.symbol === 'VETH' &&
 							<VethAllowLessOption
@@ -1344,6 +1360,7 @@ const RadioCard = (props) => {
 		children: PropTypes.any,
 		set: PropTypes.func.isRequired,
 		setting: PropTypes.bool.isRequired,
+		pointerEvents: PropTypes.string,
 	}
 
 	const { getInputProps, getCheckboxProps } = useRadio(props)
@@ -1353,18 +1370,16 @@ const RadioCard = (props) => {
 	return (
 		<>
 			<Box as='label' width='100%'>
-				<input
-					onClick={() => props.set(!props.setting)}
-					{...input} />
+				<input {...input}/>
 				<Box
 					{...checkbox}
-					cursor='pointer'
+
 					borderWidth='1px'
 					borderRadius='12px'
 					fontWeight='600'
 					textAlign='center'
-					transitionProperty='var(--chakra-transition-property-common)'
-					transitionDuration='var(--chakra-transition-duration-normal)'
+					cursor='pointer'
+					pointerEvents={props.pointerEvents}
 					_hover={{
 						background: 'rgba(255,255,255, 0.08)',
 					}}
@@ -1387,6 +1402,8 @@ const SubmitOptions = (props) => {
 	SubmitOptions.propTypes = {
 		set: PropTypes.func.isRequired,
 		setting: PropTypes.bool.isRequired,
+		opacity: PropTypes.string,
+		pointerEvents: PropTypes.string,
 	}
 
 	const options = ['Burn', 'Claim']
@@ -1394,6 +1411,7 @@ const SubmitOptions = (props) => {
 	const { getRootProps, getRadioProps } = useRadioGroup({
 		name: 'action',
 		value: !props.setting ? 'Burn' : 'Claim',
+		onChange: () => props.set(!props.setting),
 	})
 	const group = getRootProps()
 
@@ -1402,6 +1420,8 @@ const SubmitOptions = (props) => {
 			{...group}
 			mt='0.7rem'
 			lineHeight='normal'
+			opacity={props.opacity}
+			pointerEvents={props.pointerEvents}
 		>
 			{options.map((value) => {
 				const radio = getRadioProps({ value })
