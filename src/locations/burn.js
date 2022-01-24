@@ -84,6 +84,12 @@ const Burn = (props) => {
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 	const fee = publicFee?.data?.mul(value).div(1e4)
+	const feeAmount = uniswapTWAP?.data ? Number(
+		1 /
+		Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
+	) * (Number(publicFee?.data * 0.0001) * 100) : false
+
+	console.log(conversionFactor)
 
 	const submit = () => {
 		if(!working) {
@@ -277,8 +283,9 @@ const Burn = (props) => {
 						setWorking(true)
 						minterBurn(
 							value,
-							ethers.utils.parseEther(String(Number(inputAmount) /
-							Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+							ethers.utils.parseEther(String((Number(inputAmount) /
+								Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount),
+							)),
 							minter,
 							provider)
 							.then((tx) => {
@@ -433,10 +440,11 @@ const Burn = (props) => {
 		else if (tokenSelect) {
 			uniswapTWAP?.refetch()
 			publicFee?.refetch()
+			console.log(uniswapTWAP)
 			if(uniswapTWAP.data) setConversionFactor(uniswapTWAP.data)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
-	}, [tokenSelect, wallet.account])
+	}, [tokenSelect, uniswapTWAP.data, wallet.account])
 
 	useEffect(() => {
 		if(wallet.account && tokenSelect) {
@@ -834,15 +842,19 @@ const Burn = (props) => {
 										}
 									</>
 								}
-								{tokenSelect && tokenSelect?.symbol !== 'VETH' &&
+								{tokenSelect && tokenSelect?.symbol !== 'VETH' && !!uniswapTWAP?.data &&
 									<>
-										{fee &&
+										{!!uniswapTWAP?.data && inputAmount && feeAmount && conversionFactor?.gt(0) &&
 											<>
 												{prettifyCurrency(
 													tokenSelect?.symbol === 'USDV' ?
 														(ethers.utils.formatEther(
-															ethers.utils.parseEther(String(Number(inputAmount) /
-													Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+															ethers.utils.parseEther(
+																String(
+																	isFinite(Number(Number(Number(inputAmount) / Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount))) ?
+																		(Number(Number(Number(inputAmount) / Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount))) :
+																		0,
+																)),
 														)) :
 														(ethers.utils.formatEther(
 															ethers.utils.parseEther(String(Number(inputAmount) *
@@ -860,7 +872,8 @@ const Burn = (props) => {
 							</>
 						}
 						{((!tokenSelect) ||
-						(!inputAmount))
+						(!inputAmount) ||
+						(!uniswapTWAP?.data))
 						&&
 							<>
 								<span>👻</span>
