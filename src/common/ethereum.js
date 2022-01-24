@@ -380,6 +380,15 @@ const usdvClaim = async (lockIndex, provider) => {
 	return await contract.claim(lockIndex)
 }
 
+const usdvClaimAll = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		provider.getSigner(0),
+	)
+	return await contract.claimAll()
+}
+
 const getMinterDailyLimits = async (minterAddress) => {
 	const contract = new ethers.Contract(
 		minterAddress,
@@ -403,4 +412,5 @@ export {
 	zapDeposit, getStaleVaderPrice, getMinter,
 	getMinterLbt, minterMint, minterBurn,
 	getPublicFee, usdvClaim, getMinterDailyLimits,
+	usdvClaimAll,
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
+import { useLocalStorage } from 'react-use'
 import {
 	Box,
 	Badge,
@@ -27,6 +28,9 @@ import {
 	AlertDialogBody,
 	AlertDialogFooter,
 	useBreakpointValue,
+	useRadio,
+	useRadioGroup,
+	HStack,
 } from '@chakra-ui/react'
 import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
@@ -34,7 +38,7 @@ import defaults from '../common/defaults'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { getERC20Allowance, convert, approveERC20ToSpend,
 	getClaimed, getVester, claim, minterMint, minterBurn,
-	usdvClaim } from '../common/ethereum'
+	usdvClaimAll } from '../common/ethereum'
 import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency, getPercentage } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
@@ -73,6 +77,8 @@ const Burn = (props) => {
 	const [vethAccountLeafClaimed, setVethAccountLeafClaimed] = useState(false)
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
+
+	const [submitOption, setSubmitOption] = useLocalStorage('acquireSubmitOption23049', false)
 
 	const { data: minter } = useMinter()
 	const uniswapTWAP = useUniswapTWAP()
@@ -499,7 +505,7 @@ const Burn = (props) => {
 						as='h4'
 						fontSize='1.24rem'
 						fontWeight='bolder'>
-							Token to burn
+							Token
 					</Text>
 					<Flex
 						marginBottom='0.7rem'>
@@ -591,12 +597,17 @@ const Burn = (props) => {
 							}
 
 							{tokenSelect.symbol !== 'VETH' &&
-								uniswapTWAP &&
-								publicFee &&
 								<>
-									<Breakdown
-										token={tokenSelect}
-									/>
+									{uniswapTWAP &&
+										publicFee &&
+										!submitOption &&
+											<Breakdown
+												token={tokenSelect}
+											/>
+									}
+									{submitOption &&
+										<BreakdownClaim/>
+									}
 								</>
 							}
 						</>
@@ -617,7 +628,8 @@ const Burn = (props) => {
 										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? '0.5' :
 											tokenSelect.symbol === 'VETH' && !vethAllowLess ? '0.5' :
-												'1'
+												tokenSelect !== 'VETH' && submitOption ? '0.5' :
+													'1'
 								}>
 								Amount
 							</Text>
@@ -628,7 +640,8 @@ const Burn = (props) => {
 										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? 'not-allowed' :
 											tokenSelect.symbol === 'VETH' && !vethAllowLess ? 'not-allowed' :
-												''
+												tokenSelect !== 'VETH' && submitOption ? 'not-allowed' :
+													''
 								}
 							>
 								<Box flex='1'>
@@ -641,7 +654,8 @@ const Burn = (props) => {
 													tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 													(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? true :
 														tokenSelect.symbol === 'VETH' && !vethAllowLess ? true :
-															false
+															tokenSelect !== 'VETH' && submitOption ? true :
+																false
 											}
 											_disabled={{
 												opacity: '0.5',
@@ -687,6 +701,9 @@ const Burn = (props) => {
 										borderBottomLeftRadius='0.375rem'
 										paddingInlineStart='0.5rem'
 										paddingInlineEnd='0.5rem'
+										transitionProperty='var(--chakra-transition-property-common)'
+										transitionDuration='var(--chakra-transition-duration-normal)'
+										opacity={tokenSelect !== 'VETH' && submitOption ? '0' : '1'}
 									>
 										<Flex
 											cursor='default'
@@ -713,6 +730,12 @@ const Burn = (props) => {
 									</InputGroup>
 								</Box>
 							</Flex>
+
+							<SubmitOptions
+								set={setSubmitOption}
+								setting={submitOption}
+							/>
+
 							{tokenSelect && tokenSelect.symbol === 'VETH' &&
 							<VethAllowLessOption
 								allow={vethAllowLess}
@@ -794,13 +817,11 @@ const Burn = (props) => {
 						}
 					</Flex>
 
-					<Button
+					{/* <Button
 						onClick={() => {
 							setWorking(true)
 							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-							usdvClaim(
-								'0',
-								provider)
+							usdvClaimAll(provider)
 								.then((tx) => {
 									tx.wait(
 										defaults.network.tx.confirmations,
@@ -836,7 +857,7 @@ const Burn = (props) => {
 									}
 								})
 						}}
-					>Claim</Button>
+					>Claim</Button> */}
 
 					<Button
 						variant='solidRadial'
@@ -858,7 +879,12 @@ const Burn = (props) => {
 											}
 											{tokenApproved &&
 												<>
-													Burn
+													{submitOption &&
+														<>Claim</>
+													}
+													{!submitOption &&
+														<>Burn</>
+													}
 												</>
 											}
 										</>
@@ -943,14 +969,96 @@ const WhatYouGetTag = () => {
 	)
 }
 
+const BreakdownClaim = () => {
+
+	return (
+		<>
+			<Text
+				as='h4'
+				fontSize='1.1rem'
+				fontWeight='bolder'
+				mr='0.66rem'
+			>
+				Breakdown
+			</Text>
+
+			<Flex
+				flexDir='column'
+				p='0 0.15rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+			>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							Total unclaimed
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Locked
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Locked until
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Lock duration
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+
+						</Box>
+					</Container>
+				</Flex>
+			</Flex>
+		</>
+	)
+}
+
 const Breakdown = (props) => {
 
 	Breakdown.propTypes = {
 		token: PropTypes.object.isRequired,
 	}
 
-	const { data: uniswapTWAP } = useUniswapTWAP()
-	const { data: publicFee } = usePublicFee()
+	const uniswapTWAP = useUniswapTWAP()
+	const publicFee = usePublicFee()
 	const { data: limits } = useMinterDailyLimits()
 
 	return (
@@ -982,20 +1090,24 @@ const Breakdown = (props) => {
 						<Box
 							textAlign='right'
 						>
-							{prettifyCurrency(
-								ethers.utils.formatUnits(
-									props.token.symbol === 'USDV' ?
-										ethers.utils.parseEther(
-											String(
-												1 /
-												Number(ethers.utils.formatUnits(uniswapTWAP, 18)),
-											),
-										) : uniswapTWAP,
-									props.token.decimals),
-								0,
-								props.token.symbol === 'USDV' ? 5 : 2,
-								props.token.convertsTo.symbol,
-							)}
+							{uniswapTWAP.data &&
+								<>
+									{prettifyCurrency(
+										ethers.utils.formatUnits(
+											props.token.symbol === 'USDV' ?
+												ethers.utils.parseEther(
+													String(
+														1 /
+														Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
+													),
+												) : uniswapTWAP?.data,
+											props.token.decimals),
+										0,
+										props.token.symbol === 'USDV' ? 5 : 2,
+										props.token.convertsTo.symbol,
+									)}
+								</>
+							}
 						</Box>
 					</Container>
 				</Flex>
@@ -1009,7 +1121,11 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='right'>
-							{getPercentage(Number(publicFee ? publicFee * 0.0001 : 0), 0, 2)}
+							{publicFee?.data &&
+								<>
+									{getPercentage(Number(publicFee?.data ? publicFee?.data * 0.0001 : 0), 0, 2)}
+								</>
+							}
 						</Box>
 					</Container>
 				</Flex>
@@ -1054,7 +1170,11 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='right'>
-							{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
+							{limits?.[3] &&
+								<>
+									{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
+								</>
+							}
 						</Box>
 					</Container>
 				</Flex>
@@ -1216,6 +1336,85 @@ const VethBreakdown = (props) => {
 				</Flex>
 			</Flex>
 		</>
+	)
+}
+const RadioCard = (props) => {
+
+	RadioCard.propTypes = {
+		children: PropTypes.any,
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+	}
+
+	const { getInputProps, getCheckboxProps } = useRadio(props)
+	const input = getInputProps()
+	const checkbox = getCheckboxProps()
+
+	return (
+		<>
+			<Box as='label' width='100%'>
+				<input
+					onClick={() => props.set(!props.setting)}
+					{...input} />
+				<Box
+					{...checkbox}
+					cursor='pointer'
+					borderWidth='1px'
+					borderRadius='12px'
+					fontWeight='600'
+					textAlign='center'
+					transitionProperty='var(--chakra-transition-property-common)'
+					transitionDuration='var(--chakra-transition-duration-normal)'
+					_hover={{
+						background: 'rgba(255,255,255, 0.08)',
+					}}
+					_checked={{
+						color: 'bluish.300',
+						borderColor: 'bluish.300',
+						borderWidth: '2px',
+					}}
+					p='0.75rem 1.25rem'
+				>
+					{props.children}
+				</Box>
+			</Box>
+		</>
+	)
+}
+
+const SubmitOptions = (props) => {
+
+	SubmitOptions.propTypes = {
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+	}
+
+	const options = ['Burn', 'Claim']
+
+	const { getRootProps, getRadioProps } = useRadioGroup({
+		name: 'action',
+		value: !props.setting ? 'Burn' : 'Claim',
+	})
+	const group = getRootProps()
+
+	return (
+		<HStack
+			{...group}
+			mt='0.7rem'
+			lineHeight='normal'
+		>
+			{options.map((value) => {
+				const radio = getRadioProps({ value })
+				return (
+					<RadioCard
+						set={props.set}
+						setting={props.setting}
+						key={value} {...radio}>
+						{value}
+					</RadioCard>
+				)
+			})}
+		</HStack>
 	)
 }
 
