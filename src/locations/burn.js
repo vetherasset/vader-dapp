@@ -325,10 +325,11 @@ const Burn = (props) => {
 					}
 					else {
 						setWorking(true)
+						const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+						const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
 						minterMint(
 							value,
-							ethers.utils.parseEther(String(Number(inputAmount) *
-							Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+							amount.sub(feeAmount),
 							minter,
 							provider)
 							.then((tx) => {
@@ -849,8 +850,12 @@ const Burn = (props) => {
 																Number(ethers.utils.formatUnits(conversionFactor, 18)))),
 														)) :
 														(ethers.utils.formatEther(
-															ethers.utils.parseEther(String(Number(inputAmount) *
-													Number(ethers.utils.formatUnits(conversionFactor, 18)))),
+															value?.mul(conversionFactor)
+																.div(ethers.utils.parseUnits('1', 18))
+																.sub(
+																	uniswapTWAP?.data?.mul(fee)
+																		.div(ethers.utils.parseUnits('1', 18)),
+																),
 														)),
 													0,
 													5,
