@@ -84,6 +84,8 @@ const Burn = (props) => {
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 	const fee = publicFee?.data?.mul(value).div(1e4)
+	const usdcTWAP = ethers.utils.parseEther(
+		String(1 / Number(ethers.utils.formatUnits(uniswapTWAP?.data ? uniswapTWAP.data : '1', 18))))
 
 	const submit = () => {
 		if(!working) {
@@ -275,16 +277,11 @@ const Burn = (props) => {
 					}
 					else if (tokenSelect.symbol === 'USDV') {
 						setWorking(true)
-						const twap = ethers.utils.parseEther(
-							String(
-								1 /
-								Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
-							),
-						)
-						const minOutput = twap.mul(fee).div(ethers.utils.parseUnits('1', 18))
+						const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+						const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
 						minterBurn(
 							value,
-							minOutput,
+							amount.sub(feeAmount),
 							minter,
 							provider)
 							.then((tx) => {
@@ -846,8 +843,8 @@ const Burn = (props) => {
 												{prettifyCurrency(
 													tokenSelect?.symbol === 'USDV' ?
 														(ethers.utils.formatEther(
-															ethers.utils.parseEther(String(Number(inputAmount) /
-																Number(ethers.utils.formatUnits(conversionFactor, 18)))),
+															(value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18)))
+																.sub(usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))),
 														)) :
 														(ethers.utils.formatEther(
 															value?.mul(conversionFactor)
