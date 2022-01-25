@@ -84,12 +84,6 @@ const Burn = (props) => {
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 	const fee = publicFee?.data?.mul(value).div(1e4)
-	const feeAmount = uniswapTWAP?.data ? Number(
-		1 /
-		Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
-	) * (Number(publicFee?.data * 0.0001) * 100) : false
-
-	console.log(conversionFactor)
 
 	const submit = () => {
 		if(!working) {
@@ -281,11 +275,16 @@ const Burn = (props) => {
 					}
 					else if (tokenSelect.symbol === 'USDV') {
 						setWorking(true)
+						const twap = ethers.utils.parseEther(
+							String(
+								1 /
+								Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
+							),
+						)
+						const minOutput = twap.mul(fee).div(ethers.utils.parseUnits('1', 18))
 						minterBurn(
 							value,
-							ethers.utils.parseEther(String((Number(inputAmount) /
-								Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount),
-							)),
+							minOutput,
 							minter,
 							provider)
 							.then((tx) => {
@@ -438,9 +437,6 @@ const Burn = (props) => {
 			)
 		}
 		else if (tokenSelect) {
-			uniswapTWAP?.refetch()
-			publicFee?.refetch()
-			console.log(uniswapTWAP)
 			if(uniswapTWAP.data) setConversionFactor(uniswapTWAP.data)
 		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
@@ -830,35 +826,31 @@ const Burn = (props) => {
 										</>
 										}
 										{vethAccountLeafClaimed &&
-										<>
-											{prettifyCurrency(
-												ethers.utils.formatUnits(claimableVeth, 18),
-												0,
-												5,
-												'VADER',
-											)}
-											<WhatYouGetTag/>
-										</>
+											<>
+												{prettifyCurrency(
+													ethers.utils.formatUnits(claimableVeth, 18),
+													0,
+													5,
+													'VADER',
+												)}
+												<WhatYouGetTag/>
+											</>
 										}
 									</>
 								}
 								{tokenSelect && tokenSelect?.symbol !== 'VETH' && !!uniswapTWAP?.data &&
 									<>
-										{!!uniswapTWAP?.data && inputAmount && feeAmount && conversionFactor?.gt(0) &&
+										{!!uniswapTWAP?.data && inputAmount && conversionFactor?.gt(0) &&
 											<>
 												{prettifyCurrency(
 													tokenSelect?.symbol === 'USDV' ?
 														(ethers.utils.formatEther(
-															ethers.utils.parseEther(
-																String(
-																	isFinite(Number(Number(Number(inputAmount) / Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount))) ?
-																		(Number(Number(Number(inputAmount) / Number(ethers.utils.formatUnits(conversionFactor, 18))) - (feeAmount))) :
-																		0,
-																)),
+															ethers.utils.parseEther(String(Number(inputAmount) /
+																Number(ethers.utils.formatUnits(conversionFactor, 18)))),
 														)) :
 														(ethers.utils.formatEther(
 															ethers.utils.parseEther(String(Number(inputAmount) *
-													Number(ethers.utils.formatUnits(conversionFactor, 18)))).sub(fee),
+													Number(ethers.utils.formatUnits(conversionFactor, 18)))),
 														)),
 													0,
 													5,
