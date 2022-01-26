@@ -1176,7 +1176,9 @@ const Overview = (props) => {
 						</Flex>
 						{props.bondInfo?.[1] && props.bondInfo?.[1]?.gt(0) &&
 							<Flex>
-								<Container p='0'>
+								<Container
+									maxW='none'
+									p='0'>
 									<Box
 										textAlign='left'
 									>
