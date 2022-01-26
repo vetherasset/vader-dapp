@@ -70,13 +70,13 @@ const Bonds = (props) => {
 							justifyContent='space-between'
 							p='0 12px'
 							minH='34.4px'
-							mb='1rem'
+							mb={{ base: '0.7rem', md: '1rem' }}
 						>
 							<>
 								<Flex>
 									<Text
 										as='h4'
-										fontSize='1.1rem'
+										fontSize={{ base: '0.87rem', md: '1.1rem' }}
 										fontWeight='bolder'>
 											Assets
 									</Text>
@@ -87,7 +87,7 @@ const Bonds = (props) => {
 									<Flex>
 										<Text
 											as='h4'
-											fontSize='1.1rem'
+											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
 											Price
 										</Text>
@@ -95,7 +95,7 @@ const Bonds = (props) => {
 									<Flex>
 										<Text
 											as='h4'
-											fontSize='1.1rem'
+											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
 											ROI
 										</Text>
