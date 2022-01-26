@@ -362,7 +362,7 @@ const Burn = (props) => {
 			<Box
 				maxWidth={defaults.layout.container.sm.width}
 				m='0 auto'
-				p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
+				p={{ base: '5rem .4rem 0', md: '5rem 0 0' }}
 				{...props}
 			>
 				<Flex

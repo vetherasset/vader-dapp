@@ -32,7 +32,7 @@ export const Footer = (props) => {
 	const container = {
 		w: '100%',
 		justifyContent: 'center',
-		mt: '10px',
+		m: '20px 0',
 	}
 
 	return(
