@@ -40,7 +40,7 @@ export const BondItem = (props) => {
 					width='100%'
 					alignItems='center'
 					justifyContent='space-between'
-					p={{ base: '12px 24px', md: '0 24px' }}
+					p={{ base: '12px 11px', md: '0 24px' }}
 					minH='60px'
 					cursor='pointer'
 					animation={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '2.3s ease-in-out infinite bgAnimation' : '' }
@@ -49,7 +49,6 @@ export const BondItem = (props) => {
 					mb='16px'
 					borderRadius='16px'
 					border={ bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '1px solid #ffffff10' : '1px solid #ffffff08' }
-					flexWrap='wrap'
 					_hover={{
 						cursor: 'pointer',
 						background: 'rgba(244, 155, 202, 0.2) none repeat scroll 0% 0%',
@@ -57,16 +56,16 @@ export const BondItem = (props) => {
 					}}
 				>
 					<Flex
-						mb={{
-							base: bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? '0.5rem' : '',
-							md: '0',
-						}}
+						alignItems={{ base: 'center' }}
+						width={{ base: '54%', md: '' }}
+						flexWrap={bondInfo?.[1] && bondInfo?.[1]?.gt(0) ? 'wrap' : '' }
+						fontSize={{ base: '0.75rem', md: '1rem' }}
 						fontWeight='bolder'>
 						<Image
 							width='23px'
 							height='23px'
 							borderRadius='50%'
-							mr='7px'
+							mr={{ base: '3px', md: '7px' }}
 							src={props.token0?.logoURI}
 							alt={`${props.token0?.name} token`}
 						/>
@@ -74,13 +73,15 @@ export const BondItem = (props) => {
 							width='23px'
 							height='23px'
 							borderRadius='50%'
-							mr='10px'
+							mr={{ base: '2px', md: '10px' }}
 							src={props.token1?.logoURI}
 							alt={`${props.token1?.name} token`}
 						/>
 						{props.token0?.symbol}{props.token1 ? ` / ${props.token1.symbol}` : ''}
 						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&
 							<Tag
+								fontSize={{ base: '0.67rem', md: '0.83rem' }}
+								mt={{ base: '3px', md: '' }}
 								ml='10px'
 								borderRadius='11px'
 								variant='subtle'
@@ -99,7 +100,9 @@ export const BondItem = (props) => {
 					>
 						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
-									<Tag colorScheme='gray'>
+									<Tag
+										fontSize={{ base: '0.67rem', md: '0.83rem' }}
+										colorScheme='gray'>
 										{prettifyCurrency(
 											Number(ethers.utils.formatUnits(price, 18)) *
 											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
@@ -108,7 +111,9 @@ export const BondItem = (props) => {
 								</>
 						}
 						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
-							<Tag colorScheme='gray'>
+							<Tag
+								fontSize={{ base: '0.67rem', md: '0.83rem' }}
+								colorScheme='gray'>
 								{getPercentage(calculateDifference(marketPrice, bondPirce))}
 							</Tag>
 						}
