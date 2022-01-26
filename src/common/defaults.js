@@ -2,8 +2,8 @@ import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { QueryClient } from 'react-query'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
-import vaderBonds from '../artifacts/js/vaderBonds'
 import vaderTokens from '../artifacts/json/vaderTokens'
+import { bondsKovan } from '../artifacts/js/vaderBonds'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
@@ -256,7 +256,10 @@ defaults.unstakeable = [
 	...[defaults.xvader],
 ]
 
-defaults.bonds = vaderBonds
+defaults.bonds = defaults.network.chainId === 1 ? bondsKovan :
+	defaults.network.chainId === 42 ? bondsKovan :
+		[]
+
 defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
 defaults.bondZapMinPayoutAllowed = '10000000000000000'
 
