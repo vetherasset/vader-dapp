@@ -6,7 +6,7 @@ import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
 	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement, FormControl, FormLabel } from '@chakra-ui/react'
-import { ArrowBackIcon } from '@chakra-ui/icons'
+import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
@@ -390,13 +390,13 @@ const Bond = (props) => {
 				<Box
 					maxWidth={defaults.layout.container.md.width}
 					m='0 auto'
-					p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
+					p={{ base: '3rem .4rem 0', md: '5rem 0 0' }}
 					{...props}
 				>
 			 <Flex
 						minH='96.3667px'
 						m='0 auto'
-						p='1.8rem'
+						p={{ base: '1.8rem 0', md: '1.8rem' }}
 						flexDir='row'
 						height='auto'
 						justifyContent='space-between'
@@ -906,14 +906,19 @@ const PriceOverview = (props) => {
 				<Box textAlign={{ base: 'center', md: 'left' }}>
 					<Tag
 						width='100%'
-						minH='95.5167px'
+						minH={{ base: 'auto', md: '95.5167px' }}
 						flexDir='column'
 						size='lg'
 						variant='outline'
 						p='18px 0'
 					>
-						<Box fontSize='1rem'>Bond Price</Box>
-						<TagLabel fontSize='2.1rem'>
+						<Box
+							fontSize={{ base: '0.87rem', md: '1rem' }}
+						>
+							Bond Price</Box>
+						<TagLabel
+							fontSize={{ base: '1.3rem', md: '2.1rem' }}
+						>
 							{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									{prettifyCurrency(
@@ -931,14 +936,20 @@ const PriceOverview = (props) => {
 				<Box textAlign={{ base: 'center', md: 'left' }}>
 					<Tag
 						width='100%'
-						minH='95.5167px'
+						minH={{ base: 'auto', md: '95.5167px' }}
 						flexDir='column'
 						size='lg'
 						variant='outline'
 						p='18px 0'
 					>
-						<Box fontSize='1rem'>Market Price</Box>
-						<TagLabel fontSize='2.1rem'>
+						<Box
+							fontSize={{ base: '0.87rem', md: '1rem' }}
+						>
+							Market Price
+						</Box>
+						<TagLabel
+							fontSize={{ base: '1.3rem', md: '2.1rem' }}
+						>
 							{!isNaN(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price)) &&
 									<>
 										{prettifyCurrency(
@@ -1005,6 +1016,21 @@ const Overview = (props) => {
 								</Box>
 							</Container>
 						</Flex>
+						{props.bondInfo?.[1] && props.bondInfo?.[1]?.gt(0) &&
+							<Flex>
+								<Container p='0'>
+									<Box
+										textAlign='left'
+									>
+										Purchased
+										<CheckCircleIcon
+											color='cyan'
+											ml='5px'
+										/>
+									</Box>
+								</Container>
+							</Flex>
+						}
 					</>
 				}
 			</Flex>
