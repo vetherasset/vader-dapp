@@ -116,7 +116,7 @@ defaults.api.graphql.uri.vaderProtocol = (
 )
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/sc0vu/uniswap-v2-kovan' :
 			undefined
 )
 
@@ -173,8 +173,16 @@ defaults.address.linearVesting = (
 )
 
 defaults.address.uniswapV2 = {}
-defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
-defaults.address.uniswapV2.usdcEthPair = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+defaults.address.uniswapV2.vaderEthPair = (
+	defaults.network.chainId === 1 ? '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa' :
+		defaults.network.chainId === 42 ? '0xC42706E83433580dd8d865a30e2Ae61082056007' :
+			undefined
+)
+defaults.address.uniswapV2.usdcEthPair = (
+	defaults.network.chainId === 1 ? '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' :
+		defaults.network.chainId === 42 ? '0x00ba37fd79ba75b631e74de45299bb8021611e22' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
