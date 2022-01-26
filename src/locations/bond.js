@@ -452,7 +452,7 @@ const Bond = (props) => {
 								width={{ base: '100%', md: '50%' }}
 							>
 								<Flex
-									p={{ base: '1.8rem', md: '1.8rem 0.9rem 1.8rem 1.8rem' }}
+									p={{ base: '1.8rem 0.6rem', md: '1.8rem 0.9rem 1.8rem 1.8rem' }}
 									minH='541.217px'
 									justifyContent='space-between'
 									gridGap='5px'
@@ -791,7 +791,7 @@ const Bond = (props) => {
 								width={{ base: '100%', md: '50%' }}
 							>
 								<Flex
-									p={{ base: '1.8rem', md: '1.8rem 1.8rem 1.8rem 0.9rem' }}
+									p={{ base: '1.8rem 0.6rem', md: '1.8rem 1.8rem 1.8rem 0.9rem' }}
 									minH='526.4px'
 									justifyContent='space-between'
 									gridGap='12px'
@@ -822,6 +822,7 @@ const Bond = (props) => {
 										<Button
 											size='lg'
 											w='100%'
+											mb={{ base: '0.9rem', md: '0' }}
 											variant='solidRounded'
 											disabled={working}
 											onClick={() => submit()}

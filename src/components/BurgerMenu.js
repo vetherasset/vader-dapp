@@ -10,7 +10,9 @@ export const BurgerMenu = (props) => {
 		pages: PropTypes.array.isRequired,
 	}
 	return (
-		<Menu>
+		<Menu
+			autoSelect={false}
+		>
 			<MenuButton
 				as={IconButton}
 				aria-label='Options'

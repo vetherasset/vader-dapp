@@ -56,7 +56,7 @@ const Bonds = (props) => {
 					position='relative'
 				>
 					<Box
-						p='0 20px'
+						p={{ base: '0 0.5rem', md: '0 1.2rem' }}
 						display='block'
 						flexDir='column'
 						justifyContent='center'
