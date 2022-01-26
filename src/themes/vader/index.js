@@ -37,9 +37,6 @@ const overrides = {
 			'.chakra-alert button:focus': {
 				boxShadow: '0 0 0 3px #7b7ce0',
 			},
-			'.chakra-toast__inner': {
-				width: '30vw',
-			},
 			h1: {
 				textTransform: 'uppercase',
 				margin: '0 0 1rem',
