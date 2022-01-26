@@ -15,6 +15,7 @@ export const BondItem = (props) => {
 
 	BondItem.propTypes = {
 		address: PropTypes.string.isRequired,
+		principal: PropTypes.object.isRequired,
 		token0: PropTypes.object.isRequired,
 		token1: PropTypes.object,
 		payout: PropTypes.object.isRequired,
@@ -22,13 +23,15 @@ export const BondItem = (props) => {
 
 	const wallet = useWallet()
 	const { data: bondInfo } = useBondInfo(props.address, wallet.account, true)
-	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
+	const [vaderEth] = useUniswapV2Price(props.principal.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
-	const [principalEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair, true)
+	const [principalEth] = useUniswapV2Price(props.principal.address, true)
 	const { data: price } = useBondPrice(props.address)
 	const bondPirce = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
+
+	console.log(principalEth)
 
 	return (
 		<>

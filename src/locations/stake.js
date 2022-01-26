@@ -89,7 +89,7 @@ const Stake = (props) => {
 			minHeight='634.95px'
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
-			p={{ base: '5rem 1.2rem 0', md: '5rem 1.2rem 0' }}
+			p={{ base: '5rem 0.4rem 0', md: '5rem 1.2rem 0' }}
 			{...props}
 		>
 			<Flex
@@ -110,19 +110,23 @@ const Stake = (props) => {
 								<Heading
 									as='h1'
 									size='md'
+									textAlign={{ base: 'center', md: 'left' }}
 									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
 								<Box
 									as='p'
 									mb='0.65rem'
+									textAlign={{ base: 'center', md: 'left' }}
 									fontSize={{ base: '0.9rem', md: '1rem' }}
 								>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
 								<Box
 									as='p'
+									textAlign={{ base: 'center', md: 'left' }}
 									fontSize={{ base: '0.9rem', md: '1rem' }}
 								><b>xVADER</b> is fully composable that can interact with other protocols. By staking <i>VADER</i>, you will be able to participate in governance, get access to ecosystem airdrops, obtain priority whitelist for new <i>VADER</i> ecosystem projects and get paid from liquidity incentives - all by holding the token.
 								</Box>
 								<Box
 									as='p'
+									textAlign={{ base: 'center', md: 'left' }}
 									fontSize={{ base: '0.9rem', md: '1rem' }}>
 									<i>xVADER</i> continuously yields compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.
 								</Box>
