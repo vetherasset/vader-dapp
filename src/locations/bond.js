@@ -5,7 +5,8 @@ import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
-	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement, FormControl, FormLabel } from '@chakra-ui/react'
+	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
+	FormControl, FormLabel, useBreakpointValue } from '@chakra-ui/react'
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
@@ -382,7 +383,7 @@ const Bond = (props) => {
 				setPurchaseValue(ethers.BigNumber.from(0))
 			}
 		}
-	}, [value, useLPTokens])
+	}, [value, useLPTokens, principalEth?.principalPrice])
 
 	if (isBondAddress) {
 		return (
@@ -453,7 +454,7 @@ const Bond = (props) => {
 							>
 								<Flex
 									p={{ base: '1.8rem 0.6rem', md: '1.8rem 0.9rem 1.8rem 1.8rem' }}
-									minH='541.217px'
+									minH={{ base: '', md: '541.217px' }}
 									justifyContent='space-between'
 									gridGap='5px'
 									flexDir='column'>
@@ -491,297 +492,337 @@ const Bond = (props) => {
 									</Tabs>
 
 									<Flex
-										pointerEvents={tabIndex === 1 ? 'none' : ''}
-										opacity={tabIndex === 1 ? '0.55' : '1'}
+										pointerEvents={{ base: '', md: `${tabIndex === 1 ? 'none' : ''}` }}
+										opacity={{ base: '1', md: `${tabIndex === 1 ? '0.55' : '1'}` }}
 										flexDir='column'
 									>
+										{useBreakpointValue({
+											base: <PriceOverview
+												bond={bond}
+											/>,
+											md:	'',
+										})}
+
+										{useBreakpointValue({
+											base: <>
+												{tabIndex === 0 &&
+														<Breakdown
+															value={inputAmount}
+															useLPTokens={useLPTokens}
+															treasuryBalance={treasuryBalance}
+															maxPayout={maxPayout}
+															bond={bond}
+														/>
+												}
+												{tabIndex === 1 &&
+														<Overview
+															bondInfo={bondInfo}
+															pendingPayout={pendingPayout}
+														/>
+												}
+											</>,
+											md:	'',
+										})}
+
 										<Flex
-											alignItems='center'
-											justifyContent='space-between'>
-											<Text
-												as='h4'
-												fontSize={{ base: '1rem', md: '1.24rem' }}
-												fontWeight='bolder'>
-											Amount
-											</Text>
-										</Flex>
-										<Flex
-											layerStyle='inputLike'
+											display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
+											flexDir='column'
 										>
-											<InputGroup>
-												<Input
-													variant='transparent'
-													flex='1'
-													fontSize='1.3rem'
-													fontWeight='bold'
-													placeholder='0.0'
-													value={inputAmount}
-													onChange={(e) => {
-														if (isNaN(e.target.value)) {
-															setInputAmount(prev => prev)
-														}
-														else {
-															setInputAmount(String(e.target.value))
-															if(Number(e.target.value) >= 0) {
-																try {
-																	setValue(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																}
-																catch(err) {
-																	if (err.code === 'NUMERIC_FAULT') {
-																		toast(tokenValueTooSmall)
+											<Flex
+												alignItems='center'
+												justifyContent='space-between'>
+												<Text
+													as='h4'
+													fontSize={{ base: '1rem', md: '1.24rem' }}
+													fontWeight='bolder'>
+													Amount
+												</Text>
+											</Flex>
+											<Flex
+												layerStyle='inputLike'
+											>
+												<InputGroup>
+													<Input
+														variant='transparent'
+														flex='1'
+														fontSize='1.3rem'
+														fontWeight='bold'
+														placeholder='0.0'
+														value={inputAmount}
+														onChange={(e) => {
+															if (isNaN(e.target.value)) {
+																setInputAmount(prev => prev)
+															}
+															else {
+																setInputAmount(String(e.target.value))
+																if(Number(e.target.value) >= 0) {
+																	try {
+																		setValue(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																	}
+																	catch(err) {
+																		if (err.code === 'NUMERIC_FAULT') {
+																			toast(tokenValueTooSmall)
+																		}
 																	}
 																}
 															}
-														}
-													}}/>
-												<InputRightAddon
-													width='auto'
-													borderTopLeftRadius='0.375rem'
-													borderBottomLeftRadius='0.375rem'
-													paddingInlineStart='0.5rem'
-													paddingInlineEnd='0.5rem'
-												>
-													<Flex
-														cursor='default'
-														zIndex='1'
+														}}/>
+													<InputRightAddon
+														width='auto'
+														borderTopLeftRadius='0.375rem'
+														borderBottomLeftRadius='0.375rem'
+														paddingInlineStart='0.5rem'
+														paddingInlineEnd='0.5rem'
 													>
-														<Box d='flex' alignItems='center'>
-															{token0 && token0?.logoURI &&
-																<Image
-																	width='24px'
-																	height='24px'
-																	borderRadius='50%'
-																	mr='5px'
-																	src={token0?.logoURI}
-																	alt={`${token0?.name} token`}
-																/>
-															}
-															{token0?.address && !token0?.logoURI &&
-																<TokenJazzicon address={token0.address} />
-															}
-															<Box
-																as='h3'
-																m='0'
-																fontSize='1.02rem'
-																fontWeight='bold'
-																textTransform='capitalize'>{token0?.symbol}</Box>
-														</Box>
-													</Flex>
-												</InputRightAddon>
-											</InputGroup>
-										</Flex>
-										<Flex
-											mt='.6rem'
-											justifyContent='flex-end'
-											flexDir='row'
-										>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												onClick={() => {
-													setInputAmount(
-														ethers.utils.formatUnits(
-															token0balance.div(100).mul(25),
-															token0.decimals),
-													)
-													setValue(token0balance.div(100).mul(25))
-												}}>
-											25%
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												onClick={() => {
-													setInputAmount(
-														ethers.utils.formatUnits(
-															token0balance.div(100).mul(50),
-															token0.decimals),
-													)
-													setValue(token0balance.div(100).mul(50))
-												}}>
-											50%
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												onClick={() => {
-													setInputAmount(
-														ethers.utils.formatUnits(
-															token0balance.div(100).mul(75),
-															token0.decimals),
-													)
-													setValue(token0balance.div(100).mul(75))
-												}}>
-											75%
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												onClick={() => {
-													setInputAmount(
-														ethers.utils.formatUnits(token0balance, token0.decimals),
-													)
-													setValue(token0balance)
-												}}>
-											MAX
-											</Button>
+														<Flex
+															cursor='default'
+															zIndex='1'
+														>
+															<Box d='flex' alignItems='center'>
+																{token0 && token0?.logoURI &&
+																		<Image
+																			width='24px'
+																			height='24px'
+																			borderRadius='50%'
+																			mr='5px'
+																			src={token0?.logoURI}
+																			alt={`${token0?.name} token`}
+																		/>
+																}
+																{token0?.address && !token0?.logoURI &&
+																		<TokenJazzicon address={token0.address} />
+																}
+																<Box
+																	as='h3'
+																	m='0'
+																	fontSize='1.02rem'
+																	fontWeight='bold'
+																	textTransform='capitalize'>{token0?.symbol}</Box>
+															</Box>
+														</Flex>
+													</InputRightAddon>
+												</InputGroup>
+											</Flex>
+											<Flex
+												mt='.6rem'
+												justifyContent='flex-end'
+												flexDir='row'
+											>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													onClick={() => {
+														setInputAmount(
+															ethers.utils.formatUnits(
+																token0balance.div(100).mul(25),
+																token0.decimals),
+														)
+														setValue(token0balance.div(100).mul(25))
+													}}>
+													25%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													onClick={() => {
+														setInputAmount(
+															ethers.utils.formatUnits(
+																token0balance.div(100).mul(50),
+																token0.decimals),
+														)
+														setValue(token0balance.div(100).mul(50))
+													}}>
+													50%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													onClick={() => {
+														setInputAmount(
+															ethers.utils.formatUnits(
+																token0balance.div(100).mul(75),
+																token0.decimals),
+														)
+														setValue(token0balance.div(100).mul(75))
+													}}>
+													75%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													onClick={() => {
+														setInputAmount(
+															ethers.utils.formatUnits(token0balance, token0.decimals),
+														)
+														setValue(token0balance)
+													}}>
+													MAX
+												</Button>
+											</Flex>
 										</Flex>
 									</Flex>
 
 									<Flex
-										pointerEvents={tabIndex === 1 ? 'none' : ''}
-										opacity={tabIndex === 1 ? '0.55' : '1'}
+										display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
+										mt={{ base: '1.2rem', md: '' }}
 										flexDir='column'
 									>
-										<Text
-											as='h4'
-											fontWeight='bolder'>
-													Slippage Tolerance
-										</Text>
 										<Flex
-											mt='.6rem'
-											justifyContent='flex-start'
-											flexDir='row'
+											pointerEvents={tabIndex === 1 ? 'none' : ''}
+											opacity={tabIndex === 1 ? '0.55' : '1'}
+											flexDir='column'
 										>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: useLPTokens && slippageTol1 === 2 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-														!useLPTokens && slippageTol0 === 4 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													if (useLPTokens) { setSlippageTol1(2), setSlippageTolAmount1('') }
-													if (!useLPTokens) { setSlippageTol0(4), setSlippageTolAmount0('') }
-												}}>
-												{useLPTokens &&
-													<>
-														2%
-													</>
-												}
-												{!useLPTokens &&
-													<>
-														4%
-													</>
-												}
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: useLPTokens && slippageTol1 === 3 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-														!useLPTokens && slippageTol0 === 6 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													if (useLPTokens) { setSlippageTol1(3), setSlippageTolAmount1('') }
-													if (!useLPTokens) { setSlippageTol0(6), setSlippageTolAmount0('') }
-												}}>
-												{useLPTokens &&
-													<>
-														3%
-													</>
-												}
-												{!useLPTokens &&
-													<>
-														6%
-													</>
-												}
-											</Button>
-											<Button
-												variant='outline'
-												size='sm'
-												mr='0.4rem'
-												style={{
-													border: useLPTokens && slippageTol1 === 5 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-														!useLPTokens && slippageTol0 === 8 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-												}}
-												onClick={() => {
-													if (useLPTokens) { setSlippageTol1(5), setSlippageTolAmount1('') }
-													if (!useLPTokens) { setSlippageTol0(8), setSlippageTolAmount0('') }
-												}}>
-												{useLPTokens &&
-													<>
-														5%
-													</>
-												}
-												{!useLPTokens &&
-													<>
-														8%
-													</>
-												}
-											</Button>
-											<InputGroup
-												size='sm'
+											<Text
+												as='h4'
+												fontWeight='bolder'>
+														Slippage Tolerance
+											</Text>
+											<Flex
+												mt='.6rem'
+												justifyContent='flex-start'
+												flexDir='row'
 											>
-												<Input
+												<Button
 													variant='outline'
-													placeholder='Custom'
+													size='sm'
+													mr='0.4rem'
 													style={{
-														border: useLPTokens && ((([2, 3, 5].indexOf(slippageTol1) === -1)) || slippageTolAmount1) ? '2px solid #3fa3fa' :
-															!useLPTokens && ((([4, 6, 8].indexOf(slippageTol0) === -1)) || slippageTolAmount0) ? '2px solid #3fa3fa' : '',
+														border: useLPTokens && slippageTol1 === 2 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+															!useLPTokens && slippageTol0 === 4 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
 													}}
-													value={useLPTokens ? slippageTolAmount1 : slippageTolAmount0}
-													onChange={(e) => {
-														if (isNaN(e.target.value)) {
-															if (useLPTokens) setSlippageTolAmount1(prev => prev)
-															if (!useLPTokens) setSlippageTolAmount0(prev => prev)
-														}
-														else {
-															if (useLPTokens) setSlippageTolAmount1(String(e.target.value))
-															if (!useLPTokens) setSlippageTolAmount0(String(e.target.value))
-															if(Number(e.target.value) >= 0) {
-																try {
-																	if (useLPTokens) setSlippageTol1(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																	if (!useLPTokens) setSlippageTol0(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																}
-																catch(err) {
-																	if (err.code === 'NUMERIC_FAULT') {
-																		console.log('value too small')
+													onClick={() => {
+														if (useLPTokens) { setSlippageTol1(2), setSlippageTolAmount1('') }
+														if (!useLPTokens) { setSlippageTol0(4), setSlippageTolAmount0('') }
+													}}>
+													{useLPTokens &&
+														<>
+															2%
+														</>
+													}
+													{!useLPTokens &&
+														<>
+															4%
+														</>
+													}
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: useLPTokens && slippageTol1 === 3 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+															!useLPTokens && slippageTol0 === 6 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														if (useLPTokens) { setSlippageTol1(3), setSlippageTolAmount1('') }
+														if (!useLPTokens) { setSlippageTol0(6), setSlippageTolAmount0('') }
+													}}>
+													{useLPTokens &&
+														<>
+															3%
+														</>
+													}
+													{!useLPTokens &&
+														<>
+															6%
+														</>
+													}
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: useLPTokens && slippageTol1 === 5 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+															!useLPTokens && slippageTol0 === 8 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														if (useLPTokens) { setSlippageTol1(5), setSlippageTolAmount1('') }
+														if (!useLPTokens) { setSlippageTol0(8), setSlippageTolAmount0('') }
+													}}>
+													{useLPTokens &&
+														<>
+															5%
+														</>
+													}
+													{!useLPTokens &&
+														<>
+															8%
+														</>
+													}
+												</Button>
+												<InputGroup
+													size='sm'
+												>
+													<Input
+														variant='outline'
+														placeholder='Custom'
+														style={{
+															border: useLPTokens && ((([2, 3, 5].indexOf(slippageTol1) === -1)) || slippageTolAmount1) ? '2px solid #3fa3fa' :
+																!useLPTokens && ((([4, 6, 8].indexOf(slippageTol0) === -1)) || slippageTolAmount0) ? '2px solid #3fa3fa' : '',
+														}}
+														value={useLPTokens ? slippageTolAmount1 : slippageTolAmount0}
+														onChange={(e) => {
+															if (isNaN(e.target.value)) {
+																if (useLPTokens) setSlippageTolAmount1(prev => prev)
+																if (!useLPTokens) setSlippageTolAmount0(prev => prev)
+															}
+															else {
+																if (useLPTokens) setSlippageTolAmount1(String(e.target.value))
+																if (!useLPTokens) setSlippageTolAmount0(String(e.target.value))
+																if(Number(e.target.value) >= 0) {
+																	try {
+																		if (useLPTokens) setSlippageTol1(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																		if (!useLPTokens) setSlippageTol0(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																	}
+																	catch(err) {
+																		if (err.code === 'NUMERIC_FAULT') {
+																			console.log('value too small')
+																		}
 																	}
 																}
 															}
-														}
-													}}
-												/>
-												<InputRightElement>
-													<>
-														%
-													</>
-												</InputRightElement>
-											</InputGroup>
+														}}
+													/>
+													<InputRightElement>
+														<>
+															%
+														</>
+													</InputRightElement>
+												</InputGroup>
+											</Flex>
 										</Flex>
-									</Flex>
 
-									<FormControl
-										d='flex'
-										pointerEvents={tabIndex === 1 ? 'none' : ''}
-										opacity={tabIndex === 1 ? '0.55' : '1'}
-										borderTop='1px solid rgb(102, 101, 129)'
-										borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
-										pt='2.1rem'
-										pb={{ base: '2.1rem', md: '0' }}
-										w='100%'
-										flexDir='row'
-										justifyContent='space-between'
-									>
-										<FormLabel
-											htmlFor='useLPTokens'
-											fontWeight='bolder'
+										<FormControl
+											d='flex'
+											pointerEvents={tabIndex === 1 ? 'none' : ''}
+											opacity={tabIndex === 1 ? '0.55' : '1'}
+											mt={{ base: '3.2rem', md: '' }}
+											borderTop='1px solid rgb(102, 101, 129)'
+											borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
+											pt='2.1rem'
+											pb={{ base: '2.1rem', md: '0' }}
+											w='100%'
+											flexDir='row'
+											justifyContent='space-between'
 										>
+											<FormLabel
+												htmlFor='useLPTokens'
+												fontWeight='bolder'
+											>
 											Use LP tokens instead
-										</FormLabel>
-										<Switch
-											id='useLPTokens'
-											size='lg'
-											isChecked={useLPTokens}
-											onChange={() => setUseLPTokens(!useLPTokens)}/>
-									</FormControl>
+											</FormLabel>
+											<Switch
+												id='useLPTokens'
+												size='lg'
+												isChecked={useLPTokens}
+												onChange={() => setUseLPTokens(!useLPTokens)}/>
+										</FormControl>
+									</Flex>
 								</Flex>
 							</Flex>
 
@@ -792,30 +833,145 @@ const Bond = (props) => {
 							>
 								<Flex
 									p={{ base: '1.8rem 0.6rem', md: '1.8rem 1.8rem 1.8rem 0.9rem' }}
-									minH='526.4px'
+									minH={{ base: '', md: '526.4px' }}
 									justifyContent='space-between'
 									gridGap='12px'
 									flexDir='column'>
 
-									<PriceOverview
-										bond={bond}
-									/>
+									{useBreakpointValue({
+										base:	'',
+										md: <PriceOverview
+											bond={bond}
+										/>,
+									})}
+
+									{useBreakpointValue({
+										base:	'',
+										md: <>
+											{tabIndex == 0 &&
+													<Breakdown
+														value={inputAmount}
+														useLPTokens={useLPTokens}
+														treasuryBalance={treasuryBalance}
+														maxPayout={maxPayout}
+														bond={bond}
+													/>
+											}
+											{tabIndex === 1 &&
+													<Overview
+														bondInfo={bondInfo}
+														pendingPayout={pendingPayout}
+													/>
+											}
+										</>,
+									})}
 
 									{tabIndex == 0 &&
-										<Breakdown
-											value={inputAmount}
-											useLPTokens={useLPTokens}
-											treasuryBalance={treasuryBalance}
-											maxPayout={maxPayout}
-											bond={bond}
-										/>
+										<Flex
+											minH='76px'
+											m='1.66rem 0'
+											fontSize={{ base: '1.35rem', md: '1.5rem' }}
+											fontWeight='bolder'
+											justifyContent='center' alignItems='center' flexDir='column'
+										>
+											<Box
+												minH={{ base: '32.4px', md: '36px' }}
+											>
+												{treasuryBalance &&
+													<>
+														{treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
+														<>
+															{purchaseValue !== '' &&
+																prettifyCurrency(
+																	purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
+																	0,
+																	2,
+																	'VADER')
+															}
+														</>
+														}
+														{treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+															<>
+																Sold Out
+															</>
+														}
+													</>
+												}
+											</Box>
+
+											<Box
+												as='h3'
+												fontWeight='bold'
+												textAlign='center'
+												fontSize='1rem'
+											>
+												{treasuryBalance &&
+													<>
+														{treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
+															<>
+																<Badge
+																	as='div'
+																	fontSize={{ base: '0.6rem', md: '0.75rem' }}
+																	background='rgb(214, 188, 250)'
+																	color='rgb(128, 41, 251)'
+																>PURCHASE VALUE
+																</Badge>
+															</>
+														}
+														{treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+															<>
+																<Badge
+																	as='div'
+																	fontSize={{ base: '0.6rem', md: '0.75rem' }}
+																	background='rgb(214, 188, 250)'
+																	color='rgb(128, 41, 251)'
+																>NOT AVAILABLE
+																</Badge>
+															</>
+														}
+													</>
+												}
+											</Box>
+										</Flex>
 									}
 
-									{tabIndex === 1 &&
-										<Overview
-											bondInfo={bondInfo}
-											pendingPayout={pendingPayout}
-										/>
+									{tabIndex == 1 &&
+										<Flex
+											minH='76px'
+											m='1.66rem 0'
+											fontSize={{ base: '1.35rem', md: '1.5rem' }}
+											fontWeight='bolder'
+											justifyContent='center' alignItems='center' flexDir='column'
+										>
+											<Box
+												minH={{ base: '32.4px', md: '36px' }}
+											>
+												{pendingPayout && pendingPayout.gte(0) &&
+													prettifyCurrency(
+														ethers.utils.formatUnits(pendingPayout, defaults.vader.decimals),
+														0,
+														5,
+														'VADER')
+												}
+											</Box>
+
+											<Box
+												as='h3'
+												fontWeight='bold'
+												textAlign='center'
+												fontSize='1rem'
+											>
+												{pendingPayout && pendingPayout.gte(0) &&
+												<Badge
+													as='div'
+													fontSize={{ base: '0.6rem', md: '0.75rem' }}
+													background='rgb(214, 188, 250)'
+													color='rgb(128, 41, 251)'
+												>CLAIMABLE NOW
+												</Badge>
+												}
+											</Box>
+										</Flex>
 									}
 
 									<Flex justifyContent='center'>
@@ -907,7 +1063,7 @@ const PriceOverview = (props) => {
 				<Box textAlign={{ base: 'center', md: 'left' }}>
 					<Tag
 						width='100%'
-						minH={{ base: 'auto', md: '95.5167px' }}
+						minH={{ base: '77.6667px', md: '95.5167px' }}
 						flexDir='column'
 						size='lg'
 						variant='outline'
@@ -980,9 +1136,10 @@ const Overview = (props) => {
 			<Flex
 				flexDir='column'
 				p='0 0.15rem'
+				mt={{ base: '1.2rem', md: '' }}
 				marginBottom='.7rem'
 				opacity='0.87'
-				minH='157.767px'
+				minH={{ base: '', md: '157.767px' }}
 			>
 				{props.bondInfo?.[0]?.gt(0) &&
 					<>
@@ -1019,7 +1176,9 @@ const Overview = (props) => {
 						</Flex>
 						{props.bondInfo?.[1] && props.bondInfo?.[1]?.gt(0) &&
 							<Flex>
-								<Container p='0'>
+								<Container
+									maxW='none'
+									p='0'>
 									<Box
 										textAlign='left'
 									>
@@ -1035,43 +1194,6 @@ const Overview = (props) => {
 					</>
 				}
 			</Flex>
-
-			<Flex
-				minH='76px'
-				m='1.66rem 0'
-				fontSize={{ base: '1.35rem', md: '1.5rem' }}
-				fontWeight='bolder'
-				justifyContent='center' alignItems='center' flexDir='column'
-			>
-				<Box
-					minH={{ base: '32.4px', md: '36px' }}
-				>
-					{props.pendingPayout && props.pendingPayout.gte(0) &&
-							prettifyCurrency(
-								ethers.utils.formatUnits(props.pendingPayout, defaults.vader.decimals),
-								0,
-								5,
-								'VADER')
-					}
-				</Box>
-
-				<Box
-					as='h3'
-					fontWeight='bold'
-					textAlign='center'
-					fontSize='1rem'
-				>
-					{props.pendingPayout && props.pendingPayout.gte(0) &&
-						<Badge
-							as='div'
-							fontSize={{ base: '0.6rem', md: '0.75rem' }}
-							background='rgb(214, 188, 250)'
-							color='rgb(128, 41, 251)'
-						>CLAIMABLE NOW
-						</Badge>
-					}
-				</Box>
-			</Flex>
 		</>
 	)
 }
@@ -1086,7 +1208,6 @@ const Breakdown = (props) => {
 		bond: PropTypes.any.isRequired,
 	}
 
-	const [purchaseValue, setPurchaseValue] = useState('')
 	const { data: bondPrice } = useBondPrice(props.bond?.[0]?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
@@ -1097,32 +1218,12 @@ const Breakdown = (props) => {
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 
-	useEffect(() => {
-		if (Number(props.value) > 0) {
-			if (props.useLPTokens || principalEth?.principalPrice) {
-				bondPayoutFor(
-					String(props.bond?.[0]?.address).toLowerCase(),
-					props.useLPTokens ? ethers.utils.parseUnits(Number(props.value).toFixed(props.bond?.[0].principal?.decimals), props.bond?.[0].principal?.decimals) :
-						ethers.utils.parseUnits(
-							(Number(props.value) / Number(principalEth?.principalPrice)).toFixed(props.bond?.[0].principal?.decimals), props.bond?.[0].principal?.decimals,
-						),
-				)
-					.then(n => {
-						console.log(n)
-						setPurchaseValue(n)
-					})
-			}
-		}
-		else {
-			setPurchaseValue(ethers.BigNumber.from(0))
-		}
-	}, [props.value, props.useLPTokens, principalEth?.principalPrice])
-
 	return (
 		<>
 			<Flex
 				flexDir='column'
 				p='0 0.15rem'
+				mt={{ base: '1.2rem', md: '' }}
 				marginBottom='.7rem'
 				opacity='0.87'
 				minH='133.767px'
@@ -1230,73 +1331,6 @@ const Breakdown = (props) => {
 						}
 					</Container>
 				</Flex>
-			</Flex>
-
-			<Flex
-				minH='76px'
-				m='1.66rem 0'
-				fontSize={{ base: '1.35rem', md: '1.5rem' }}
-				fontWeight='bolder'
-				justifyContent='center' alignItems='center' flexDir='column'
-			>
-				<Box
-					minH={{ base: '32.4px', md: '36px' }}
-				>
-					{props.treasuryBalance &&
-						<>
-							{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
-							<>
-								{purchaseValue !== '' &&
-									prettifyCurrency(
-										purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
-										0,
-										2,
-										'VADER')
-								}
-							</>
-							}
-							{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-								<>
-									Sold Out
-								</>
-							}
-						</>
-					}
-				</Box>
-
-				<Box
-					as='h3'
-					fontWeight='bold'
-					textAlign='center'
-					fontSize='1rem'
-				>
-					{props.treasuryBalance &&
-						<>
-							{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
-								<>
-									<Badge
-										as='div'
-										fontSize={{ base: '0.6rem', md: '0.75rem' }}
-										background='rgb(214, 188, 250)'
-										color='rgb(128, 41, 251)'
-									>PURCHASE VALUE
-									</Badge>
-								</>
-							}
-							{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-								<>
-									<Badge
-										as='div'
-										fontSize={{ base: '0.6rem', md: '0.75rem' }}
-										background='rgb(214, 188, 250)'
-										color='rgb(128, 41, 251)'
-									>NOT AVAILABLE
-									</Badge>
-								</>
-							}
-						</>
-					}
-				</Box>
 			</Flex>
 		</>
 	)

@@ -97,7 +97,6 @@ export const BalanceIndicator = () => {
 									display='flex'
 									flexDirection='row'
 									alignItems='center'
-									minW='84px'
 									transform={{
 										base: 'scale(0.86)',
 										sm: 'scale(1)',
