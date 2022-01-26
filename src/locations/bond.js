@@ -1147,7 +1147,7 @@ const Overview = (props) => {
 							as='h4'
 							fontSize='1.24rem'
 							fontWeight='bolder'>
-						Overview
+								Overview
 						</Text>
 
 						<Flex>
