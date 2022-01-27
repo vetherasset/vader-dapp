@@ -41,7 +41,7 @@ export const Header = (props) => {
 			style={{ justifyContent: 'space-between', alignItems: 'center' }}
 			minH={defaults.layout.header.minHeight}
 			{...props}>
-			<Flex w={{ md: '30%', sm: '30%' }}>
+			<Flex w={{ md: '100%', sm: '30%' }}>
 				<Logotype margin='0 8px 0' />
 			</Flex>
 			<Flex w='auto'
@@ -72,7 +72,7 @@ export const Header = (props) => {
 				}
 			</Flex>
 			<Flex
- 				w={{ md: '30%', sm: '70%' }}
+ 				w={{ md: '100%', sm: '70%' }}
  				justifyContent='flex-end'
 				gridGap={{ base: '7.3px', sm: '17.3px' }}
 			>

@@ -398,6 +398,24 @@ const getMinterDailyLimits = async (minterAddress) => {
 	return await contract.dailyLimits()
 }
 
+const getLockCount = async (address) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.getLockCount(address)
+}
+
+const getLocks = async (address, lockIndex) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.locks(address, lockIndex)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -412,5 +430,5 @@ export {
 	zapDeposit, getStaleVaderPrice, getMinter,
 	getMinterLbt, minterMint, minterBurn,
 	getPublicFee, usdvClaim, getMinterDailyLimits,
-	usdvClaimAll,
+	usdvClaimAll, getLockCount, getLocks,
 }
