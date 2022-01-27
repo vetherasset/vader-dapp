@@ -126,12 +126,15 @@ export const BalanceIndicator = () => {
 													fontSize='1.02rem'
 													fontWeight='bold'
 													textTransform='capitalize'>
-													{prettifyNumber(totalBalance(true), 0, 2)}
+													{prettifyNumber(totalBalance(true), 0, 2, 'us', 'compact')}
 												</Box>
 											</Box>
 										}
 										{usdvBalance?.data?.gt(0) &&
-											<Box d='flex' alignItems='center'>
+											<Box
+												d='flex'
+												alignItems='center'
+												overflow='hidden'>
 												<Image
 													width='24px'
 													height='24px'
@@ -145,7 +148,7 @@ export const BalanceIndicator = () => {
 													fontSize='1.02rem'
 													fontWeight='bold'
 													textTransform='capitalize'>
-													{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2)}
+													{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2, 'us', 'compact')}
 												</Box>
 											</Box>
 										}

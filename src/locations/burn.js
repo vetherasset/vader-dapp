@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { useLocalStorage } from 'react-use'
+import { useLocalStorage, useSessionStorage } from 'react-use'
 import {
 	Box,
 	Badge,
@@ -78,6 +78,7 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
+	const [slippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
 	const [submitOption, setSubmitOption] = useLocalStorage('acquireSubmitOption23049', false)
 
 	const { data: minter } = useMinter()
@@ -226,27 +227,81 @@ const Burn = (props) => {
 					toast(nothingtoclaim)
 				}
 			}
-			else if ((value > 0)) {
-				if ((balance?.data?.gte(value))) {
-					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					if (tokenSelect.symbol === 'VETH') {
-						if (defaults.redeemables[0].snapshot[wallet.account] &&
-							Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+			else if (!submitOption) {
+				if(value > 0) {
+					if ((balance?.data?.gte(value))) {
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						if (tokenSelect.symbol === 'VETH') {
+							if (defaults.redeemables[0].snapshot[wallet.account] &&
+								Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+								setWorking(true)
+								const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
+								convert(
+									proof,
+									defaults.redeemables[0].snapshot[wallet.account],
+									value.mul(ethers.BigNumber.from(conversionFactor)),
+									provider)
+									.then((tx) => {
+										tx.wait(
+											defaults.network.tx.confirmations,
+										).then((r) => {
+											setWorking(false)
+											setVethAccountLeafClaimed(true)
+											toast({
+												...vethupgraded,
+												description: <Link
+													variant='underline'
+													_focus={{
+														boxShadow: '0',
+													}}
+													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+													isExternal>
+													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+												duration: defaults.toast.txHashDuration,
+											})
+										})
+									})
+									.catch(err => {
+										setWorking(false)
+										if (err.code === 4001) {
+											console.log('Transaction rejected: You have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else {
+											console.log(err)
+											toast(failed)
+										}
+									})
+							}
+							else {
+								toast(notBurnEligible)
+							}
+						}
+						else if (tokenSelect.symbol === 'USDV') {
 							setWorking(true)
-							const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
-							convert(
-								proof,
-								defaults.redeemables[0].snapshot[wallet.account],
-								value.mul(ethers.BigNumber.from(conversionFactor)),
+							const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+							const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
+							const a = amount.sub(feeAmount)
+							const minValue = a
+								.div(100)
+								.mul(slippageTol)
+								.sub(a)
+								.mul(-1)
+							minterBurn(
+								value,
+								minValue,
+								minter,
 								provider)
 								.then((tx) => {
 									tx.wait(
 										defaults.network.tx.confirmations,
 									).then((r) => {
+										uniswapTWAP?.refetch()
+										publicFee?.refetch()
+										balance?.refetch()
 										setWorking(false)
-										setVethAccountLeafClaimed(true)
 										toast({
-											...vethupgraded,
+											...vaderconverted,
 											description: <Link
 												variant='underline'
 												_focus={{
@@ -260,6 +315,9 @@ const Burn = (props) => {
 									})
 								})
 								.catch(err => {
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
+									balance?.refetch()
 									setWorking(false)
 									if (err.code === 4001) {
 										console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -272,102 +330,63 @@ const Burn = (props) => {
 								})
 						}
 						else {
-							toast(notBurnEligible)
+							setWorking(true)
+							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
+							const a = amount.sub(feeAmount)
+							const minValue = a
+								.div(100)
+								.mul(slippageTol)
+								.sub(a)
+								.mul(-1)
+							minterMint(
+								value,
+								minValue,
+								minter,
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										uniswapTWAP?.refetch()
+										publicFee?.refetch()
+										balance?.refetch()
+										setWorking(false)
+										toast({
+											...vaderconverted,
+											description: <Link
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+											duration: defaults.toast.txHashDuration,
+										})
+									})
+								})
+								.catch(err => {
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: You have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
 						}
 					}
-					else if (tokenSelect.symbol === 'USDV') {
-						setWorking(true)
-						const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
-						const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
-						minterBurn(
-							value,
-							amount.sub(feeAmount),
-							minter,
-							provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									uniswapTWAP?.refetch()
-									publicFee?.refetch()
-									balance?.refetch()
-									setWorking(false)
-									toast({
-										...vaderconverted,
-										description: <Link
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-										duration: defaults.toast.txHashDuration,
-									})
-								})
-							})
-							.catch(err => {
-								uniswapTWAP?.refetch()
-								publicFee?.refetch()
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: You have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
-					}
 					else {
-						setWorking(true)
-						const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
-						const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
-						minterMint(
-							value,
-							amount.sub(feeAmount),
-							minter,
-							provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									uniswapTWAP?.refetch()
-									publicFee?.refetch()
-									balance?.refetch()
-									setWorking(false)
-									toast({
-										...vaderconverted,
-										description: <Link
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-										duration: defaults.toast.txHashDuration,
-									})
-								})
-							})
-							.catch(err => {
-								uniswapTWAP?.refetch()
-								publicFee?.refetch()
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: You have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
+						toast(insufficientBalance)
 					}
 				}
 				else {
-					toast(insufficientBalance)
+					toast(noAmount)
 				}
 			}
 			else if (submitOption) {
@@ -410,9 +429,6 @@ const Burn = (props) => {
 			((!defaults.redeemables[0].snapshot[wallet.account]) ||
 			(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
 				toast(notBurnEligible)
-			}
-			else {
-				toast(noAmount)
 			}
 		}
 	}
@@ -740,36 +756,35 @@ const Burn = (props) => {
 													}
 												}
 											}}/>
-										{tokenSelect &&
-									<InputRightAddon
-										width='auto'
-										borderTopLeftRadius='0.375rem'
-										borderBottomLeftRadius='0.375rem'
-										paddingInlineStart='0.5rem'
-										paddingInlineEnd='0.5rem'
-										display={tokenSelect !== 'VETH' && submitOption ? 'none' : 'flex'}
-									>
-										<Flex
-											cursor='default'
-											zIndex='1'
-										>
-											<Box d='flex' alignItems='center'>
-												<Image
-													width='24px'
-													height='24px'
-													mr='5px'
-													src={tokenSelect.logoURI}
-													alt={`${tokenSelect.name} token`}
-												/>
-												<Box
-													as='h3'
-													m='0'
-													fontSize='1.02rem'
-													fontWeight='bold'
-													textTransform='capitalize'>{tokenSelect.symbol}</Box>
-											</Box>
-										</Flex>
-									</InputRightAddon>
+										{tokenSelect && tokenSelect !== 'VETH' && !submitOption &&
+											<InputRightAddon
+												width='auto'
+												borderTopLeftRadius='0.375rem'
+												borderBottomLeftRadius='0.375rem'
+												paddingInlineStart='0.5rem'
+												paddingInlineEnd='0.5rem'
+											>
+												<Flex
+													cursor='default'
+													zIndex='1'
+												>
+													<Box d='flex' alignItems='center'>
+														<Image
+															width='24px'
+															height='24px'
+															mr='5px'
+															src={tokenSelect.logoURI}
+															alt={`${tokenSelect.name} token`}
+														/>
+														<Box
+															as='h3'
+															m='0'
+															fontSize='1.02rem'
+															fontWeight='bold'
+															textTransform='capitalize'>{tokenSelect.symbol}</Box>
+													</Box>
+												</Flex>
+											</InputRightAddon>
 										}
 									</InputGroup>
 								</Box>
@@ -815,7 +830,7 @@ const Burn = (props) => {
 													{prettifyCurrency(
 														(Number(inputAmount) * Number(conversionFactor)) / 2,
 														0,
-														5,
+														2,
 														tokenSelect.convertsTo.symbol,
 													)}
 													<WhatYouGetTag/>
@@ -828,7 +843,7 @@ const Burn = (props) => {
 												{prettifyCurrency(
 													ethers.utils.formatUnits(claimableVeth, 18),
 													0,
-													5,
+													2,
 													'VADER',
 												)}
 												<WhatYouGetTag/>
@@ -855,7 +870,7 @@ const Burn = (props) => {
 																),
 														)),
 													0,
-													5,
+													2,
 													tokenSelect?.convertsTo?.symbol,
 												)}
 											</>
