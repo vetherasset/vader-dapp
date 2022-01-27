@@ -122,7 +122,7 @@ const Stake = (props) => {
 									as='p'
 									textAlign={{ base: 'center', md: 'left' }}
 									fontSize={{ base: '0.9rem', md: '1rem' }}
-								><b>xVADER</b> is fully composable that can interact with other protocols. By staking <i>VADER</i>, you will be able to participate in governance, get access to ecosystem airdrops, obtain priority whitelist for new <i>VADER</i> ecosystem projects and get paid from liquidity incentives - all by holding the token.
+								><b>xVADER</b> is fully composable, which means it can interact with other protocols. By staking <i>VADER</i>, you will be able to participate in governance, get access to ecosystem airdrops, obtain priority whitelist for new <i>VADER</i> ecosystem projects, and get paid from liquidity incentives - all by holding the token.
 								</Box>
 								<Box
 									as='p'
