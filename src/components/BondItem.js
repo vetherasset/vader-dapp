@@ -31,8 +31,6 @@ export const BondItem = (props) => {
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 
-	console.log(principalEth)
-
 	return (
 		<>
 			<Link to={`/bond/${props.address}`}>

@@ -323,7 +323,7 @@ const Burn = (props) => {
 							const a = amount.sub(feeAmount)
 							const minValue = a
 								.div(100)
-								.mul(slippageTol)
+								.mul(slippageTol._isBigNumber ? Number(ethers.utils.formatUnits(slippageTol, 18)) : slippageTol)
 								.sub(a)
 								.mul(-1)
 							minterBurn(
@@ -378,7 +378,7 @@ const Burn = (props) => {
 							const a = amount.sub(feeAmount)
 							const minValue = a
 								.div(100)
-								.mul(slippageTol)
+								.mul(slippageTol._isBigNumber ? Number(ethers.utils.formatUnits(slippageTol, 18)) : slippageTol)
 								.sub(a)
 								.mul(-1)
 							minterMint(
@@ -976,7 +976,7 @@ const Burn = (props) => {
 														setSlippageTol(4)
 														setSlippageTolAmount('')
 													}}>
-														8%
+														4%
 												</Button>
 												<InputGroup
 													size='sm'
