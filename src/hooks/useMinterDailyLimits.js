@@ -19,7 +19,6 @@ export const useMinterDailyLimits = (rpc = true, pollInterval = defaults.api.gra
 		)
 
 		const limits = useQuery('dailyLimits', async () => {
-			console.log(minter)
 			return await getMinterDailyLimits(minter)
 		}, {
 			staleTime: staleTime,
