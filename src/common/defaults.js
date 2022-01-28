@@ -116,7 +116,7 @@ defaults.api.client = new QueryClient()
 defaults.api.graphql = {}
 defaults.api.graphql.uri = {}
 defaults.api.graphql.uri.vaderProtocol = (
-	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet' :
+	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet-usdv' :
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
