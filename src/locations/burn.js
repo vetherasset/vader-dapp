@@ -115,8 +115,8 @@ const Burn = (props) => {
 
 	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
 	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
-		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).lt(limits?.[1]) ?
-			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value)) :
+		ethers.BigNumber.from('0').lt(limits?.[1]) ?
+			limits?.[1].sub(ethers.BigNumber.from('0')) :
 			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
 				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : undefined
 
@@ -334,7 +334,7 @@ const Burn = (props) => {
 							}
 						}
 						else if (tokenSelect.symbol === 'USDV') {
-							if(dailyLimitBurnt && dailyLimitBurnt.gt(0)) {
+							if(((dailyLimitBurnt && dailyLimitBurnt.gt(0)) || (dailyLimitBurnt === 'No Limit'))) {
 								setWorking(true)
 								const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 								const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
@@ -397,7 +397,7 @@ const Burn = (props) => {
 								toast(dailyLimitReached)
 							}
 						}
-						else if(dailyLimitMint && dailyLimitMint.gt(0)) {
+						else if(((dailyLimitMint && dailyLimitMint.gt(0)) || (dailyLimitBurnt === 'No Limit'))) {
 							setWorking(true)
 							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
@@ -1361,18 +1361,21 @@ const Breakdown = (props) => {
 	const { data: limits } = useMinterDailyLimits()
 
 	const usdvMinted = useUsdvMintedBurnt()
-	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
-		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).lt(limits?.[1]) ?
-			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value)) :
-			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : undefined
+
+	console.log(usdvMinted?.data?.globals?.[0]?.value)
+
+	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
+		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
+			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :
+			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).eq(limits?.[1]) ?
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : 'No limit'
 
 	const usdvBurnt = useUsdvMintedBurnt(true)
-	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2] ?
+	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2]?.gt(0) ?
 		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
 			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
 			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : undefined
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : 'No limit'
 
 	return (
 		<>
@@ -1465,7 +1468,16 @@ const Breakdown = (props) => {
 								<>
 									{limits?.[2] && dailyLimitBurnt &&
 										<>
-											{prettifyCurrency(ethers.utils.formatUnits(dailyLimitBurnt ? dailyLimitBurnt : 0, 18), 0, 2, 'USDV')}
+											{isNaN(dailyLimitBurnt) &&
+												<>
+													{dailyLimitBurnt}
+												</>
+											}
+											{!isNaN(dailyLimitBurnt) &&
+												<>
+													{prettifyCurrency(ethers.utils.formatUnits(dailyLimitBurnt ? dailyLimitBurnt : 0, 18), 0, 2, 'USDV')}
+												</>
+											}
 										</>
 									}
 								</>
