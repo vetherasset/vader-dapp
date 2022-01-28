@@ -2,9 +2,9 @@ import defaults from '../common/defaults'
 import { useXvaderPrice } from './useXvaderPrice'
 import { utils } from 'ethers'
 
-export const useXvaderAPR = (type, basedOnNumberOfRecords, days = 365, pollInterval = defaults.api.graphql.pollInterval) => {
+export const useXvaderAPR = (type = 'Day', basedOnNumberOfRecords, days = 365, pollInterval = defaults.api.graphql.pollInterval) => {
 
-	const [xvaderPrices] = useXvaderPrice(basedOnNumberOfRecords, pollInterval, 'Day')
+	const [xvaderPrices] = useXvaderPrice(basedOnNumberOfRecords, pollInterval, type)
 
 	if(xvaderPrices) {
 		const [currentPrice] = xvaderPrices?.globals

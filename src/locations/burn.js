@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
+import { useLocalStorage, useSessionStorage } from 'react-use'
 import {
 	Box,
 	Badge,
@@ -27,13 +28,22 @@ import {
 	AlertDialogBody,
 	AlertDialogFooter,
 	useBreakpointValue,
+	useRadio,
+	useRadioGroup,
+	HStack,
+	Tag,
+	TagLabel,
+	TagLeftIcon,
 } from '@chakra-ui/react'
 import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
-import { ChevronDownIcon } from '@chakra-ui/icons'
-import { getERC20Allowance, convert, approveERC20ToSpend, getERC20BalanceOf, getClaimed, getVester, claim } from '../common/ethereum'
-import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency } from '../common/utils'
+import { ChevronDownIcon, CheckCircleIcon } from '@chakra-ui/icons'
+import { BsPauseCircleFill } from 'react-icons/bs'
+import { getERC20Allowance, convert, approveERC20ToSpend,
+	getClaimed, getVester, claim, minterMint, minterBurn,
+	usdvClaimAll } from '../common/ethereum'
+import { getMerkleProofForAccount, getMerkleLeaf, prettifyCurrency, getPercentage } from '../common/utils'
 import { useWallet } from 'use-wallet'
 import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected, noAmount,
 	tokenValueTooSmall,
@@ -44,8 +54,17 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	notBurnEligible,
 	nothingtoclaim,
 	nomorethaneligible,
+	vaderconverted,
+	notyetUnlocked,
 } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
+import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
+import { usePublicFee } from '../hooks/usePublicFee'
+import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
+import { useMinter } from '../hooks/useMinter'
+import { useERC20Balance } from '../hooks/useERC20Balance'
+import { useLocks } from '../hooks/useLocks'
+import TimeAgo from 'react-timeago'
 
 const Burn = (props) => {
 
@@ -55,10 +74,10 @@ const Burn = (props) => {
 	const [isSelect, setIsSelect] = useState(-1)
 	const [tokenSelect, setTokenSelect] = useState(false)
 	const [tokenApproved, setTokenApproved] = useState(false)
-	const [tokenBalance, setTokenBalance] = useState(ethers.BigNumber.from('0'))
+	const balance = useERC20Balance(tokenSelect?.address)
 	const [inputAmount, setInputAmount] = useState('')
 	const [value, setValue] = useState(0)
-	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from(String(defaults.vader.conversionRate)))
+	const [conversionFactor, setConversionFactor] = useState(ethers.BigNumber.from('0'))
 	const [working, setWorking] = useState(false)
 
 	const [vethAllowLess, setVethAllowLess] = useState(false)
@@ -66,37 +85,42 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
-	const DrawAmount = () => {
-		return (
-			<>
-				{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
-					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
-					<>
-						{prettifyCurrency(
-							(Number(inputAmount) * Number(conversionFactor)) / 2,
-							0,
-							5,
-							tokenSelect.convertsTo,
-						)}
-						<Box
-							as='h3'
-							fontWeight='bold'
-							textAlign='center'
-							fontSize='1rem'
-						>
-							<Badge
-								as='div'
-								fontSize={{ base: '0.6rem', md: '0.75rem' }}
-								background='rgb(214, 188, 250)'
-								color='rgb(128, 41, 251)'
-							>What You Get
-							</Badge>
-						</Box>
-					</>
-				}
-			</>
-		)
-	}
+	const [slippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
+	const [submitOption, setSubmitOption] = useLocalStorage('acquireSubmitOption23049', false)
+
+	const { data: minter } = useMinter()
+	const uniswapTWAP = useUniswapTWAP()
+	const publicFee = usePublicFee()
+	const fee = publicFee?.data?.mul(value).div(1e4)
+	const usdcTWAP = ethers.utils.parseEther(
+		String(1 / Number(ethers.utils.formatUnits(uniswapTWAP?.data ? uniswapTWAP.data : '1', 18))))
+
+	const { data: limits } = useMinterDailyLimits()
+	const locks = useLocks(tokenSelect.symbol)
+	const locksComplete = useLocks(undefined, false, 0, (defaults.api.graphql.pollInterval / 2))
+
+	const unclaimed = locks?.data?.locks.length > 1 ? locks?.data?.locks?.reduce((acc, lock) => {
+		acc = acc.add(ethers.BigNumber.from(lock?.amount))
+		return acc
+	}, ethers.BigNumber.from('0')) : ethers.BigNumber.from(locks?.data?.locks.length > 0 ? locks?.data?.locks[0]?.amount : '0')
+
+	const [releaseTime, setReleaseTime] = useState(new Date())
+	const [now, setNow] = useState(new Date())
+
+	useEffect(() => {
+		if(locksComplete?.data?.locks[0]?.release) {
+			setReleaseTime(new Date(locksComplete?.data?.locks[0]?.release * 1000))
+		}
+	}, [locksComplete?.data?.locks[0]?.release])
+
+	useEffect(() => {
+		const id = setInterval(() => setNow(new Date()), 1000)
+		return () => clearInterval(id)
+	}, [])
+
+	useEffect(() => {
+		locks.refetch()
+	}, [tokenSelect, submitOption, releaseTime])
 
 	const submit = () => {
 		if(!working) {
@@ -106,160 +130,353 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (tokenSelect && !tokenApproved && tokenBalance && !vethAccountLeafClaimed) {
+			else if (!tokenApproved) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				if ((tokenBalance > 0 && value > 0)) {
-					if(tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
-					(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+				if (tokenSelect.symbol === 'VETH' &&
+				balance?.data &&
+				!vethAccountLeafClaimed) {
+					if ((balance?.data > 0 && value > 0)) {
+						if((!defaults.redeemables[0].snapshot[wallet.account]) ||
+						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
+							toast(notBurnEligible)
+						}
+						else {
+							setWorking(true)
+							approveERC20ToSpend(
+								tokenSelect.address,
+								defaults.address.converter,
+								vethAllowLess ? value : balance?.data,
+								provider,
+							).then((tx) => {
+								tx.wait(defaults.network.tx.confirmations)
+									.then(() => {
+										setWorking(false)
+										setTokenApproved(true)
+										toast(approved)
+									})
+									.catch(e => {
+										setWorking(false)
+										if (e.code === 4001) toast(rejected)
+										if (e.code === -32016) toast(exception)
+									})
+							})
+								.catch(err => {
+									setWorking(false)
+									if(err.code === 4001) {
+										console.log('Transaction rejected: Your have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+					}
+					else if (
+						((!defaults.redeemables[0].snapshot[wallet.account]) ||
+						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) &&
+						!vethAllowLess) {
 						toast(notBurnEligible)
 					}
+					else if (vethAllowLess && !value > 0) {
+						toast(noAmount)
+					}
 					else {
-						setWorking(true)
-						approveERC20ToSpend(
-							tokenSelect.address,
-							defaults.address.converter,
-							vethAllowLess ? value : tokenBalance,
-							provider,
-						).then((tx) => {
-							tx.wait(defaults.network.tx.confirmations)
-								.then(() => {
-									setWorking(false)
-									setTokenApproved(true)
-									toast(approved)
-								})
-								.catch(e => {
-									setWorking(false)
-									if (e.code === 4001) toast(rejected)
-									if (e.code === -32016) toast(exception)
-								})
-						})
-							.catch(err => {
-								setWorking(false)
-								if(err.code === 'INSUFFICIENT_FUNDS') {
-									console.log('Insufficient balance: Your account balance is insufficient.')
-									toast(insufficientBalance)
-								}
-								else if(err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
+						toast(insufficientBalance)
 					}
 				}
-				else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) && !vethAllowLess) {
-					toast(notBurnEligible)
+				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
+					setWorking(true)
+					approveERC20ToSpend(
+						tokenSelect.address,
+						tokenSelect.convertsTo.address,
+						defaults.network.erc20.maxApproval,
+						provider,
+					).then((tx) => {
+						tx.wait(defaults.network.tx.confirmations)
+							.then(() => {
+								setWorking(false)
+								setTokenApproved(true)
+								toast(approved)
+							})
+							.catch(e => {
+								setWorking(false)
+								if (e.code === 4001) toast(rejected)
+								if (e.code === -32016) toast(exception)
+							})
+					})
+						.catch(err => {
+							setWorking(false)
+							if(err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
 				}
-				else if (vethAllowLess && !value > 0) {
+			}
+			else if (tokenSelect.symbol === 'VETH' &&
+			vethAccountLeafClaimed) {
+				if(vester?.[0]?.gt(0)) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					setWorking(true)
+					claim(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								setVethAccountLeafClaimed(true)
+								toast({
+									...vaderclaimed,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(nothingtoclaim)
+				}
+			}
+			else if (!submitOption) {
+				if(value > 0) {
+					if ((balance?.data?.gte(value))) {
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						if (tokenSelect.symbol === 'VETH') {
+							if (defaults.redeemables[0].snapshot[wallet.account] &&
+								Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+								setWorking(true)
+								const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
+								convert(
+									proof,
+									defaults.redeemables[0].snapshot[wallet.account],
+									value.mul(ethers.BigNumber.from(conversionFactor)),
+									provider)
+									.then((tx) => {
+										tx.wait(
+											defaults.network.tx.confirmations,
+										).then((r) => {
+											setWorking(false)
+											setVethAccountLeafClaimed(true)
+											toast({
+												...vethupgraded,
+												description: <Link
+													variant='underline'
+													_focus={{
+														boxShadow: '0',
+													}}
+													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+													isExternal>
+													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+												duration: defaults.toast.txHashDuration,
+											})
+										})
+									})
+									.catch(err => {
+										setWorking(false)
+										if (err.code === 4001) {
+											console.log('Transaction rejected: You have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else {
+											console.log(err)
+											toast(failed)
+										}
+									})
+							}
+							else {
+								toast(notBurnEligible)
+							}
+						}
+						else if (tokenSelect.symbol === 'USDV') {
+							setWorking(true)
+							const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+							const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
+							const a = amount.sub(feeAmount)
+							const minValue = a
+								.div(100)
+								.mul(slippageTol)
+								.sub(a)
+								.mul(-1)
+							minterBurn(
+								value,
+								minValue,
+								minter,
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
+										locks?.refetch()
+										locksComplete?.refetch()
+										uniswapTWAP?.refetch()
+										publicFee?.refetch()
+										balance?.refetch()
+										setWorking(false)
+										toast({
+											...vaderconverted,
+											description: <Link
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+											duration: defaults.toast.txHashDuration,
+										})
+									})
+								})
+								.catch(err => {
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
+									balance?.refetch()
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: You have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+						else {
+							setWorking(true)
+							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
+							const a = amount.sub(feeAmount)
+							const minValue = a
+								.div(100)
+								.mul(slippageTol)
+								.sub(a)
+								.mul(-1)
+							minterMint(
+								value,
+								minValue,
+								minter,
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
+										locks?.refetch()
+										locksComplete?.refetch()
+										uniswapTWAP?.refetch()
+										publicFee?.refetch()
+										balance?.refetch()
+										setWorking(false)
+										toast({
+											...vaderconverted,
+											description: <Link
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+											duration: defaults.toast.txHashDuration,
+										})
+									})
+								})
+								.catch(err => {
+									uniswapTWAP?.refetch()
+									publicFee?.refetch()
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: You have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+					}
+					else {
+						toast(insufficientBalance)
+					}
+				}
+				else {
 					toast(noAmount)
 				}
-				else {
-					toast(insufficientBalance)
-				}
 			}
-			else if (vethAccountLeafClaimed) {
-				if (tokenSelect.symbol === 'VETH') {
-					if(vester?.[0]?.gt(0)) {
-						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-						setWorking(true)
-						claim(provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									setWorking(false)
-									setVethAccountLeafClaimed(true)
-									toast({
-										...vaderclaimed,
-										description: <Link
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-										duration: defaults.toast.txHashDuration,
-									})
-								})
-							})
-							.catch(err => {
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
-					}
-					else {
-						toast(nothingtoclaim)
-					}
-				}
-			}
-			else if ((value > 0)) {
-				if ((tokenBalance.gte(value))) {
+			else if (submitOption) {
+				if(releaseTime < now) {
+					setWorking(true)
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					if (tokenSelect.symbol === 'VETH' && defaults.redeemables[0].snapshot[wallet.account] &&
-					Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
-						setWorking(true)
-						const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
-						convert(
-							proof,
-							defaults.redeemables[0].snapshot[wallet.account],
-							value.mul(ethers.BigNumber.from(conversionFactor)),
-							provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									setWorking(false)
-									setVethAccountLeafClaimed(true)
-									toast({
-										...vethupgraded,
-										description: <Link
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-										duration: defaults.toast.txHashDuration,
-									})
+					usdvClaimAll(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
+								locks.refetch()
+								locksComplete.refetch()
+								balance?.refetch()
+								setWorking(false)
+								toast({
+									...vaderconverted,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
 								})
 							})
-							.catch(err => {
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: You have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
-					}
-					else {
-						toast(notBurnEligible)
-					}
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: You have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
 				}
 				else {
-					toast(insufficientBalance)
+					toast(notyetUnlocked)
 				}
 			}
-			else if (((!defaults.redeemables[0].snapshot[wallet.account]) || (!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
+			else if (tokenSelect.symbol === 'VETH' &&
+			((!defaults.redeemables[0].snapshot[wallet.account]) ||
+			(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0))) {
 				toast(notBurnEligible)
-			}
-			else {
-				toast(noAmount)
 			}
 		}
 	}
@@ -281,8 +498,11 @@ const Burn = (props) => {
 				ethers.BigNumber.from(String(defaults.vader.conversionRate)),
 			)
 		}
+		else if (tokenSelect) {
+			if(uniswapTWAP.data) setConversionFactor(uniswapTWAP.data)
+		}
 		return () => setConversionFactor(ethers.BigNumber.from('0'))
-	}, [tokenSelect, wallet.account])
+	}, [tokenSelect, uniswapTWAP.data, wallet.account])
 
 	useEffect(() => {
 		if(wallet.account && tokenSelect) {
@@ -290,12 +510,15 @@ const Burn = (props) => {
 			getERC20Allowance(
 				tokenSelect.address,
 				wallet.account,
-				defaults.address.converter,
+				tokenSelect.symbol === 'VETH' ? defaults.address.converter : tokenSelect.convertsTo.address,
 				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
-				if(!tokenSelect.symbol === 'VETH') {
-					if (n.gt(0) && n.gte(value))	setTokenApproved(true)
+				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
+					if (n.gt(0)) setTokenApproved(true)
+				}
+				if (tokenSelect.symbol === 'USDV') {
+					setTokenApproved(true)
 				}
 				if (tokenSelect.symbol === 'VETH') {
 					if (n.eq(value)) {
@@ -311,40 +534,30 @@ const Burn = (props) => {
 			setWorking(false)
 			setTokenApproved(false)
 		}
-	}, [wallet.account, tokenSelect, value])
+	}, [wallet.account,
+		tokenSelect,
+		(tokenSelect.symbol === 'VETH' ? value : ''),
+	])
 
 	useEffect(() => {
-		if (wallet.account && tokenSelect) {
-			setWorking(true)
-			getERC20BalanceOf(
-				tokenSelect.address,
-				wallet.account,
-				defaults.network.provider,
-			)
-				.then(data => {
-					setTokenBalance(data)
-					if (tokenSelect.symbol === 'VETH') {
-						setWorking(false)
-						if (defaults.redeemables[0].snapshot[wallet.account]) {
-							if(!vethAllowLess) {
-								if (data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
-									setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
-									setInputAmount(ethers.utils.formatUnits(defaults.redeemables[0].snapshot[wallet.account], tokenSelect.decimals))
-								}
-								else {
-									setValue(data)
-									setInputAmount(ethers.utils.formatUnits(data, tokenSelect.decimals))
-								}
-							}
-						}
+		if (tokenSelect.symbol === 'VETH') {
+			if (defaults.redeemables[0].snapshot[wallet.account]) {
+				if(!vethAllowLess) {
+					if (balance.data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
+						setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
+						setInputAmount(
+							ethers.utils.formatUnits(
+								defaults.redeemables[0].snapshot[wallet.account],
+								tokenSelect.decimals,
+							))
 					}
-				})
-				.catch((err) => {
-					setWorking(false)
-					console.log(err)
-				})
+					else {
+						setValue(balance.data)
+						setInputAmount(ethers.utils.formatUnits(balance.data, tokenSelect.decimals))
+					}
+				}
+			}
 		}
-		return () => setTokenBalance(ethers.BigNumber.from('0'))
 	}, [wallet.account, tokenSelect, vethAllowLess])
 
 	useEffect(() => {
@@ -394,7 +607,7 @@ const Burn = (props) => {
 						as='h4'
 						fontSize='1.24rem'
 						fontWeight='bolder'>
-							Token to burn
+							Token
 					</Text>
 					<Flex
 						marginBottom='0.7rem'>
@@ -484,11 +697,33 @@ const Burn = (props) => {
 									}
 								</>
 							}
+
+							{tokenSelect.symbol !== 'VETH' &&
+								<>
+									{uniswapTWAP &&
+										publicFee &&
+										!submitOption &&
+											<Breakdown
+												token={tokenSelect}
+											/>
+									}
+									{submitOption &&
+										<ClaimOverview
+											token={tokenSelect}
+											unclaimed={unclaimed}
+											releaseTime={releaseTime}
+											now={now}
+										/>
+									}
+								</>
+							}
 						</>
 					}
 
-					{((!tokenSelect) ||
-					(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed)) &&
+					{(!tokenSelect ||
+						(tokenSelect.symbol === 'VETH' && !vethAccountLeafClaimed) ||
+						(tokenSelect.symbol !== 'VETH')
+					) &&
 						<>
 							<Text
 								as='h4'
@@ -500,7 +735,8 @@ const Burn = (props) => {
 										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? '0.5' :
 											tokenSelect.symbol === 'VETH' && !vethAllowLess ? '0.5' :
-												'1'
+												tokenSelect !== 'VETH' && submitOption ? '0.5' :
+													'1'
 								}>
 								Amount
 							</Text>
@@ -511,7 +747,16 @@ const Burn = (props) => {
 										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? 'not-allowed' :
 											tokenSelect.symbol === 'VETH' && !vethAllowLess ? 'not-allowed' :
-												''
+												tokenSelect !== 'VETH' && submitOption ? 'not-allowed' :
+													''
+								}
+								opacity={
+									!tokenSelect ? '0.5' :
+										tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
+										(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? '0.5' :
+											tokenSelect.symbol === 'VETH' && !vethAllowLess ? '0.5' :
+												tokenSelect !== 'VETH' && submitOption ? '0.5' :
+													'1'
 								}
 							>
 								<Box flex='1'>
@@ -524,7 +769,8 @@ const Burn = (props) => {
 													tokenSelect.symbol === 'VETH' && ((!defaults.redeemables[0].snapshot[wallet.account]) ||
 													(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) ? true :
 														tokenSelect.symbol === 'VETH' && !vethAllowLess ? true :
-															false
+															tokenSelect !== 'VETH' && submitOption ? true :
+																false
 											}
 											_disabled={{
 												opacity: '0.5',
@@ -563,39 +809,55 @@ const Burn = (props) => {
 													}
 												}
 											}}/>
-										{tokenSelect &&
-									<InputRightAddon
-										width='auto'
-										borderTopLeftRadius='0.375rem'
-										borderBottomLeftRadius='0.375rem'
-										paddingInlineStart='0.5rem'
-										paddingInlineEnd='0.5rem'
-									>
-										<Flex
-											cursor='default'
-											zIndex='1'
-										>
-											<Box d='flex' alignItems='center'>
-												<Image
-													width='24px'
-													height='24px'
-													mr='5px'
-													src={tokenSelect.logoURI}
-													alt={`${tokenSelect.name} token`}
-												/>
-												<Box
-													as='h3'
-													m='0'
-													fontSize='1.02rem'
-													fontWeight='bold'
-													textTransform='capitalize'>{tokenSelect.symbol}</Box>
-											</Box>
-										</Flex>
-									</InputRightAddon>
+										{tokenSelect && tokenSelect !== 'VETH' && !submitOption &&
+											<InputRightAddon
+												width='auto'
+												borderTopLeftRadius='0.375rem'
+												borderBottomLeftRadius='0.375rem'
+												paddingInlineStart='0.5rem'
+												paddingInlineEnd='0.5rem'
+											>
+												<Flex
+													cursor='default'
+													zIndex='1'
+												>
+													<Box d='flex' alignItems='center'>
+														<Image
+															width='24px'
+															height='24px'
+															mr='5px'
+															src={tokenSelect.logoURI}
+															alt={`${tokenSelect.name} token`}
+														/>
+														<Box
+															as='h3'
+															m='0'
+															fontSize='1.02rem'
+															fontWeight='bold'
+															textTransform='capitalize'>{tokenSelect.symbol}</Box>
+													</Box>
+												</Flex>
+											</InputRightAddon>
 										}
 									</InputGroup>
 								</Box>
 							</Flex>
+
+							{tokenSelect?.symbol !== 'VETH' &&
+								<>
+									<SubmitOptions
+										pointerEvents={!tokenSelect ? 'none' :
+											''}
+										opacity={
+											!tokenSelect ? '0.5' :
+												'1'
+										}
+										set={setSubmitOption}
+										setting={submitOption}
+									/>
+								</>
+							}
+
 							{tokenSelect && tokenSelect.symbol === 'VETH' &&
 							<VethAllowLessOption
 								allow={vethAllowLess}
@@ -609,39 +871,84 @@ const Burn = (props) => {
 						fontSize={{ base: '1.35rem', md: '1.5rem' }}
 						fontWeight='bolder'
 						justifyContent='center' alignItems='center' flexDir='column'>
-						{inputAmount &&
-								<>
-									{!vethAccountLeafClaimed &&
+						{inputAmount && tokenSelect.symbol === 'VETH' &&
+									<>
+										{!vethAccountLeafClaimed &&
 										<>
-											<DrawAmount/>
+											{inputAmount && defaults.redeemables[0].snapshot[wallet.account] &&
+												Number(defaults.redeemables[0].snapshot[wallet.account]) > 0 &&
+												<>
+													{prettifyCurrency(
+														(Number(inputAmount) * Number(conversionFactor)) / 2,
+														0,
+														2,
+														tokenSelect.convertsTo.symbol,
+													)}
+													<WhatYouGetTag/>
+												</>
+											}
 										</>
-									}
-									{vethAccountLeafClaimed &&
-										<>
-											{prettifyCurrency(
-												ethers.utils.formatUnits(claimableVeth, 18),
-												0,
-												5,
-												'VADER',
-											)}
-											<Box
-												as='h3'
-												fontWeight='bold'
-												textAlign='center'
-												fontSize='1rem'
-											>
-												<Badge
-													as='div'
-													fontSize={{ base: '0.6rem', md: '0.75rem' }}
-													background='rgb(214, 188, 250)'
-													color='rgb(128, 41, 251)'
-												>What You Get
-												</Badge>
-											</Box>
-										</>
-									}
-								</>
+										}
+										{vethAccountLeafClaimed &&
+											<>
+												{prettifyCurrency(
+													ethers.utils.formatUnits(claimableVeth, 18),
+													0,
+													2,
+													'VADER',
+												)}
+												<WhatYouGetTag/>
+											</>
+										}
+									</>
 						}
+						{tokenSelect && tokenSelect?.symbol !== 'VETH' && !!uniswapTWAP?.data &&
+									<>
+										{!!uniswapTWAP?.data && conversionFactor?.gt(0) &&
+											<>
+												{inputAmount && !submitOption &&
+													<>
+														{prettifyCurrency(
+															tokenSelect?.symbol === 'USDV' ?
+																(ethers.utils.formatEther(
+																	(value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18)))
+																		.sub(usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))),
+																)) :
+																(ethers.utils.formatEther(
+																	value?.mul(conversionFactor)
+																		.div(ethers.utils.parseUnits('1', 18))
+																		.sub(
+																			uniswapTWAP?.data?.mul(fee)
+																				.div(ethers.utils.parseUnits('1', 18)),
+																		),
+																)),
+															0,
+															2,
+															tokenSelect?.convertsTo?.symbol,
+														)}
+													</>
+												}
+											</>
+										}
+										{submitOption && unclaimed.gt(0) &&
+											<>
+												{prettifyCurrency(ethers.utils.formatEther(unclaimed), 0, 2, tokenSelect.symbol)}
+											</>
+										}
+									</>
+						}
+
+						{(
+							(!tokenSelect) ||
+							(!inputAmount && !submitOption) ||
+							(!uniswapTWAP?.data) ||
+							(!unclaimed.gt(0) && submitOption)
+						) &&
+							<>
+								<span>👻</span>
+							</>
+						}
+						<WhatYouGetTag/>
 					</Flex>
 
 					<Button
@@ -655,7 +962,7 @@ const Burn = (props) => {
 					>
 						{wallet.account &&
 								<>
-									{!working && tokenSelect && !tokenSelect.symbol === 'VETH' &&
+									{!working && tokenSelect && tokenSelect.symbol !== 'VETH' &&
 										<>
 											{!tokenApproved &&
 												<>
@@ -664,7 +971,12 @@ const Burn = (props) => {
 											}
 											{tokenApproved &&
 												<>
-													Burn
+													{submitOption &&
+														<>Claim</>
+													}
+													{!submitOption &&
+														<>Burn</>
+													}
 												</>
 											}
 										</>
@@ -726,6 +1038,238 @@ const Burn = (props) => {
 				onOpen={onOpen}
 				onClose={onClose}
 			/>
+		</>
+	)
+}
+
+const WhatYouGetTag = () => {
+	return (
+		<Box
+			as='h3'
+			fontWeight='bold'
+			textAlign='center'
+			fontSize='1rem'
+		>
+			<Badge
+				as='div'
+				fontSize={{ base: '0.6rem', md: '0.75rem' }}
+				background='rgb(214, 188, 250)'
+				color='rgb(128, 41, 251)'
+			>What You Get
+			</Badge>
+		</Box>
+	)
+}
+
+const ClaimOverview = (props) => {
+
+	ClaimOverview.propTypes = {
+		token: PropTypes.object.isRequired,
+		unclaimed: PropTypes.object.isRequired,
+		releaseTime: PropTypes.object.isRequired,
+		now: PropTypes.object.isRequired,
+	}
+
+	return (
+		<>
+			<Text
+				as='h4'
+				fontSize='1.1rem'
+				fontWeight='bolder'
+				mr='0.66rem'
+			>
+				Overview
+			</Text>
+
+			<Flex
+				flexDir='column'
+				p='0 0.15rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+			>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							Total unclaimed
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+							{prettifyCurrency(ethers.utils.formatEther(props.unclaimed), 0, 2, props.token.symbol)}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Time to unlock
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{props.releaseTime >= props.now &&
+								<TimeAgo date={props.releaseTime} live={false}/>
+							}
+							{props.releaseTime < props.now &&
+								<i>None</i>
+							}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container
+						maxW='none'
+						mt='4px'
+						p='0'>
+						<Tag
+							size='md'
+							colorScheme={props.releaseTime < props.now ? 'cyan' : 'red'}
+							borderRadius='full'>
+							<TagLeftIcon
+								as={props.releaseTime < props.now ? CheckCircleIcon : BsPauseCircleFill}/>
+							<TagLabel>{props.releaseTime < props.now ? 'Unlocked' : 'Locked'}</TagLabel>
+						</Tag>
+					</Container>
+				</Flex>
+			</Flex>
+		</>
+	)
+}
+
+const Breakdown = (props) => {
+
+	Breakdown.propTypes = {
+		token: PropTypes.object.isRequired,
+	}
+
+	const uniswapTWAP = useUniswapTWAP()
+	const publicFee = usePublicFee()
+	const { data: limits } = useMinterDailyLimits()
+
+	return (
+		<>
+			<Text
+				as='h4'
+				fontSize='1.1rem'
+				fontWeight='bolder'
+				mr='0.66rem'
+			>
+				Breakdown
+			</Text>
+
+			<Flex
+				flexDir='column'
+				p='0 0.15rem'
+				marginBottom='.7rem'
+				opacity='0.87'
+			>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'
+						>
+							TWAP
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'
+						>
+							{uniswapTWAP.data &&
+								<>
+									{prettifyCurrency(
+										ethers.utils.formatUnits(
+											props.token.symbol === 'USDV' ?
+												ethers.utils.parseEther(
+													String(
+														1 /
+														Number(ethers.utils.formatUnits(uniswapTWAP?.data, 18)),
+													),
+												) : uniswapTWAP?.data,
+											props.token.decimals),
+										0,
+										props.token.symbol === 'USDV' ? 5 : 2,
+										props.token.convertsTo.symbol,
+									)}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Fee
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{publicFee?.data &&
+								<>
+									{getPercentage(Number(publicFee?.data ? publicFee?.data * 0.0001 : 0), 0, 2)}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Daily limit
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{props.token.symbol === 'VADER' &&
+								<>
+									{limits?.[1] &&
+										<>
+											{prettifyCurrency(ethers.utils.formatUnits(limits?.[1], 18), 0, 2, 'USDV')}
+										</>
+									}
+								</>
+							}
+							{props.token.symbol === 'USDV' &&
+								<>
+									{limits?.[2] &&
+										<>
+											{prettifyCurrency(ethers.utils.formatUnits(limits?.[2], 18), 0, 2, 'USDV')}
+										</>
+									}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+				<Flex>
+					<Container p='0'>
+						<Box
+							textAlign='left'>
+								Lock duration
+						</Box>
+					</Container>
+					<Container p='0'>
+						<Box
+							textAlign='right'>
+							{limits?.[3] &&
+								<>
+									{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
+								</>
+							}
+						</Box>
+					</Container>
+				</Flex>
+			</Flex>
 		</>
 	)
 }
@@ -883,6 +1427,89 @@ const VethBreakdown = (props) => {
 				</Flex>
 			</Flex>
 		</>
+	)
+}
+const RadioCard = (props) => {
+
+	RadioCard.propTypes = {
+		children: PropTypes.any,
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+		pointerEvents: PropTypes.string,
+	}
+
+	const { getInputProps, getCheckboxProps } = useRadio(props)
+	const input = getInputProps()
+	const checkbox = getCheckboxProps()
+
+	return (
+		<>
+			<Box as='label' width='100%'>
+				<input {...input}/>
+				<Box
+					{...checkbox}
+
+					borderWidth='1px'
+					borderRadius='12px'
+					fontWeight='600'
+					textAlign='center'
+					cursor='pointer'
+					pointerEvents={props.pointerEvents}
+					_hover={{
+						background: 'rgba(255,255,255, 0.08)',
+					}}
+					_checked={{
+						color: 'bluish.300',
+						borderColor: 'bluish.300',
+						borderWidth: '2px',
+					}}
+					p='0.75rem 1.25rem'
+				>
+					{props.children}
+				</Box>
+			</Box>
+		</>
+	)
+}
+
+const SubmitOptions = (props) => {
+
+	SubmitOptions.propTypes = {
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+		opacity: PropTypes.string,
+		pointerEvents: PropTypes.string,
+	}
+
+	const options = ['Burn', 'Claim']
+
+	const { getRootProps, getRadioProps } = useRadioGroup({
+		name: 'action',
+		value: !props.setting ? 'Burn' : 'Claim',
+		onChange: () => props.set(!props.setting),
+	})
+	const group = getRootProps()
+
+	return (
+		<HStack
+			{...group}
+			mt='0.7rem'
+			lineHeight='normal'
+			opacity={props.opacity}
+			pointerEvents={props.pointerEvents}
+		>
+			{options.map((value) => {
+				const radio = getRadioProps({ value })
+				return (
+					<RadioCard
+						set={props.set}
+						setting={props.setting}
+						key={value} {...radio}>
+						{value}
+					</RadioCard>
+				)
+			})}
+		</HStack>
 	)
 }
 

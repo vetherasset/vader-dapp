@@ -21,15 +21,15 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
+		// {
+		// 	provider: new ethers.providers.InfuraProvider(
+		// 		defaults.network.chainId,
+		// 		process.env.REACT_APP_INFURA_KEY,
+		// 	),
+		// 	weight: 1,
+		// 	priority: 2,
+		// 	stallTimeout: 2000,
+		// },
 	],
 	1,
 )
@@ -95,10 +95,16 @@ defaults.network.autoConnect = true
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
-defaults.network.tx.confirmations = 1
+defaults.network.tx.confirmations = 2
 
 defaults.network.blockTime = {}
-defaults.network.blockTime.hour = 262
+defaults.network.blockTime.second = (
+	defaults.network.chainId === 1 ? 0.07570023 :
+		defaults.network.chainId === 42 ? 0.25 :
+			0)
+defaults.network.blockTime.minute = defaults.network.blockTime.second * 60
+defaults.network.blockTime.hour = defaults.network.blockTime.minute * 60
+defaults.network.blockTime.day = defaults.network.blockTime.hour * 24
 
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
@@ -135,15 +141,15 @@ defaults.api.graphql.client.uniswapV2 = new ApolloClient({
 defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
-	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
-		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+	defaults.network.chainId === 1 ? 'https://etherscan.io' :
+		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io' :
 			undefined
 )
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
+	defaults.network.chainId === 1 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
+		defaults.network.chainId === 42 ? '0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F' :
 			undefined
 )
 defaults.address.vether = (
@@ -158,7 +164,7 @@ defaults.address.xvader = (
 )
 defaults.address.usdv = (
 	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
 defaults.address.converter = (
@@ -236,7 +242,7 @@ defaults.vether = {
 defaults.redeemables = [
 	{
 		...defaults.vether,
-		'convertsTo':'VADER',
+		'convertsTo':defaults.vader,
 		'snapshot':snapshot,
 		'salt':(
 			defaults.network.chainId === 1 ? '13662469' :
@@ -246,13 +252,13 @@ defaults.redeemables = [
 	},
 	{
 		...defaults.usdv,
-		'convertsTo':'VADER',
-		'disabled': true,
+		'convertsTo':defaults.vader,
+		'disabled': false,
 	},
 	{
 		...defaults.vader,
-		'convertsTo':'USDV',
-		'disabled': true,
+		'convertsTo':defaults.usdv,
+		'disabled': false,
 	},
 ]
 
