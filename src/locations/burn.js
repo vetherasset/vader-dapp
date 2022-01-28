@@ -10,6 +10,7 @@ import {
 	Input,
 	InputGroup,
 	InputRightAddon,
+	InputRightElement,
 	Image,
 	Link,
 	Spinner,
@@ -86,7 +87,8 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
-	const [slippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
+	const [slippageTolAmount, setSlippageTolAmount] = useSessionStorage('acquireSlippageTolAmount042334310', '')
+	const [slippageTol, setSlippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
 	const [submitOption, setSubmitOption] = useLocalStorage('acquireSubmitOption23049', false)
 
 	const { data: minter } = useMinter()
@@ -107,6 +109,8 @@ const Burn = (props) => {
 
 	const [releaseTime, setReleaseTime] = useState(new Date())
 	const [now, setNow] = useState(new Date())
+
+	console.log(slippageTol)
 
 	useEffect(() => {
 		if(locksComplete?.data?.locks[0]?.release) {
@@ -847,7 +851,7 @@ const Burn = (props) => {
 							{tokenSelect?.symbol !== 'VETH' &&
 								<>
 									<Flex
-										m='.6rem 0 .3rem'
+										mt='.6rem'
 										justifyContent='flex-end'
 										flexDir='row'
 										opacity={
@@ -911,6 +915,106 @@ const Burn = (props) => {
 											}}>
 													MAX
 										</Button>
+									</Flex>
+									<Flex
+										m='.3rem 0 1.2rem'
+										flexDir='column'
+									>
+										<Flex
+											pointerEvents={(!tokenSelect || submitOption) ? 'none' :
+												''}
+											opacity={
+												(!tokenSelect || submitOption) ? '0.5' :
+													'1'
+											}
+											flexDir='column'
+										>
+											<Text
+												as='h4'
+												fontWeight='bolder'>
+														Slippage Tolerance
+											</Text>
+											<Flex
+												mt='.3rem'
+												justifyContent='flex-start'
+												flexDir='row'
+											>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border:	slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(2)
+														setSlippageTolAmount('')
+													}}>
+														2%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(3)
+														setSlippageTolAmount('')
+													}}>
+														3%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 4 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(4)
+														setSlippageTolAmount('')
+													}}>
+														8%
+												</Button>
+												<InputGroup
+													size='sm'
+												>
+													<Input
+														variant='outline'
+														placeholder='Custom'
+														style={{
+															border: ((([2, 3, 4].indexOf(slippageTol) === -1)) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
+														}}
+														value={slippageTolAmount}
+														onChange={(e) => {
+															if (isNaN(e.target.value)) {
+																setSlippageTolAmount(prev => prev)
+															}
+															else {
+																setSlippageTolAmount(String(e.target.value))
+																if(Number(e.target.value) >= 0) {
+																	try {
+																		setSlippageTol(ethers.utils.parseUnits(String(e.target.value), tokenSelect.decimals))
+																	}
+																	catch(err) {
+																		if (err.code === 'NUMERIC_FAULT') {
+																			console.log('value too small')
+																		}
+																	}
+																}
+															}
+														}}
+													/>
+													<InputRightElement>
+														<>
+															%
+														</>
+													</InputRightElement>
+												</InputGroup>
+											</Flex>
+										</Flex>
 									</Flex>
 									<SubmitOptions
 										pointerEvents={!tokenSelect ? 'none' :
@@ -1188,7 +1292,7 @@ const ClaimOverview = (props) => {
 								<TimeAgo date={props.releaseTime} live={false}/>
 							}
 							{props.releaseTime < props.now &&
-								<i>None</i>
+								<i>None left</i>
 							}
 						</Box>
 					</Container>
