@@ -5,7 +5,7 @@ import { getLocks } from '../common/ethereum'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 
-export const useLocks = (rpc = false, lockIndex = 0, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
+export const useLocks = (token, rpc = false, lockIndex = 0, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
 
 	const wallet = useWallet()
 
@@ -17,7 +17,8 @@ export const useLocks = (rpc = false, lockIndex = 0, pollInterval = defaults.api
 				orderDirection: desc
 				where: {
 					isRemoved: false
-					user_contains: "${wallet.account.toLowerCase()}"
+					user_contains: "${wallet?.account?.toLowerCase()}"
+					${token ? `token : ${token}` : ''}
 				}
 			) {
 				token

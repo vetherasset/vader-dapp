@@ -31,11 +31,15 @@ import {
 	useRadio,
 	useRadioGroup,
 	HStack,
+	Tag,
+	TagLabel,
+	TagLeftIcon,
 } from '@chakra-ui/react'
 import { TokenSelector } from '../components/TokenSelector'
 import { ethers } from 'ethers'
 import defaults from '../common/defaults'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, CheckCircleIcon } from '@chakra-ui/icons'
+import { BsPauseCircleFill } from 'react-icons/bs'
 import { getERC20Allowance, convert, approveERC20ToSpend,
 	getClaimed, getVester, claim, minterMint, minterBurn,
 	usdvClaimAll } from '../common/ethereum'
@@ -51,6 +55,7 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	nothingtoclaim,
 	nomorethaneligible,
 	vaderconverted,
+	notyetUnlocked,
 } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
@@ -58,6 +63,8 @@ import { usePublicFee } from '../hooks/usePublicFee'
 import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
 import { useMinter } from '../hooks/useMinter'
 import { useERC20Balance } from '../hooks/useERC20Balance'
+import { useLocks } from '../hooks/useLocks'
+import TimeAgo from 'react-timeago'
 
 const Burn = (props) => {
 
@@ -87,6 +94,33 @@ const Burn = (props) => {
 	const fee = publicFee?.data?.mul(value).div(1e4)
 	const usdcTWAP = ethers.utils.parseEther(
 		String(1 / Number(ethers.utils.formatUnits(uniswapTWAP?.data ? uniswapTWAP.data : '1', 18))))
+
+	const { data: limits } = useMinterDailyLimits()
+	const locks = useLocks(tokenSelect.symbol)
+	const locksComplete = useLocks(undefined, false, 0, (defaults.api.graphql.pollInterval / 2))
+
+	const unclaimed = locks?.data?.locks.length > 1 ? locks?.data?.locks?.reduce((acc, lock) => {
+		acc = acc.add(ethers.BigNumber.from(lock?.amount))
+		return acc
+	}, ethers.BigNumber.from('0')) : ethers.BigNumber.from(locks?.data?.locks.length > 0 ? locks?.data?.locks[0]?.amount : '0')
+
+	const [releaseTime, setReleaseTime] = useState(new Date())
+	const [now, setNow] = useState(new Date())
+
+	useEffect(() => {
+		if(locksComplete?.data?.locks[0]?.release) {
+			setReleaseTime(new Date(locksComplete?.data?.locks[0]?.release * 1000))
+		}
+	}, [locksComplete?.data?.locks[0]?.release])
+
+	useEffect(() => {
+		const id = setInterval(() => setNow(new Date()), 1000)
+		return () => clearInterval(id)
+	}, [])
+
+	useEffect(() => {
+		locks.refetch()
+	}, [tokenSelect, submitOption, releaseTime])
 
 	const submit = () => {
 		if(!working) {
@@ -296,6 +330,9 @@ const Burn = (props) => {
 									tx.wait(
 										defaults.network.tx.confirmations,
 									).then((r) => {
+										setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
+										locks?.refetch()
+										locksComplete?.refetch()
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
 										balance?.refetch()
@@ -348,6 +385,9 @@ const Burn = (props) => {
 									tx.wait(
 										defaults.network.tx.confirmations,
 									).then((r) => {
+										setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
+										locks?.refetch()
+										locksComplete?.refetch()
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
 										balance?.refetch()
@@ -390,40 +430,48 @@ const Burn = (props) => {
 				}
 			}
 			else if (submitOption) {
-				setWorking(true)
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				usdvClaimAll(provider)
-					.then((tx) => {
-						tx.wait(
-							defaults.network.tx.confirmations,
-						).then((r) => {
-							balance?.refetch()
-							setWorking(false)
-							toast({
-								...vaderconverted,
-								description: <Link
-									variant='underline'
-									_focus={{
-										boxShadow: '0',
-									}}
-									href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-									isExternal>
-									<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-								duration: defaults.toast.txHashDuration,
+				if(releaseTime < now) {
+					setWorking(true)
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					usdvClaimAll(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
+								locks.refetch()
+								locksComplete.refetch()
+								balance?.refetch()
+								setWorking(false)
+								toast({
+									...vaderconverted,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
 							})
 						})
-					})
-					.catch(err => {
-						setWorking(false)
-						if (err.code === 4001) {
-							console.log('Transaction rejected: You have decided to reject the transaction..')
-							toast(rejected)
-						}
-						else {
-							console.log(err)
-							toast(failed)
-						}
-					})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: You have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(notyetUnlocked)
+				}
 			}
 			else if (tokenSelect.symbol === 'VETH' &&
 			((!defaults.redeemables[0].snapshot[wallet.account]) ||
@@ -660,7 +708,12 @@ const Burn = (props) => {
 											/>
 									}
 									{submitOption &&
-										<BreakdownClaim/>
+										<ClaimOverview
+											token={tokenSelect}
+											unclaimed={unclaimed}
+											releaseTime={releaseTime}
+											now={now}
+										/>
 									}
 								</>
 							}
@@ -818,9 +871,7 @@ const Burn = (props) => {
 						fontSize={{ base: '1.35rem', md: '1.5rem' }}
 						fontWeight='bolder'
 						justifyContent='center' alignItems='center' flexDir='column'>
-						{inputAmount &&
-							<>
-								{tokenSelect.symbol === 'VETH' &&
+						{inputAmount && tokenSelect.symbol === 'VETH' &&
 									<>
 										{!vethAccountLeafClaimed &&
 										<>
@@ -850,45 +901,54 @@ const Burn = (props) => {
 											</>
 										}
 									</>
-								}
-								{tokenSelect && tokenSelect?.symbol !== 'VETH' && !!uniswapTWAP?.data &&
+						}
+						{tokenSelect && tokenSelect?.symbol !== 'VETH' && !!uniswapTWAP?.data &&
 									<>
-										{!!uniswapTWAP?.data && inputAmount && conversionFactor?.gt(0) &&
+										{!!uniswapTWAP?.data && conversionFactor?.gt(0) &&
 											<>
-												{prettifyCurrency(
-													tokenSelect?.symbol === 'USDV' ?
-														(ethers.utils.formatEther(
-															(value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18)))
-																.sub(usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))),
-														)) :
-														(ethers.utils.formatEther(
-															value?.mul(conversionFactor)
-																.div(ethers.utils.parseUnits('1', 18))
-																.sub(
-																	uniswapTWAP?.data?.mul(fee)
-																		.div(ethers.utils.parseUnits('1', 18)),
-																),
-														)),
-													0,
-													2,
-													tokenSelect?.convertsTo?.symbol,
-												)}
+												{inputAmount && !submitOption &&
+													<>
+														{prettifyCurrency(
+															tokenSelect?.symbol === 'USDV' ?
+																(ethers.utils.formatEther(
+																	(value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18)))
+																		.sub(usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))),
+																)) :
+																(ethers.utils.formatEther(
+																	value?.mul(conversionFactor)
+																		.div(ethers.utils.parseUnits('1', 18))
+																		.sub(
+																			uniswapTWAP?.data?.mul(fee)
+																				.div(ethers.utils.parseUnits('1', 18)),
+																		),
+																)),
+															0,
+															2,
+															tokenSelect?.convertsTo?.symbol,
+														)}
+													</>
+												}
 											</>
 										}
-										<WhatYouGetTag/>
+										{submitOption && unclaimed.gt(0) &&
+											<>
+												{prettifyCurrency(ethers.utils.formatEther(unclaimed), 0, 2, tokenSelect.symbol)}
+											</>
+										}
 									</>
-								}
-							</>
 						}
-						{((!tokenSelect) ||
-						(!inputAmount) ||
-						(!uniswapTWAP?.data))
-						&&
+
+						{(
+							(!tokenSelect) ||
+							(!inputAmount && !submitOption) ||
+							(!uniswapTWAP?.data) ||
+							(!unclaimed.gt(0) && submitOption)
+						) &&
 							<>
 								<span>👻</span>
-								<WhatYouGetTag/>
 							</>
 						}
+						<WhatYouGetTag/>
 					</Flex>
 
 					<Button
@@ -1001,7 +1061,14 @@ const WhatYouGetTag = () => {
 	)
 }
 
-const BreakdownClaim = () => {
+const ClaimOverview = (props) => {
+
+	ClaimOverview.propTypes = {
+		token: PropTypes.object.isRequired,
+		unclaimed: PropTypes.object.isRequired,
+		releaseTime: PropTypes.object.isRequired,
+		now: PropTypes.object.isRequired,
+	}
 
 	return (
 		<>
@@ -1011,7 +1078,7 @@ const BreakdownClaim = () => {
 				fontWeight='bolder'
 				mr='0.66rem'
 			>
-				Breakdown
+				Overview
 			</Text>
 
 			<Flex
@@ -1032,7 +1099,7 @@ const BreakdownClaim = () => {
 						<Box
 							textAlign='right'
 						>
-
+							{prettifyCurrency(ethers.utils.formatEther(props.unclaimed), 0, 2, props.token.symbol)}
 						</Box>
 					</Container>
 				</Flex>
@@ -1040,42 +1107,34 @@ const BreakdownClaim = () => {
 					<Container p='0'>
 						<Box
 							textAlign='left'>
-								Locked
+								Time to unlock
 						</Box>
 					</Container>
 					<Container p='0'>
 						<Box
 							textAlign='right'>
-
+							{props.releaseTime >= props.now &&
+								<TimeAgo date={props.releaseTime} live={false}/>
+							}
+							{props.releaseTime < props.now &&
+								<i>None</i>
+							}
 						</Box>
 					</Container>
 				</Flex>
 				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
-								Locked until
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-
-						</Box>
-					</Container>
-				</Flex>
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'>
-								Lock duration
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'>
-
-						</Box>
+					<Container
+						maxW='none'
+						mt='4px'
+						p='0'>
+						<Tag
+							size='md'
+							colorScheme={props.releaseTime < props.now ? 'cyan' : 'red'}
+							borderRadius='full'>
+							<TagLeftIcon
+								as={props.releaseTime < props.now ? CheckCircleIcon : BsPauseCircleFill}/>
+							<TagLabel>{props.releaseTime < props.now ? 'Unlocked' : 'Locked'}</TagLabel>
+						</Tag>
 					</Container>
 				</Flex>
 			</Flex>

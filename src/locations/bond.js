@@ -5,7 +5,7 @@ import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
-	useToast, Container, Tag, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
+	useToast, Container, Tag, TagLeftIcon, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
 	FormControl, FormLabel, useBreakpointValue } from '@chakra-ui/react'
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
@@ -1178,16 +1178,12 @@ const Overview = (props) => {
 							<Flex>
 								<Container
 									maxW='none'
+									mt='4px'
 									p='0'>
-									<Box
-										textAlign='left'
-									>
-										Purchased
-										<CheckCircleIcon
-											color='cyan'
-											ml='5px'
-										/>
-									</Box>
+									<Tag size='md' colorScheme='cyan' borderRadius='full'>
+										<TagLeftIcon as={CheckCircleIcon}/>
+										<TagLabel>Purchased</TagLabel>
+									</Tag>
 								</Container>
 							</Flex>
 						}

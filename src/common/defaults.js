@@ -95,10 +95,16 @@ defaults.network.autoConnect = true
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
-defaults.network.tx.confirmations = 1
+defaults.network.tx.confirmations = 2
 
 defaults.network.blockTime = {}
-defaults.network.blockTime.hour = 262
+defaults.network.blockTime.second = (
+	defaults.network.chainId === 1 ? 0.07570023 :
+		defaults.network.chainId === 42 ? 0.25 :
+			0)
+defaults.network.blockTime.minute = defaults.network.blockTime.second * 60
+defaults.network.blockTime.hour = defaults.network.blockTime.minute * 60
+defaults.network.blockTime.day = defaults.network.blockTime.hour * 24
 
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
