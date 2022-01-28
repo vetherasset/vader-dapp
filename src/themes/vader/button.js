@@ -127,7 +127,8 @@ export default {
 			},
 		}),
 		link: () => ({
-			color: 'accent.200',
+			borderRadius: '12px',
+			color: 'accent.100',
 			height: 'auto',
     	padding: '0',
 			_active: {
@@ -171,13 +172,14 @@ export default {
 		linkAccent: () => ({
 			color: 'accent.100',
 			height: 'auto',
-    	padding: '0',
+			borderRadius: '12px',
+    	padding: '0 .44rem',
 			_hover: {
-				textDecoration: 'underline',
+				color: 'accent.200',
 			},
 			_active: {
 				color: 'accent.100',
-				opacity: '0.6',
+				opacity: '0.8',
 			},
 		}),
 	},

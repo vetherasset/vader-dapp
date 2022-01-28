@@ -10,6 +10,7 @@ import {
 	Input,
 	InputGroup,
 	InputRightAddon,
+	InputRightElement,
 	Image,
 	Link,
 	Spinner,
@@ -55,7 +56,9 @@ import { insufficientBalance, rejected, failed, vethupgraded, walletNotConnected
 	nothingtoclaim,
 	nomorethaneligible,
 	vaderconverted,
+	usdvredeemed,
 	notyetUnlocked,
+	dailyLimitReached,
 } from '../messages'
 import { useClaimableVeth } from '../hooks/useClaimableVeth'
 import { useUniswapTWAP } from '../hooks/useUniswapTWAP'
@@ -64,9 +67,12 @@ import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
 import { useMinter } from '../hooks/useMinter'
 import { useERC20Balance } from '../hooks/useERC20Balance'
 import { useLocks } from '../hooks/useLocks'
+import prettyMilliseconds from 'pretty-ms'
 import TimeAgo from 'react-timeago'
+import { useUsdvMintedBurnt } from '../hooks/useUsdvMintedBurnt'
 
 const Burn = (props) => {
+
 
 	const wallet = useWallet()
 	const toast = useToast()
@@ -85,7 +91,8 @@ const Burn = (props) => {
 	const claimableVeth = useClaimableVeth()
 	const [vester, setVester] = useState([])
 
-	const [slippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
+	const [slippageTolAmount, setSlippageTolAmount] = useSessionStorage('acquireSlippageTolAmount042334310', '')
+	const [slippageTol, setSlippageTol] = useSessionStorage('acquireSlippageTol042434310', 3)
 	const [submitOption, setSubmitOption] = useLocalStorage('acquireSubmitOption23049', false)
 
 	const { data: minter } = useMinter()
@@ -107,6 +114,20 @@ const Burn = (props) => {
 	const [releaseTime, setReleaseTime] = useState(new Date())
 	const [now, setNow] = useState(new Date())
 
+	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
+	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
+		ethers.BigNumber.from('0').lt(limits?.[1]) ?
+			limits?.[1].sub(ethers.BigNumber.from('0')) :
+			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
+
+	const usdvBurnt = useUsdvMintedBurnt(true, (defaults.api.graphql.pollInterval / 2))
+	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2] ?
+		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
+			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
+			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
+
 	useEffect(() => {
 		if(locksComplete?.data?.locks[0]?.release) {
 			setReleaseTime(new Date(locksComplete?.data?.locks[0]?.release * 1000))
@@ -120,6 +141,8 @@ const Burn = (props) => {
 
 	useEffect(() => {
 		locks.refetch()
+		usdvMinted.refetch()
+		usdvBurnt.refetch()
 	}, [tokenSelect, submitOption, releaseTime])
 
 	const submit = () => {
@@ -312,68 +335,77 @@ const Burn = (props) => {
 							}
 						}
 						else if (tokenSelect.symbol === 'USDV') {
-							setWorking(true)
-							const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
-							const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
-							const a = amount.sub(feeAmount)
-							const minValue = a
-								.div(100)
-								.mul(slippageTol)
-								.sub(a)
-								.mul(-1)
-							minterBurn(
-								value,
-								minValue,
-								minter,
-								provider)
-								.then((tx) => {
-									tx.wait(
-										defaults.network.tx.confirmations,
-									).then((r) => {
-										setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
-										locks?.refetch()
-										locksComplete?.refetch()
+							if((dailyLimitBurnt && dailyLimitBurnt.gt(0))) {
+								setWorking(true)
+								const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
+								const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
+								const a = amount.sub(feeAmount)
+								const minValue = a
+									.div(100)
+									.mul(slippageTol._isBigNumber ? Number(ethers.utils.formatUnits(slippageTol, 18)) : slippageTol)
+									.sub(a)
+									.mul(-1)
+								minterBurn(
+									value,
+									minValue,
+									minter,
+									provider)
+									.then((tx) => {
+										tx.wait(
+											defaults.network.tx.confirmations,
+										).then((r) => {
+											setReleaseTime(new Date().setSeconds(new Date().getSeconds() + (limits?.[3].toNumber() + ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations))))
+											locks?.refetch()
+											locksComplete?.refetch()
+											uniswapTWAP?.refetch()
+											publicFee?.refetch()
+											balance?.refetch()
+											usdvMinted?.refetch()
+											usdvBurnt?.refetch()
+											setWorking(false)
+											toast({
+												...usdvredeemed,
+												description: <Link
+													variant='underline'
+													_focus={{
+														boxShadow: '0',
+													}}
+													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+													isExternal>
+													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+												duration: defaults.toast.txHashDuration,
+											})
+										})
+									})
+									.catch(err => {
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
 										balance?.refetch()
+										usdvMinted?.refetch()
+										usdvBurnt?.refetch()
 										setWorking(false)
-										toast({
-											...vaderconverted,
-											description: <Link
-												variant='underline'
-												_focus={{
-													boxShadow: '0',
-												}}
-												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-												isExternal>
-												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-											duration: defaults.toast.txHashDuration,
-										})
+										if (err.code === 4001) {
+											console.log('Transaction rejected: You have decided to reject the transaction..')
+											toast(rejected)
+										}
+										else {
+											console.log(err)
+											toast(failed)
+										}
 									})
-								})
-								.catch(err => {
-									uniswapTWAP?.refetch()
-									publicFee?.refetch()
-									balance?.refetch()
-									setWorking(false)
-									if (err.code === 4001) {
-										console.log('Transaction rejected: You have decided to reject the transaction..')
-										toast(rejected)
-									}
-									else {
-										console.log(err)
-										toast(failed)
-									}
-								})
+							}
+							else {
+								toast(dailyLimitReached)
+							}
 						}
-						else {
+						else if(dailyLimitMint && dailyLimitMint.gt(0)) {
 							setWorking(true)
 							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
 							const a = amount.sub(feeAmount)
 							const minValue = a
 								.div(100)
-								.mul(slippageTol)
+								.mul(slippageTol._isBigNumber ? Number(ethers.utils.formatUnits(slippageTol, 18)) : slippageTol)
 								.sub(a)
 								.mul(-1)
 							minterMint(
@@ -390,6 +422,8 @@ const Burn = (props) => {
 										locksComplete?.refetch()
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
+										usdvMinted?.refetch()
+										usdvBurnt?.refetch()
 										balance?.refetch()
 										setWorking(false)
 										toast({
@@ -409,6 +443,8 @@ const Burn = (props) => {
 								.catch(err => {
 									uniswapTWAP?.refetch()
 									publicFee?.refetch()
+									usdvMinted?.refetch()
+									usdvBurnt?.refetch()
 									setWorking(false)
 									if (err.code === 4001) {
 										console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -419,6 +455,9 @@ const Burn = (props) => {
 										toast(failed)
 									}
 								})
+						}
+						else {
+							toast(dailyLimitReached)
 						}
 					}
 					else {
@@ -542,7 +581,7 @@ const Burn = (props) => {
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
 			if (defaults.redeemables[0].snapshot[wallet.account]) {
-				if(!vethAllowLess) {
+				if(!vethAllowLess && balance.data) {
 					if (balance.data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
 						setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
 						setInputAmount(
@@ -845,6 +884,172 @@ const Burn = (props) => {
 
 							{tokenSelect?.symbol !== 'VETH' &&
 								<>
+									<Flex
+										mt='.6rem'
+										justifyContent='flex-end'
+										flexDir='row'
+										opacity={
+											(!tokenSelect || submitOption) ? '0.5' :
+												'1'
+										}
+										pointerEvents={(!tokenSelect || submitOption) ? 'none' :
+											''}
+									>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(25),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(25))
+											}}>
+													25%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(50),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(50))
+											}}>
+													50%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(75),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(75))
+											}}>
+													75%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(balance?.data, tokenSelect.decimals),
+												)
+												setValue(balance?.data)
+											}}>
+													MAX
+										</Button>
+									</Flex>
+									<Flex
+										m='.3rem 0 1.2rem'
+										flexDir='column'
+									>
+										<Flex
+											pointerEvents={(!tokenSelect || submitOption) ? 'none' :
+												''}
+											opacity={
+												(!tokenSelect || submitOption) ? '0.5' :
+													'1'
+											}
+											flexDir='column'
+										>
+											<Text
+												as='h4'
+												fontWeight='bolder'>
+														Slippage Tolerance
+											</Text>
+											<Flex
+												mt='.3rem'
+												justifyContent='flex-start'
+												flexDir='row'
+											>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border:	slippageTol === 2 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(2)
+														setSlippageTolAmount('')
+													}}>
+														2%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 3 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(3)
+														setSlippageTolAmount('')
+													}}>
+														3%
+												</Button>
+												<Button
+													variant='outline'
+													size='sm'
+													mr='0.4rem'
+													style={{
+														border: slippageTol === 4 && !slippageTolAmount ? '2px solid #3fa3fa' : '',
+													}}
+													onClick={() => {
+														setSlippageTol(4)
+														setSlippageTolAmount('')
+													}}>
+														4%
+												</Button>
+												<InputGroup
+													size='sm'
+												>
+													<Input
+														variant='outline'
+														placeholder='Custom'
+														style={{
+															border: ((([2, 3, 4].indexOf(slippageTol) === -1)) || slippageTolAmount) ? '2px solid #3fa3fa' : '',
+														}}
+														value={slippageTolAmount}
+														onChange={(e) => {
+															if (isNaN(e.target.value)) {
+																setSlippageTolAmount(prev => prev)
+															}
+															else {
+																setSlippageTolAmount(String(e.target.value))
+																if(Number(e.target.value) >= 0) {
+																	try {
+																		setSlippageTol(ethers.utils.parseUnits(String(e.target.value), tokenSelect.decimals))
+																	}
+																	catch(err) {
+																		if (err.code === 'NUMERIC_FAULT') {
+																			console.log('value too small')
+																		}
+																	}
+																}
+															}
+														}}
+													/>
+													<InputRightElement>
+														<>
+															%
+														</>
+													</InputRightElement>
+												</InputGroup>
+											</Flex>
+										</Flex>
+									</Flex>
 									<SubmitOptions
 										pointerEvents={!tokenSelect ? 'none' :
 											''}
@@ -859,9 +1064,9 @@ const Burn = (props) => {
 							}
 
 							{tokenSelect && tokenSelect.symbol === 'VETH' &&
-							<VethAllowLessOption
-								allow={vethAllowLess}
-								setAllow={setVethAllowLess}/>
+								<VethAllowLessOption
+									allow={vethAllowLess}
+									setAllow={setVethAllowLess}/>
 							}
 						</>
 					}
@@ -871,7 +1076,7 @@ const Burn = (props) => {
 						fontSize={{ base: '1.35rem', md: '1.5rem' }}
 						fontWeight='bolder'
 						justifyContent='center' alignItems='center' flexDir='column'>
-						{inputAmount && tokenSelect.symbol === 'VETH' &&
+						{tokenSelect.symbol === 'VETH' &&
 									<>
 										{!vethAccountLeafClaimed &&
 										<>
@@ -884,7 +1089,6 @@ const Burn = (props) => {
 														2,
 														tokenSelect.convertsTo.symbol,
 													)}
-													<WhatYouGetTag/>
 												</>
 											}
 										</>
@@ -897,7 +1101,6 @@ const Burn = (props) => {
 													2,
 													'VADER',
 												)}
-												<WhatYouGetTag/>
 											</>
 										}
 									</>
@@ -938,7 +1141,7 @@ const Burn = (props) => {
 									</>
 						}
 
-						{(
+						{(!claimableVeth.gt(0)) && (
 							(!tokenSelect) ||
 							(!inputAmount && !submitOption) ||
 							(!uniswapTWAP?.data) ||
@@ -1071,7 +1274,11 @@ const ClaimOverview = (props) => {
 	}
 
 	return (
-		<>
+		<Flex
+			flexDir='column'
+			justifyContent='center'
+			minH='141.6px'
+		>
 			<Text
 				as='h4'
 				fontSize='1.1rem'
@@ -1117,7 +1324,7 @@ const ClaimOverview = (props) => {
 								<TimeAgo date={props.releaseTime} live={false}/>
 							}
 							{props.releaseTime < props.now &&
-								<i>None</i>
+								<i>None left</i>
 							}
 						</Box>
 					</Container>
@@ -1138,7 +1345,7 @@ const ClaimOverview = (props) => {
 					</Container>
 				</Flex>
 			</Flex>
-		</>
+		</Flex>
 	)
 }
 
@@ -1151,6 +1358,21 @@ const Breakdown = (props) => {
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 	const { data: limits } = useMinterDailyLimits()
+
+	const usdvMinted = useUsdvMintedBurnt()
+
+	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
+		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
+			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :
+			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).eq(limits?.[1]) ?
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
+
+	const usdvBurnt = useUsdvMintedBurnt(true)
+	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2]?.gt(0) ?
+		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
+			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
+			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
+				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
 
 	return (
 		<>
@@ -1224,7 +1446,7 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='left'>
-								Daily limit
+								Remaining daily limit
 						</Box>
 					</Container>
 					<Container p='0'>
@@ -1232,18 +1454,18 @@ const Breakdown = (props) => {
 							textAlign='right'>
 							{props.token.symbol === 'VADER' &&
 								<>
-									{limits?.[1] &&
+									{limits?.[1] && dailyLimitMint &&
 										<>
-											{prettifyCurrency(ethers.utils.formatUnits(limits?.[1], 18), 0, 2, 'USDV')}
+											{prettifyCurrency(ethers.utils.formatUnits(dailyLimitMint ? dailyLimitMint : 0, 18), 0, 2, 'USDV')}
 										</>
 									}
 								</>
 							}
 							{props.token.symbol === 'USDV' &&
 								<>
-									{limits?.[2] &&
+									{limits?.[2] && dailyLimitBurnt &&
 										<>
-											{prettifyCurrency(ethers.utils.formatUnits(limits?.[2], 18), 0, 2, 'USDV')}
+											{prettifyCurrency(ethers.utils.formatUnits(dailyLimitBurnt ? dailyLimitBurnt : 0, 18), 0, 2, 'USDV')}
 										</>
 									}
 								</>
@@ -1263,7 +1485,9 @@ const Breakdown = (props) => {
 							textAlign='right'>
 							{limits?.[3] &&
 								<>
-									{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
+									{limits?.[3]?.toString() ? prettyMilliseconds(
+										limits?.[3]?.toNumber() * 1000,
+										{ verbose: true }) : ''}
 								</>
 							}
 						</Box>
@@ -1282,7 +1506,6 @@ const VethBreakdown = (props) => {
 	}
 
 	const wallet = useWallet()
-
 	const [vester, setVester] = useState([])
 
 	useEffect(() => {
