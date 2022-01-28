@@ -120,11 +120,6 @@ defaults.api.graphql.uri.vaderProtocol = (
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
 			undefined
 )
-defaults.api.graphql.uri.vaderProtocolUsdv = (
-	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol-mainnet-usdv' :
-		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/satoshi-naoki/vader-protocol' :
-			undefined
-)
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
 		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/sc0vu/uniswap-v2-kovan' :
@@ -136,10 +131,6 @@ defaults.api.graphql.cache = new InMemoryCache()
 defaults.api.graphql.client = {}
 defaults.api.graphql.client.vaderProtocol = new ApolloClient({
 	uri: defaults.api.graphql.uri.vaderProtocol,
-	cache: defaults.api.graphql.cache,
-})
-defaults.api.graphql.client.vaderProtocolUsdv = new ApolloClient({
-	uri: defaults.api.graphql.uri.vaderProtocolUsdv,
 	cache: defaults.api.graphql.cache,
 })
 defaults.api.graphql.client.uniswapV2 = new ApolloClient({

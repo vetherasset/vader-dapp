@@ -1362,8 +1362,6 @@ const Breakdown = (props) => {
 
 	const usdvMinted = useUsdvMintedBurnt()
 
-	console.log(usdvMinted?.data?.globals?.[0]?.value)
-
 	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
 		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
 			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :

@@ -24,7 +24,6 @@ export const useUsdvMintedBurnt = (burnt = false, pollInterval = defaults.api.gr
 		query,
 		{
 			pollInterval: pollInterval,
-			client: defaults.api.graphql.client.vaderProtocolUsdv,
 		},
 	)
 
