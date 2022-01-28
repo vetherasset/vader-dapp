@@ -580,7 +580,7 @@ const Burn = (props) => {
 	useEffect(() => {
 		if (tokenSelect.symbol === 'VETH') {
 			if (defaults.redeemables[0].snapshot[wallet.account]) {
-				if(!vethAllowLess) {
+				if(!vethAllowLess && balance.data) {
 					if (balance.data.gt(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))) {
 						setValue(ethers.BigNumber.from(defaults.redeemables[0].snapshot[wallet.account]))
 						setInputAmount(
