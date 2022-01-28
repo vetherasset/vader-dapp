@@ -117,7 +117,7 @@ const TokenSelectDialog = (props) => {
 							<>
 								<List
 									width='100%'
-									maxWidth={448}
+									maxWidth={454.883}
 									height={600}
 									itemCount={tokenListModified ? tokenListModified.length : props.tokenList.length}
 									itemSize={64}
@@ -271,9 +271,12 @@ export const TokenSelector = (props) => {
 				isOpen={props.isOpen}
 				scrollBehavior='inside'
 				isCentered
+				autoFocus={false}
 				initialFocusRef={initialRef}>
 				<ModalOverlay />
-				<ModalContent overflow='hidden'>
+				<ModalContent
+					maxWidth='454.883px'
+					overflow='hidden'>
 					<Box height='736px'>
 						{dialog === 0 &&
 							<TokenSelectDialog

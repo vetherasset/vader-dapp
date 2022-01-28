@@ -109,6 +109,15 @@ const vaderclaimed = {
 	position: defaults.toast.position,
 }
 
+const dailyLimitReached = {
+	title: 'Daily limit reached',
+	description: 'The daily limit was reached and cannot be exceeded.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const usdvredeemed = {
 	title: 'USDV burnt for VADER Token',
 	description: 'Your USDV tokens were successfully burnt for VADER.',
@@ -157,11 +166,21 @@ const nothingtoclaim = {
 const nomorethaneligible = {
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
-	status: 'error',
+	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
 	position: defaults.toast.position,
 }
+
+const notyetUnlocked = {
+	title: 'Cannot claim when still locked',
+	description: 'You cannot claim before the cooldown is over.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 
 const tokenValueTooSmall = {
 	title: 'Token amount is too small',
@@ -242,4 +261,5 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
+	notyetUnlocked, dailyLimitReached,
 }
