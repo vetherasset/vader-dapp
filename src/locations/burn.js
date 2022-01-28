@@ -64,6 +64,7 @@ import { useMinterDailyLimits } from '../hooks/useMinterDailyLimits'
 import { useMinter } from '../hooks/useMinter'
 import { useERC20Balance } from '../hooks/useERC20Balance'
 import { useLocks } from '../hooks/useLocks'
+import prettyMilliseconds from 'pretty-ms'
 import TimeAgo from 'react-timeago'
 
 const Burn = (props) => {
@@ -1333,7 +1334,9 @@ const Breakdown = (props) => {
 							textAlign='right'>
 							{limits?.[3] &&
 								<>
-									{limits?.[3]?.toString() ? `${limits?.[3]?.toString()} sec` : ''}
+									{limits?.[3]?.toString() ? prettyMilliseconds(
+										limits?.[3]?.toNumber() * 1000,
+										{ verbose: true }) : ''}
 								</>
 							}
 						</Box>
