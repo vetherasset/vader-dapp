@@ -148,7 +148,7 @@ defaults.api.etherscanUrl = (
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
+	defaults.network.chainId === 1 ? '0x2602278ee1882889b946eb11dc0e810075650983' :
 		defaults.network.chainId === 42 ? '0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F' :
 			undefined
 )
