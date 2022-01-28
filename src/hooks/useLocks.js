@@ -31,6 +31,7 @@ export const useLocks = (token, rpc = false, lockIndex = 0, pollInterval = defau
 			query,
 			{
 				pollInterval: pollInterval,
+				client: defaults.api.graphql.client.vaderProtocolUsdv,
 			},
 		)
 
