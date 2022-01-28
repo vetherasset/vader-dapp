@@ -108,7 +108,7 @@ export const BalanceIndicator = () => {
 										justifyContent='center'
 										borderRadius='12px'
 										background='#000'
-										p='7px 11px'
+										p='7px 12px'
 										gridGap='13px'
 									>
 										{Number(totalBalance()) > 0 &&

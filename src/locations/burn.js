@@ -113,15 +113,14 @@ const Burn = (props) => {
 	const [releaseTime, setReleaseTime] = useState(new Date())
 	const [now, setNow] = useState(new Date())
 
-	const usdvMinted = useUsdvMintedBurnt(false)
-	console.log(usdvMinted)
+	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
 	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
 		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).lt(limits?.[1]) ?
 			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value)) :
 			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
 				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : undefined
 
-	const usdvBurnt = useUsdvMintedBurnt(true)
+	const usdvBurnt = useUsdvMintedBurnt(true, (defaults.api.graphql.pollInterval / 2))
 	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2] ?
 		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
 			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :

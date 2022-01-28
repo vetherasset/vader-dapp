@@ -21,15 +21,15 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		// {
-		// 	provider: new ethers.providers.InfuraProvider(
-		// 		defaults.network.chainId,
-		// 		process.env.REACT_APP_INFURA_KEY,
-		// 	),
-		// 	weight: 1,
-		// 	priority: 2,
-		// 	stallTimeout: 2000,
-		// },
+		{
+			provider: new ethers.providers.InfuraProvider(
+				defaults.network.chainId,
+				process.env.REACT_APP_INFURA_KEY,
+			),
+			weight: 1,
+			priority: 2,
+			stallTimeout: 2000,
+		},
 	],
 	1,
 )
@@ -148,7 +148,7 @@ defaults.api.etherscanUrl = (
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x9d0e2bb91589F7EC197443157C78Bd608c5e2679' :
+	defaults.network.chainId === 1 ? '0x2602278ee1882889b946eb11dc0e810075650983' :
 		defaults.network.chainId === 42 ? '0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F' :
 			undefined
 )
@@ -163,7 +163,7 @@ defaults.address.xvader = (
 			undefined
 )
 defaults.address.usdv = (
-	defaults.network.chainId === 1 ? undefined :
+	defaults.network.chainId === 1 ? '0xea3Fb6f331735252E7Bfb0b24b3B761301293DBe' :
 		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
