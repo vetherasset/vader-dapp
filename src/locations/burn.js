@@ -73,6 +73,7 @@ import { useUsdvMintedBurnt } from '../hooks/useUsdvMintedBurnt'
 
 const Burn = (props) => {
 
+
 	const wallet = useWallet()
 	const toast = useToast()
 	const { isOpen, onOpen, onClose } = useDisclosure()
@@ -1075,7 +1076,7 @@ const Burn = (props) => {
 						fontSize={{ base: '1.35rem', md: '1.5rem' }}
 						fontWeight='bolder'
 						justifyContent='center' alignItems='center' flexDir='column'>
-						{inputAmount && tokenSelect.symbol === 'VETH' &&
+						{tokenSelect.symbol === 'VETH' &&
 									<>
 										{!vethAccountLeafClaimed &&
 										<>
@@ -1088,7 +1089,6 @@ const Burn = (props) => {
 														2,
 														tokenSelect.convertsTo.symbol,
 													)}
-													<WhatYouGetTag/>
 												</>
 											}
 										</>
@@ -1101,7 +1101,6 @@ const Burn = (props) => {
 													2,
 													'VADER',
 												)}
-												<WhatYouGetTag/>
 											</>
 										}
 									</>
@@ -1142,7 +1141,7 @@ const Burn = (props) => {
 									</>
 						}
 
-						{(
+						{(!claimableVeth.gt(0)) && (
 							(!tokenSelect) ||
 							(!inputAmount && !submitOption) ||
 							(!uniswapTWAP?.data) ||
@@ -1506,8 +1505,9 @@ const VethBreakdown = (props) => {
 		vethAccountLeafClaimed: PropTypes.bool.isRequired,
 	}
 
-	const wallet = useWallet()
-
+	const wallet = {
+		account: '0xa9F583e6E7001C79Df5Fc2DdCec12A96f7ba2aD6',
+	}
 	const [vester, setVester] = useState([])
 
 	useEffect(() => {
