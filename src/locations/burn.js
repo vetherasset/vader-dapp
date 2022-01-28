@@ -842,75 +842,75 @@ const Burn = (props) => {
 									</InputGroup>
 								</Box>
 							</Flex>
-							<Flex
-								m='.6rem 0 .3rem'
-								justifyContent='flex-end'
-								flexDir='row'
-								opacity={
-									!tokenSelect ? '0.5' :
-										'1'
-								}
-								pointerEvents={!tokenSelect ? 'none' :
-									''}
-							>
-								<Button
-									variant='outline'
-									size='sm'
-									mr='0.4rem'
-									onClick={() => {
-										setInputAmount(
-											ethers.utils.formatUnits(
-												balance?.data?.div(100).mul(25),
-												tokenSelect.decimals),
-										)
-										setValue(balance?.data?.div(100).mul(25))
-									}}>
-													25%
-								</Button>
-								<Button
-									variant='outline'
-									size='sm'
-									mr='0.4rem'
-									onClick={() => {
-										setInputAmount(
-											ethers.utils.formatUnits(
-												balance?.data?.div(100).mul(50),
-												tokenSelect.decimals),
-										)
-										setValue(balance?.data?.div(100).mul(50))
-									}}>
-													50%
-								</Button>
-								<Button
-									variant='outline'
-									size='sm'
-									mr='0.4rem'
-									onClick={() => {
-										setInputAmount(
-											ethers.utils.formatUnits(
-												balance?.data?.div(100).mul(75),
-												tokenSelect.decimals),
-										)
-										setValue(balance?.data?.div(100).mul(75))
-									}}>
-													75%
-								</Button>
-								<Button
-									variant='outline'
-									size='sm'
-									mr='0.4rem'
-									onClick={() => {
-										setInputAmount(
-											ethers.utils.formatUnits(balance?.data, tokenSelect.decimals),
-										)
-										setValue(balance?.data)
-									}}>
-													MAX
-								</Button>
-							</Flex>
 
 							{tokenSelect?.symbol !== 'VETH' &&
 								<>
+									<Flex
+										m='.6rem 0 .3rem'
+										justifyContent='flex-end'
+										flexDir='row'
+										opacity={
+											(!tokenSelect || submitOption) ? '0.5' :
+												'1'
+										}
+										pointerEvents={(!tokenSelect || submitOption) ? 'none' :
+											''}
+									>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(25),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(25))
+											}}>
+													25%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(50),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(50))
+											}}>
+													50%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(
+														balance?.data?.div(100).mul(75),
+														tokenSelect.decimals),
+												)
+												setValue(balance?.data?.div(100).mul(75))
+											}}>
+													75%
+										</Button>
+										<Button
+											variant='outline'
+											size='sm'
+											mr='0.4rem'
+											onClick={() => {
+												setInputAmount(
+													ethers.utils.formatUnits(balance?.data, tokenSelect.decimals),
+												)
+												setValue(balance?.data)
+											}}>
+													MAX
+										</Button>
+									</Flex>
 									<SubmitOptions
 										pointerEvents={!tokenSelect ? 'none' :
 											''}
@@ -925,9 +925,9 @@ const Burn = (props) => {
 							}
 
 							{tokenSelect && tokenSelect.symbol === 'VETH' &&
-							<VethAllowLessOption
-								allow={vethAllowLess}
-								setAllow={setVethAllowLess}/>
+								<VethAllowLessOption
+									allow={vethAllowLess}
+									setAllow={setVethAllowLess}/>
 							}
 						</>
 					}
@@ -1137,7 +1137,11 @@ const ClaimOverview = (props) => {
 	}
 
 	return (
-		<>
+		<Flex
+			flexDir='column'
+			justifyContent='center'
+			minH='141.6px'
+		>
 			<Text
 				as='h4'
 				fontSize='1.1rem'
@@ -1204,7 +1208,7 @@ const ClaimOverview = (props) => {
 					</Container>
 				</Flex>
 			</Flex>
-		</>
+		</Flex>
 	)
 }
 
