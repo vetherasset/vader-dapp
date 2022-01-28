@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useQuery } from 'react-query'
 import { BigNumber, utils } from 'ethers'
 import { Button, Box, Image, Fade, Popover, PopoverTrigger,
 	Portal, PopoverContent,
 	PopoverBody, Flex, Container, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
-import { useWallet } from 'use-wallet'
 import { useXvaderPrice } from '../hooks/useXvaderPrice'
-import { getERC20BalanceOf } from '../common/ethereum'
 import { prettifyNumber } from '../common/utils'
+import { useERC20Balance } from '../hooks/useERC20Balance'
 
 const Item = (props) => {
 
@@ -57,39 +55,15 @@ const Item = (props) => {
 
 export const BalanceIndicator = () => {
 
-	const wallet = useWallet()
 	const xvdrExchangeRate = useXvaderPrice()
-
-	const vaderBalance = useQuery(`${defaults.vader.address}_erc20Balanceof_${wallet?.account}`,
-		async () => {
-			if (wallet.account) {
-				return await getERC20BalanceOf(
-					defaults.vader.address,
-					wallet.account,
-					defaults.network.provider,
-				)
-			}
-		}, {
-			staleTime: defaults.api.staleTime,
-		},
-	)
-
-	const xvaderBalance = useQuery(`${defaults.xvader.address}_erc20Balanceof_${wallet?.account}`,
-		async () => {
-			if (wallet.account) {
-				return await getERC20BalanceOf(
-					defaults.xvader.address,
-					wallet.account,
-					defaults.network.provider,
-				)
-			}
-		}, {
-			staleTime: defaults.api.staleTime,
-		},
-	)
+	const vaderBalance = useERC20Balance(defaults.vader.address)
+	const xvaderBalance = useERC20Balance(defaults.xvader.address)
+	const usdvBalance = useERC20Balance(defaults.usdv.address)
 
 	const totalBalance = (total = true) => {
-		if (xvdrExchangeRate?.[0]?.global.value && xvaderBalance.data && vaderBalance.data) {
+		if (xvdrExchangeRate?.[0]?.global.value &&
+			xvaderBalance?.data &&
+			vaderBalance?.data) {
 			return utils.formatEther(
 				BigNumber.from(xvdrExchangeRate?.[0]?.global?.value)
 					.mul(xvaderBalance?.data)
@@ -102,7 +76,8 @@ export const BalanceIndicator = () => {
 
 	return (
 		<>
-			{Number(totalBalance()) > 0 &&
+			{(Number(totalBalance()) > 0 ||
+				usdvBalance?.data?.gt(0)) &&
 				<>
 					<Popover
 						closeOnEsc={true}
@@ -113,7 +88,7 @@ export const BalanceIndicator = () => {
 						<PopoverTrigger>
 							<Fade
 								unmountOnExit={true}
-								in={Number(totalBalance()) > 0}
+								in={true}
 							>
 								<Button
 									size='md'
@@ -134,24 +109,49 @@ export const BalanceIndicator = () => {
 										borderRadius='12px'
 										background='#000'
 										p='7px 11px'
+										gridGap='13px'
 									>
-										<Box d='flex' alignItems='center'>
-											<Image
-												width='24px'
-												height='24px'
-												mr='5px'
-												src={defaults.vader.logoURI}
-												alt={`${defaults.vader.name} token`}
-											/>
-											<Box
-												as='h3'
-												m='0'
-												fontSize='1.02rem'
-												fontWeight='bold'
-												textTransform='capitalize'>
-												{prettifyNumber(totalBalance(true), 0, 2)}
+										{Number(totalBalance()) > 0 &&
+											<Box d='flex' alignItems='center'>
+												<Image
+													width='24px'
+													height='24px'
+													mr='5px'
+													src={defaults.vader.logoURI}
+													alt={`${defaults.vader.name} token`}
+												/>
+												<Box
+													as='h3'
+													m='0'
+													fontSize='1.02rem'
+													fontWeight='bold'
+													textTransform='capitalize'>
+													{prettifyNumber(totalBalance(true), 0, 2, 'us', 'compact')}
+												</Box>
 											</Box>
-										</Box>
+										}
+										{usdvBalance?.data?.gt(0) &&
+											<Box
+												d='flex'
+												alignItems='center'
+												overflow='hidden'>
+												<Image
+													width='24px'
+													height='24px'
+													mr='5px'
+													src={defaults.usdv.logoURI}
+													alt={`${defaults.usdv.name} token`}
+												/>
+												<Box
+													as='h3'
+													m='0'
+													fontSize='1.02rem'
+													fontWeight='bold'
+													textTransform='capitalize'>
+													{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2, 'us', 'compact')}
+												</Box>
+											</Box>
+										}
 									</Box>
 								</Button>
 							</Fade>
@@ -173,20 +173,25 @@ export const BalanceIndicator = () => {
 											value={prettifyNumber(totalBalance(false), 0, 2)}
 										/>
 									}
-
-									{xvaderBalance.data.gt(0) &&
+									{xvaderBalance?.data?.gt(0) &&
 										<Item
 											name={'Balance'}
 											token={defaults.xvader}
 											value={prettifyNumber(utils.formatEther(xvaderBalance.data), 0, 2)}
 										/>
 									}
-
-									{vaderBalance.data.gt(0) &&
+									{vaderBalance?.data?.gt(0) &&
 										<Item
 											name={'Balance'}
 											token={defaults.vader}
 											value={prettifyNumber(utils.formatEther(vaderBalance.data), 0, 2)}
+										/>
+									}
+									{usdvBalance?.data?.gt(0) &&
+										<Item
+											name={'Balance'}
+											token={defaults.usdv}
+											value={prettifyNumber(utils.formatEther(usdvBalance.data), 0, 2)}
 										/>
 									}
 								</PopoverBody>

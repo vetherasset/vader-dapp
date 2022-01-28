@@ -157,11 +157,21 @@ const nothingtoclaim = {
 const nomorethaneligible = {
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
-	status: 'error',
+	status: 'warning',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
 	position: defaults.toast.position,
 }
+
+const notyetUnlocked = {
+	title: 'Cannot claim when still locked',
+	description: 'You cannot claim before the cooldown is over.',
+	status: 'warning',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 
 const tokenValueTooSmall = {
 	title: 'Token amount is too small',
@@ -242,4 +252,5 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
+	notyetUnlocked,
 }

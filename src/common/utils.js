@@ -90,6 +90,10 @@ const getPercentage = (amount, minFractionDigits = 0, maxFractionDigits = 2, loc
 	return (new Intl.NumberFormat(locales, options).format(value))
 }
 
+const getDateFromSeconds = (seconds) => {
+	return new Date(seconds * 1000)
+}
+
 const getSecondsToGo = (date) => {
 	const time = (Date.now() / 1000).toFixed()
 	return (Number((date - time)))
@@ -210,5 +214,5 @@ export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
-	calculateDifference,
+	calculateDifference, getDateFromSeconds,
 }
