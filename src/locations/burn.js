@@ -115,14 +115,14 @@ const Burn = (props) => {
 	const [now, setNow] = useState(new Date())
 
 	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
-	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
-		ethers.BigNumber.from('0').lt(limits?.[1]) ?
-			limits?.[1].sub(ethers.BigNumber.from('0')) :
-			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
+	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
+		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
+			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :
+			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).eq(limits?.[1]) ?
 				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
 
 	const usdvBurnt = useUsdvMintedBurnt(true, (defaults.api.graphql.pollInterval / 2))
-	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2] ?
+	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2]?.gt(0) ?
 		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
 			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
 			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
@@ -1366,15 +1366,14 @@ const Breakdown = (props) => {
 	const publicFee = usePublicFee()
 	const { data: limits } = useMinterDailyLimits()
 
-	const usdvMinted = useUsdvMintedBurnt()
-
+	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
 	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
 		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
 			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :
 			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).eq(limits?.[1]) ?
 				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
 
-	const usdvBurnt = useUsdvMintedBurnt(true)
+	const usdvBurnt = useUsdvMintedBurnt(true, (defaults.api.graphql.pollInterval / 2))
 	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2]?.gt(0) ?
 		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
 			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
