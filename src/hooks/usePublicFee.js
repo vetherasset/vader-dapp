@@ -19,7 +19,9 @@ export const usePublicFee = (rpc = true, pollInterval = defaults.api.graphql.pol
 		)
 
 		const fee = useQuery('getPublicFee', async () => {
-			return await getPublicFee(minter)
+			if (minter) {
+				return await getPublicFee(minter)
+			}
 		}, {
 			staleTime: staleTime,
 			enabled: !!minter,
