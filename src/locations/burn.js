@@ -153,7 +153,7 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (!tokenApproved) {
+			else if (!tokenApproved && !submitOption) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if (tokenSelect.symbol === 'VETH' &&
 				balance?.data &&
@@ -209,7 +209,9 @@ const Burn = (props) => {
 						toast(insufficientBalance)
 					}
 				}
-				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
+				if (tokenSelect.symbol !== 'VETH' &&
+				tokenSelect.symbol !== 'USDV' &&
+				!submitOption) {
 					setWorking(true)
 					approveERC20ToSpend(
 						tokenSelect.address,
@@ -468,7 +470,7 @@ const Burn = (props) => {
 					toast(noAmount)
 				}
 			}
-			else if (submitOption) {
+			else if (((submitOption) || (submitOption && !tokenApproved))) {
 				if(releaseTime < now) {
 					setWorking(true)
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
@@ -1169,7 +1171,12 @@ const Burn = (props) => {
 										<>
 											{!tokenApproved &&
 												<>
-													Approve {tokenSelect.symbol}
+													{submitOption &&
+														<>Claim</>
+													}
+													{!submitOption &&
+														<>Approve {tokenSelect.symbol}</>
+													}
 												</>
 											}
 											{tokenApproved &&
