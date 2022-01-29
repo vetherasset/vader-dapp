@@ -461,44 +461,49 @@ const Burn = (props) => {
 				}
 			}
 			else if (((submitOption) || (submitOption && !tokenApproved))) {
-				if(releaseTime < now) {
-					setWorking(true)
-					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					usdvClaimAll(provider)
-						.then((tx) => {
-							tx.wait(
-								defaults.network.tx.confirmations,
-							).then((r) => {
-								setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
-								locks.refetch()
-								locksComplete.refetch()
-								balance?.refetch()
-								setWorking(false)
-								toast({
-									...vaderconverted,
-									description: <Link
-										variant='underline'
-										_focus={{
-											boxShadow: '0',
-										}}
-										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-										isExternal>
-										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-									duration: defaults.toast.txHashDuration,
+				if (releaseTime < now) {
+					if (unclaimed?.gt(0)) {
+						setWorking(true)
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						usdvClaimAll(provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
+									locks.refetch()
+									locksComplete.refetch()
+									balance?.refetch()
+									setWorking(false)
+									toast({
+										...vaderconverted,
+										description: <Link
+											variant='underline'
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+										duration: defaults.toast.txHashDuration,
+									})
 								})
 							})
-						})
-						.catch(err => {
-							setWorking(false)
-							if (err.code === 4001) {
-								console.log('Transaction rejected: You have decided to reject the transaction..')
-								toast(rejected)
-							}
-							else {
-								console.log(err)
-								toast(failed)
-							}
-						})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: You have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
+					else {
+						toast(nothingtoclaim)
+					}
 				}
 				else {
 					toast(notyetUnlocked)
