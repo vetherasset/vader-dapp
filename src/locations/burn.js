@@ -1430,7 +1430,7 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='left'>
-								Remaining daily limit
+								Remaining limit
 						</Box>
 					</Container>
 					<Container p='0'>
