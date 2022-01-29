@@ -1422,7 +1422,7 @@ const Breakdown = (props) => {
 												) : uniswapTWAP?.data,
 											props.token.decimals),
 										0,
-										props.token.symbol === 'USDV' ? 5 : 2,
+										props.token.symbol === 'VADER' ? 5 : 2,
 										props.token.convertsTo.symbol,
 									)}
 								</>
