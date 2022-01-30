@@ -86,6 +86,12 @@ const vaderclaimed = createToast({
 	status: 'success',
 })
 
+const dailyLimitReached = createToast({
+	title: 'Daily limit reached',
+	description: 'The daily limit was reached and cannot be exceeded.',
+	status: 'warning',
+})
+
 const usdvredeemed = createToast({
 	title: 'USDV burnt for VADER Token',
 	description: 'Your USDV tokens were successfully burnt for VADER.',
@@ -120,6 +126,12 @@ const nomorethaneligible = createToast({
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
 	status: 'error',
+})
+
+const notyetUnlocked = createToast({
+	title: 'Cannot claim when still locked',
+	description: 'You cannot claim before the cooldown is over.',
+	status: 'warning',
 })
 
 const tokenValueTooSmall = createToast({
@@ -183,5 +195,5 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
-	copiedContractAddress,
+	copiedContractAddress, notyetUnlocked, dailyLimitReached,
 }

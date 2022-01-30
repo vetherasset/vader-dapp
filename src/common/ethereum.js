@@ -6,6 +6,9 @@ import xVaderAbi from '../artifacts/abi/xvader'
 import linearVestingAbi from '../artifacts/abi/linearVesting'
 import vaderBond from '../artifacts/abi/vaderBond'
 import zapEth from '../artifacts/abi/zapEth'
+import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
+import minter from '../artifacts/abi/minter'
+import IUSDV from '../artifacts/abi/IUSDV'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -314,6 +317,123 @@ const zapDeposit = async (zapContractAddress, amount, minPayout, provider) => {
 	return await contract.zap(minPayout, options)
 }
 
+const getStaleVaderPrice = async (twapAddress) => {
+	const contract = new ethers.Contract(
+		twapAddress,
+		uniswapTWAP,
+		defaults.network.provider,
+	)
+	return await contract.getStaleVaderPrice()
+}
+
+const getMinter = async () => {
+	const contract = new ethers.Contract(
+		defaults.usdv.address,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.minter()
+}
+
+const getCycleMints = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.cycleMints()
+}
+
+const getCycleBurns = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.cycleBurns()
+}
+
+const getMinterLbt = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.lbt()
+}
+
+const minterMint = async (vaderAmount, usdvAmountMinOut, minterAddress, provider) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		provider.getSigner(0),
+	)
+	return await contract.mint(vaderAmount, usdvAmountMinOut)
+}
+
+const minterBurn = async (usdvAmount, vaderAmountMinOut, minterAddress, provider) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		provider.getSigner(0),
+	)
+	return await contract.burn(usdvAmount, vaderAmountMinOut)
+}
+
+const getPublicFee = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.getPublicFee()
+}
+
+const usdvClaim = async (lockIndex, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		provider.getSigner(0),
+	)
+	return await contract.claim(lockIndex)
+}
+
+const usdvClaimAll = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		provider.getSigner(0),
+	)
+	return await contract.claimAll()
+}
+
+const getMinterDailyLimits = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.dailyLimits()
+}
+
+const getLockCount = async (address) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.getLockCount(address)
+}
+
+const getLocks = async (address, lockIndex) => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv,
+		IUSDV,
+		defaults.network.provider,
+	)
+	return await contract.locks(address, lockIndex)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -325,5 +445,9 @@ export {
 	bondDeposit, bondRedeem, bondMaxPayout,
 	getSalt, getClaimed, getClaim, getVester,
 	claim, resolveUnknownERC20 as resolveERC20,
-	zapDeposit,
+	zapDeposit, getStaleVaderPrice, getMinter,
+	getMinterLbt, minterMint, minterBurn,
+	getPublicFee, usdvClaim, getMinterDailyLimits,
+	usdvClaimAll, getLockCount, getLocks,
+	getCycleMints, getCycleBurns,
 }

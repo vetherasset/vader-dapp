@@ -9,7 +9,7 @@ const Bonds = (props) => {
 		<Box
 			maxWidth={defaults.layout.container.md.width}
 			m='0 auto'
-			p={{ base: '5rem 1.1rem 0', md: '5rem 0 0' }}
+			p={{ base: '5rem .4rem 0', md: '5rem 0 0' }}
 			{...props}
 		>
 			<Flex
@@ -56,7 +56,7 @@ const Bonds = (props) => {
 					position='relative'
 				>
 					<Box
-						p='0 20px'
+						p={{ base: '0 0.5rem', md: '0 1.2rem' }}
 						display='block'
 						flexDir='column'
 						justifyContent='center'
@@ -70,13 +70,13 @@ const Bonds = (props) => {
 							justifyContent='space-between'
 							p='0 12px'
 							minH='34.4px'
-							mb='1rem'
+							mb={{ base: '0.7rem', md: '1rem' }}
 						>
 							<>
 								<Flex>
 									<Text
 										as='h4'
-										fontSize='1.1rem'
+										fontSize={{ base: '0.87rem', md: '1.1rem' }}
 										fontWeight='bolder'>
 											Assets
 									</Text>
@@ -87,7 +87,7 @@ const Bonds = (props) => {
 									<Flex>
 										<Text
 											as='h4'
-											fontSize='1.1rem'
+											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
 											Price
 										</Text>
@@ -95,7 +95,7 @@ const Bonds = (props) => {
 									<Flex>
 										<Text
 											as='h4'
-											fontSize='1.1rem'
+											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
 											ROI
 										</Text>
@@ -117,6 +117,7 @@ const Bonds = (props) => {
 								<BondItem
 									key={index}
 									address={item.address}
+									principal={item.principal}
 									token0={item.token0}
 									token1={item.token1}
 									payout={item.payout}

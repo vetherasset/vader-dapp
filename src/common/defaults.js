@@ -2,8 +2,8 @@ import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { QueryClient } from 'react-query'
 import { ethers } from 'ethers'
 import tokenListSources from '../tokenListSources'
-import vaderBonds from '../artifacts/js/vaderBonds'
 import vaderTokens from '../artifacts/json/vaderTokens'
+import { bonds, bondsKovan } from '../artifacts/js/vaderBonds'
 import snapshot from '../artifacts/json/vetherSnapshot'
 
 const defaults = {}
@@ -21,15 +21,15 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
+		// {
+		// 	provider: new ethers.providers.InfuraProvider(
+		// 		defaults.network.chainId,
+		// 		process.env.REACT_APP_INFURA_KEY,
+		// 	),
+		// 	weight: 1,
+		// 	priority: 2,
+		// 	stallTimeout: 2000,
+		// },
 	],
 	1,
 )
@@ -95,10 +95,16 @@ defaults.network.autoConnect = true
 defaults.network.pollInterval = 100000
 
 defaults.network.tx = {}
-defaults.network.tx.confirmations = 1
+defaults.network.tx.confirmations = 2
 
 defaults.network.blockTime = {}
-defaults.network.blockTime.hour = 262
+defaults.network.blockTime.second = (
+	defaults.network.chainId === 1 ? 0.07570023 :
+		defaults.network.chainId === 42 ? 0.25 :
+			0)
+defaults.network.blockTime.minute = defaults.network.blockTime.second * 60
+defaults.network.blockTime.hour = defaults.network.blockTime.minute * 60
+defaults.network.blockTime.day = defaults.network.blockTime.hour * 24
 
 defaults.network.erc20 = {}
 defaults.network.erc20.maxApproval = '302503999000000000299700000'
@@ -116,7 +122,7 @@ defaults.api.graphql.uri.vaderProtocol = (
 )
 defaults.api.graphql.uri.uniswapV2 = (
 	defaults.network.chainId === 1 ? 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2' :
-		defaults.network.chainId === 42 ? 'https://thegraph.com/hosted-service/subgraph/sc0vu/uniswap-v2-kovan' :
+		defaults.network.chainId === 42 ? 'https://api.thegraph.com/subgraphs/name/sc0vu/uniswap-v2-kovan' :
 			undefined
 )
 
@@ -135,15 +141,15 @@ defaults.api.graphql.client.uniswapV2 = new ApolloClient({
 defaults.api.graphql.pollInterval = 100000
 
 defaults.api.etherscanUrl = (
-	defaults.network.chainId === 1 ? 'https://etherscan.io/' :
-		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io/' :
+	defaults.network.chainId === 1 ? 'https://etherscan.io' :
+		defaults.network.chainId === 42 ? 'https://kovan.etherscan.io' :
 			undefined
 )
 
 defaults.address = {}
 defaults.address.vader = (
-	defaults.network.chainId === 1 ? '0x2602278EE1882889B946eb11DC0E810075650983' :
-		defaults.network.chainId === 42 ? '0xB46dbd07ce34813623FB0643b21DCC8D0268107D' :
+	defaults.network.chainId === 1 ? '0x2602278ee1882889b946eb11dc0e810075650983' :
+		defaults.network.chainId === 42 ? '0xcCb3AeF7Baa506e2D05193e38e88459F68AC1a8F' :
 			undefined
 )
 defaults.address.vether = (
@@ -157,8 +163,8 @@ defaults.address.xvader = (
 			undefined
 )
 defaults.address.usdv = (
-	defaults.network.chainId === 1 ? undefined :
-		defaults.network.chainId === 42 ? '0xfd87ba583bd2071713fb5CB12086536a26eec18e' :
+	defaults.network.chainId === 1 ? '0xea3Fb6f331735252E7Bfb0b24b3B761301293DBe' :
+		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
 defaults.address.converter = (
@@ -173,8 +179,16 @@ defaults.address.linearVesting = (
 )
 
 defaults.address.uniswapV2 = {}
-defaults.address.uniswapV2.vaderEthPair = '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa'
-defaults.address.uniswapV2.usdcEthPair = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+defaults.address.uniswapV2.vaderEthPair = (
+	defaults.network.chainId === 1 ? '0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa' :
+		defaults.network.chainId === 42 ? '0xC42706E83433580dd8d865a30e2Ae61082056007' :
+			undefined
+)
+defaults.address.uniswapV2.usdcEthPair = (
+	defaults.network.chainId === 1 ? '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' :
+		defaults.network.chainId === 42 ? '0x00ba37fd79ba75b631e74de45299bb8021611e22' :
+			undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
@@ -228,7 +242,7 @@ defaults.vether = {
 defaults.redeemables = [
 	{
 		...defaults.vether,
-		'convertsTo':'VADER',
+		'convertsTo':defaults.vader,
 		'snapshot':snapshot,
 		'salt':(
 			defaults.network.chainId === 1 ? '13662469' :
@@ -238,13 +252,13 @@ defaults.redeemables = [
 	},
 	{
 		...defaults.usdv,
-		'convertsTo':'VADER',
-		'disabled': true,
+		'convertsTo':defaults.vader,
+		'disabled': false,
 	},
 	{
 		...defaults.vader,
-		'convertsTo':'USDV',
-		'disabled': true,
+		'convertsTo':defaults.usdv,
+		'disabled': false,
 	},
 ]
 
@@ -256,7 +270,10 @@ defaults.unstakeable = [
 	...[defaults.xvader],
 ]
 
-defaults.bonds = vaderBonds
+defaults.bonds = defaults.network.chainId === 1 ? bonds :
+	defaults.network.chainId === 42 ? bondsKovan :
+		[]
+
 defaults.bondConsideredSoldOutMinVader = ethers.BigNumber.from('300000000000000000000')
 defaults.bondZapMinPayoutAllowed = '10000000000000000'
 

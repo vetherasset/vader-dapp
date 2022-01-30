@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { useHistory, useLocation } from 'react-router-dom'
 import { useWallet } from 'use-wallet'
 import { Menu, MenuButton, Button, Portal, MenuList,
