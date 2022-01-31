@@ -16,11 +16,13 @@ export const useERC20Balance = (tokenAddress, rpc = true, pollInterval = default
 
 		const balance = useQuery(`${tokenAddress}_erc20Balanceof_${wallet?.account}`,
 			async () => {
-				return await getERC20BalanceOf(
-					tokenAddress,
-					wallet?.account,
-					defaults.network.provider,
-				)
+				if (wallet?.account && tokenAddress) {
+					return await getERC20BalanceOf(
+						tokenAddress,
+						wallet?.account,
+						defaults.network.provider,
+					)
+				}
 			}, {
 				staleTime: defaults.api.staleTime,
 				enabled: (!!wallet?.account && !!tokenAddress),

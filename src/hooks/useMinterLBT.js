@@ -13,14 +13,18 @@ export const useMinterLBT = (rpc = true, pollInterval = defaults.api.graphql.pol
 	else {
 
 		const { data: minter } = useQuery('minter', async () => {
-			return await getMinter()
+			if (minter) {
+				return await getMinter()
+			}
 		}, {
 			staleTime: staleTime,
 		},
 		)
 
 		const address = useQuery('lbt', async () => {
-			return await getMinterLbt(minter)
+			if (minter) {
+				return await getMinterLbt(minter)
+			}
 		}, {
 			staleTime: staleTime,
 			enabled: !!minter,

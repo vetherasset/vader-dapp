@@ -19,7 +19,9 @@ export const useUniswapTWAP = (rpc = true, pollInterval = defaults.api.graphql.p
 		)
 
 		const { data: lbt } = useQuery('lbt', async () => {
-			return await getMinterLbt(minter)
+			if (minter) {
+				return await getMinterLbt(minter)
+			}
 		}, {
 			staleTime: staleTime,
 			enabled: !!minter,
@@ -27,7 +29,9 @@ export const useUniswapTWAP = (rpc = true, pollInterval = defaults.api.graphql.p
 		)
 
 		const twap = useQuery('getStaleVaderPrice', async () => {
-			return await getStaleVaderPrice(lbt)
+			if (lbt) {
+				return await getStaleVaderPrice(lbt)
+			}
 		}, {
 			staleTime: staleTime,
 			enabled: !!lbt,

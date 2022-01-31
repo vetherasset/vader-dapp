@@ -69,7 +69,8 @@ import { useERC20Balance } from '../hooks/useERC20Balance'
 import { useLocks } from '../hooks/useLocks'
 import prettyMilliseconds from 'pretty-ms'
 import TimeAgo from 'react-timeago'
-import { useUsdvMintedBurnt } from '../hooks/useUsdvMintedBurnt'
+import { useMintLimitRemains } from '../hooks/useMintLimitRemains'
+import { useBurnLimitRemains } from '../hooks/useBurnLimitRemains'
 
 const Burn = (props) => {
 
@@ -114,19 +115,8 @@ const Burn = (props) => {
 	const [releaseTime, setReleaseTime] = useState(new Date())
 	const [now, setNow] = useState(new Date())
 
-	const usdvMinted = useUsdvMintedBurnt(false, (defaults.api.graphql.pollInterval / 2))
-	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1] ?
-		ethers.BigNumber.from('0').lt(limits?.[1]) ?
-			limits?.[1].sub(ethers.BigNumber.from('0')) :
-			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).eq(limits?.[1]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
-
-	const usdvBurnt = useUsdvMintedBurnt(true, (defaults.api.graphql.pollInterval / 2))
-	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2] ?
-		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
-			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
-			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
+	const [mintLimitRemains, mintLimitRemainsRefetch] = useMintLimitRemains()
+	const [burnLimitRemains, burnLimitRemainsRefetch] = useBurnLimitRemains()
 
 	useEffect(() => {
 		if(locksComplete?.data?.locks[0]?.release) {
@@ -141,8 +131,8 @@ const Burn = (props) => {
 
 	useEffect(() => {
 		locks.refetch()
-		usdvMinted.refetch()
-		usdvBurnt.refetch()
+		mintLimitRemainsRefetch()
+		burnLimitRemainsRefetch()
 	}, [tokenSelect, submitOption, releaseTime])
 
 	const submit = () => {
@@ -153,7 +143,7 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
-			else if (!tokenApproved) {
+			else if (!tokenApproved && !submitOption) {
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if (tokenSelect.symbol === 'VETH' &&
 				balance?.data &&
@@ -209,7 +199,9 @@ const Burn = (props) => {
 						toast(insufficientBalance)
 					}
 				}
-				if (tokenSelect.symbol !== 'VETH' && tokenSelect.symbol !== 'USDV') {
+				if (tokenSelect.symbol !== 'VETH' &&
+				tokenSelect.symbol !== 'USDV' &&
+				!submitOption) {
 					setWorking(true)
 					approveERC20ToSpend(
 						tokenSelect.address,
@@ -335,7 +327,7 @@ const Burn = (props) => {
 							}
 						}
 						else if (tokenSelect.symbol === 'USDV') {
-							if((dailyLimitBurnt && dailyLimitBurnt.gt(0))) {
+							if((burnLimitRemains && burnLimitRemains.gt(0))) {
 								setWorking(true)
 								const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 								const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
@@ -360,8 +352,8 @@ const Burn = (props) => {
 											uniswapTWAP?.refetch()
 											publicFee?.refetch()
 											balance?.refetch()
-											usdvMinted?.refetch()
-											usdvBurnt?.refetch()
+											mintLimitRemainsRefetch()
+											burnLimitRemainsRefetch()
 											setWorking(false)
 											toast({
 												...usdvredeemed,
@@ -381,8 +373,8 @@ const Burn = (props) => {
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
 										balance?.refetch()
-										usdvMinted?.refetch()
-										usdvBurnt?.refetch()
+										mintLimitRemainsRefetch()
+										burnLimitRemainsRefetch()
 										setWorking(false)
 										if (err.code === 4001) {
 											console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -398,7 +390,7 @@ const Burn = (props) => {
 								toast(dailyLimitReached)
 							}
 						}
-						else if(dailyLimitMint && dailyLimitMint.gt(0)) {
+						else if(mintLimitRemains && mintLimitRemains?.gt(0)) {
 							setWorking(true)
 							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
@@ -422,8 +414,8 @@ const Burn = (props) => {
 										locksComplete?.refetch()
 										uniswapTWAP?.refetch()
 										publicFee?.refetch()
-										usdvMinted?.refetch()
-										usdvBurnt?.refetch()
+										mintLimitRemainsRefetch()
+										burnLimitRemainsRefetch()
 										balance?.refetch()
 										setWorking(false)
 										toast({
@@ -443,8 +435,8 @@ const Burn = (props) => {
 								.catch(err => {
 									uniswapTWAP?.refetch()
 									publicFee?.refetch()
-									usdvMinted?.refetch()
-									usdvBurnt?.refetch()
+									mintLimitRemainsRefetch()
+									burnLimitRemainsRefetch()
 									setWorking(false)
 									if (err.code === 4001) {
 										console.log('Transaction rejected: You have decided to reject the transaction..')
@@ -468,45 +460,50 @@ const Burn = (props) => {
 					toast(noAmount)
 				}
 			}
-			else if (submitOption) {
-				if(releaseTime < now) {
-					setWorking(true)
-					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					usdvClaimAll(provider)
-						.then((tx) => {
-							tx.wait(
-								defaults.network.tx.confirmations,
-							).then((r) => {
-								setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
-								locks.refetch()
-								locksComplete.refetch()
-								balance?.refetch()
-								setWorking(false)
-								toast({
-									...vaderconverted,
-									description: <Link
-										variant='underline'
-										_focus={{
-											boxShadow: '0',
-										}}
-										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-										isExternal>
-										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-									duration: defaults.toast.txHashDuration,
+			else if (((submitOption) || (submitOption && !tokenApproved))) {
+				if (releaseTime < now) {
+					if (unclaimed?.gt(0)) {
+						setWorking(true)
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						usdvClaimAll(provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setReleaseTime(new Date().setSeconds(new Date().getSeconds() - ((1 / defaults.network.blockTime.second) * defaults.network.tx.confirmations)))
+									locks.refetch()
+									locksComplete.refetch()
+									balance?.refetch()
+									setWorking(false)
+									toast({
+										...vaderconverted,
+										description: <Link
+											variant='underline'
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+										duration: defaults.toast.txHashDuration,
+									})
 								})
 							})
-						})
-						.catch(err => {
-							setWorking(false)
-							if (err.code === 4001) {
-								console.log('Transaction rejected: You have decided to reject the transaction..')
-								toast(rejected)
-							}
-							else {
-								console.log(err)
-								toast(failed)
-							}
-						})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: You have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
+					else {
+						toast(nothingtoclaim)
+					}
 				}
 				else {
 					toast(notyetUnlocked)
@@ -1169,7 +1166,12 @@ const Burn = (props) => {
 										<>
 											{!tokenApproved &&
 												<>
-													Approve {tokenSelect.symbol}
+													{submitOption &&
+														<>Claim</>
+													}
+													{!submitOption &&
+														<>Approve {tokenSelect.symbol}</>
+													}
 												</>
 											}
 											{tokenApproved &&
@@ -1358,21 +1360,8 @@ const Breakdown = (props) => {
 	const uniswapTWAP = useUniswapTWAP()
 	const publicFee = usePublicFee()
 	const { data: limits } = useMinterDailyLimits()
-
-	const usdvMinted = useUsdvMintedBurnt()
-
-	const dailyLimitMint = usdvMinted?.data?.globals?.[0]?.value && limits?.[1].gt(0) ?
-		ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).lt(limits?.[1]) ?
-			limits?.[1].sub(ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746'))) :
-			ethers.BigNumber.from(usdvMinted?.data?.globals?.[0]?.value).sub(ethers.BigNumber.from('2498987256675690868874746')).eq(limits?.[1]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
-
-	const usdvBurnt = useUsdvMintedBurnt(true)
-	const dailyLimitBurnt = usdvBurnt?.data?.globals?.[0]?.value && limits?.[2]?.gt(0) ?
-		ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).lt(limits?.[2]) ?
-			limits?.[2].sub(ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value)) :
-			ethers.BigNumber.from(usdvBurnt?.data?.globals?.[0]?.value).eq(limits?.[2]) ?
-				ethers.BigNumber.from('0') : ethers.BigNumber.from('0') : ethers.BigNumber.from('0')
+	const [mintLimitRemains] = useMintLimitRemains()
+	const [burnLimitRemains] = useBurnLimitRemains()
 
 	return (
 		<>
@@ -1416,7 +1405,7 @@ const Breakdown = (props) => {
 												) : uniswapTWAP?.data,
 											props.token.decimals),
 										0,
-										props.token.symbol === 'USDV' ? 5 : 2,
+										props.token.symbol === 'VADER' ? 5 : 2,
 										props.token.convertsTo.symbol,
 									)}
 								</>
@@ -1446,7 +1435,7 @@ const Breakdown = (props) => {
 					<Container p='0'>
 						<Box
 							textAlign='left'>
-								Remaining daily limit
+								Remaining limit
 						</Box>
 					</Container>
 					<Container p='0'>
@@ -1454,18 +1443,18 @@ const Breakdown = (props) => {
 							textAlign='right'>
 							{props.token.symbol === 'VADER' &&
 								<>
-									{limits?.[1] && dailyLimitMint &&
+									{mintLimitRemains &&
 										<>
-											{prettifyCurrency(ethers.utils.formatUnits(dailyLimitMint ? dailyLimitMint : 0, 18), 0, 2, 'USDV')}
+											{prettifyCurrency(ethers.utils.formatUnits(mintLimitRemains ? mintLimitRemains : 0, 18), 0, 2, 'USDV')}
 										</>
 									}
 								</>
 							}
 							{props.token.symbol === 'USDV' &&
 								<>
-									{limits?.[2] && dailyLimitBurnt &&
+									{burnLimitRemains &&
 										<>
-											{prettifyCurrency(ethers.utils.formatUnits(dailyLimitBurnt ? dailyLimitBurnt : 0, 18), 0, 2, 'USDV')}
+											{prettifyCurrency(ethers.utils.formatUnits(burnLimitRemains ? burnLimitRemains : 0, 18), 0, 2, 'USDV')}
 										</>
 									}
 								</>
