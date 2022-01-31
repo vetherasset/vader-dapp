@@ -32,7 +32,7 @@ export const BondItem = (props) => {
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 	const roi = calculateDifference(marketPrice, bondInitPrice)
-	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : '0%'
+	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
 
 	return (
 		<>
