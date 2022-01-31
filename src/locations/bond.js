@@ -1210,9 +1210,11 @@ const Breakdown = (props) => {
 	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
 	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
 
-	const bondPirce = (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
+	const bondInitPrice = (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
+	const roi = calculateDifference(marketPrice, bondInitPrice)
+	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : '0%'
 
 	return (
 		<>
@@ -1302,10 +1304,10 @@ const Breakdown = (props) => {
 						</Box>
 					</Container>
 					<Container p='0'>
-						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
+						{roiPercentage &&
 						<Box
 							textAlign='right'>
-							{getPercentage(calculateDifference(marketPrice, bondPirce))}
+							{roiPercentage}
 						</Box>
 						}
 					</Container>
