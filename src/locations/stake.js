@@ -86,7 +86,7 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			minHeight='634.95px'
+			minHeight='688.617px'
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 0.4rem 0', md: '5rem 1.2rem 0' }}
