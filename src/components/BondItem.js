@@ -27,9 +27,12 @@ export const BondItem = (props) => {
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [principalEth] = useUniswapV2Price(props.principal.address, true)
 	const { data: price } = useBondPrice(props.address)
-	const bondPirce = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+
+	const bondInitPrice = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
+	const roi = calculateDifference(marketPrice, bondInitPrice)
+	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : '0%'
 
 	return (
 		<>
@@ -108,11 +111,11 @@ export const BondItem = (props) => {
 									</Tag>
 								</>
 						}
-						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
+						{roiPercentage &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
 								colorScheme='gray'>
-								{getPercentage(calculateDifference(marketPrice, bondPirce))}
+								{roiPercentage}
 							</Tag>
 						}
 					</Flex>

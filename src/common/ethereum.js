@@ -335,6 +335,24 @@ const getMinter = async () => {
 	return await contract.minter()
 }
 
+const getCycleMints = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.cycleMints()
+}
+
+const getCycleBurns = async (minterAddress) => {
+	const contract = new ethers.Contract(
+		minterAddress,
+		minter,
+		defaults.network.provider,
+	)
+	return await contract.cycleBurns()
+}
+
 const getMinterLbt = async (minterAddress) => {
 	const contract = new ethers.Contract(
 		minterAddress,
@@ -431,4 +449,5 @@ export {
 	getMinterLbt, minterMint, minterBurn,
 	getPublicFee, usdvClaim, getMinterDailyLimits,
 	usdvClaimAll, getLockCount, getLocks,
+	getCycleMints, getCycleBurns,
 }
