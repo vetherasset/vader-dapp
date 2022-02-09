@@ -22,6 +22,7 @@ import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
 import { useBondInfo } from '../hooks/useBondInfo'
 import { useBondMaxPayout } from '../hooks/useBondMaxPayout'
+import { usePreCommit } from '../hooks/usePreCommit'
 
 const Bond = (props) => {
 
@@ -48,6 +49,9 @@ const Bond = (props) => {
 	const { data: bondInfo, refetch: refetchBondInfo } = useBondInfo(bond?.[0]?.address, wallet.account, true)
 	const [pendingPayout, setPendingPayoutBlock] = useBondPendingPayout(bond?.[0]?.address)
 	const { data: maxPayout, refetch: refetchMaxPayout } = useBondMaxPayout(bond?.[0]?.address)
+	const preCommit = usePreCommit(bond?.[0]?.precommit)
+
+	console.log(preCommit)
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -440,8 +444,8 @@ const Bond = (props) => {
 						m='0 auto'
 						flexDir='column'
 						layerStyle='colorful'
-						height='auto'
 						minH='541.217px'
+						h={{ base: '', md: `${!preCommit.started.data ? '541.217px' : 'auto'}` }}
 					>
 						<Flex
 							height='100%'
@@ -473,7 +477,7 @@ const Bond = (props) => {
 													boxShadow: 'none',
 												}}>
 												<Text as='h3' m='0' fontSize='1.24rem'>
-													Bond
+													{preCommit.started.data ? 'Bond' : 'Pre-commit'}
 												</Text>
 											</Tab>
 											<Tab
@@ -495,6 +499,8 @@ const Bond = (props) => {
 										pointerEvents={{ base: '', md: `${tabIndex === 1 ? 'none' : ''}` }}
 										opacity={{ base: '1', md: `${tabIndex === 1 ? '0.55' : '1'}` }}
 										flexDir='column'
+										h={{ base: '', md: `${!preCommit.started.data ? '66%' : 'auto'}` }}
+										justifyContent={{ base: '', md: `${!preCommit.started.data ? 'flex-start' : ''}` }}
 									>
 										{useBreakpointValue({
 											base: <PriceOverview
@@ -666,163 +672,165 @@ const Bond = (props) => {
 										</Flex>
 									</Flex>
 
-									<Flex
-										display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
-										mt={{ base: '1.2rem', md: '' }}
-										flexDir='column'
-									>
+									{preCommit.started.data &&
 										<Flex
-											pointerEvents={tabIndex === 1 ? 'none' : ''}
-											opacity={tabIndex === 1 ? '0.55' : '1'}
+											display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
+											mt={{ base: '1.2rem', md: '' }}
 											flexDir='column'
 										>
-											<Text
-												as='h4'
-												fontWeight='bolder'>
-														Slippage Tolerance
-											</Text>
 											<Flex
-												mt='.6rem'
-												justifyContent='flex-start'
-												flexDir='row'
+												pointerEvents={tabIndex === 1 ? 'none' : ''}
+												opacity={tabIndex === 1 ? '0.55' : '1'}
+												flexDir='column'
 											>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: useLPTokens && slippageTol1 === 2 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-															!useLPTokens && slippageTol0 === 4 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														if (useLPTokens) { setSlippageTol1(2), setSlippageTolAmount1('') }
-														if (!useLPTokens) { setSlippageTol0(4), setSlippageTolAmount0('') }
-													}}>
-													{useLPTokens &&
+												<Text
+													as='h4'
+													fontWeight='bolder'>
+														Slippage Tolerance
+												</Text>
+												<Flex
+													mt='.6rem'
+													justifyContent='flex-start'
+													flexDir='row'
+												>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														style={{
+															border: useLPTokens && slippageTol1 === 2 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+																!useLPTokens && slippageTol0 === 4 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+														}}
+														onClick={() => {
+															if (useLPTokens) { setSlippageTol1(2), setSlippageTolAmount1('') }
+															if (!useLPTokens) { setSlippageTol0(4), setSlippageTolAmount0('') }
+														}}>
+														{useLPTokens &&
 														<>
 															2%
 														</>
-													}
-													{!useLPTokens &&
+														}
+														{!useLPTokens &&
 														<>
 															4%
 														</>
-													}
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: useLPTokens && slippageTol1 === 3 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-															!useLPTokens && slippageTol0 === 6 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														if (useLPTokens) { setSlippageTol1(3), setSlippageTolAmount1('') }
-														if (!useLPTokens) { setSlippageTol0(6), setSlippageTolAmount0('') }
-													}}>
-													{useLPTokens &&
+														}
+													</Button>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														style={{
+															border: useLPTokens && slippageTol1 === 3 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+																!useLPTokens && slippageTol0 === 6 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+														}}
+														onClick={() => {
+															if (useLPTokens) { setSlippageTol1(3), setSlippageTolAmount1('') }
+															if (!useLPTokens) { setSlippageTol0(6), setSlippageTolAmount0('') }
+														}}>
+														{useLPTokens &&
 														<>
 															3%
 														</>
-													}
-													{!useLPTokens &&
+														}
+														{!useLPTokens &&
 														<>
 															6%
 														</>
-													}
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													style={{
-														border: useLPTokens && slippageTol1 === 5 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
-															!useLPTokens && slippageTol0 === 8 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
-													}}
-													onClick={() => {
-														if (useLPTokens) { setSlippageTol1(5), setSlippageTolAmount1('') }
-														if (!useLPTokens) { setSlippageTol0(8), setSlippageTolAmount0('') }
-													}}>
-													{useLPTokens &&
+														}
+													</Button>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														style={{
+															border: useLPTokens && slippageTol1 === 5 && !slippageTolAmount1 ? '2px solid #3fa3fa' :
+																!useLPTokens && slippageTol0 === 8 && !slippageTolAmount0 ? '2px solid #3fa3fa' : '',
+														}}
+														onClick={() => {
+															if (useLPTokens) { setSlippageTol1(5), setSlippageTolAmount1('') }
+															if (!useLPTokens) { setSlippageTol0(8), setSlippageTolAmount0('') }
+														}}>
+														{useLPTokens &&
 														<>
 															5%
 														</>
-													}
-													{!useLPTokens &&
+														}
+														{!useLPTokens &&
 														<>
 															8%
 														</>
-													}
-												</Button>
-												<InputGroup
-													size='sm'
-												>
-													<Input
-														variant='outline'
-														placeholder='Custom'
-														style={{
-															border: useLPTokens && ((([2, 3, 5].indexOf(slippageTol1) === -1)) || slippageTolAmount1) ? '2px solid #3fa3fa' :
-																!useLPTokens && ((([4, 6, 8].indexOf(slippageTol0) === -1)) || slippageTolAmount0) ? '2px solid #3fa3fa' : '',
-														}}
-														value={useLPTokens ? slippageTolAmount1 : slippageTolAmount0}
-														onChange={(e) => {
-															if (isNaN(e.target.value)) {
-																if (useLPTokens) setSlippageTolAmount1(prev => prev)
-																if (!useLPTokens) setSlippageTolAmount0(prev => prev)
-															}
-															else {
-																if (useLPTokens) setSlippageTolAmount1(String(e.target.value))
-																if (!useLPTokens) setSlippageTolAmount0(String(e.target.value))
-																if(Number(e.target.value) >= 0) {
-																	try {
-																		if (useLPTokens) setSlippageTol1(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																		if (!useLPTokens) setSlippageTol0(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																	}
-																	catch(err) {
-																		if (err.code === 'NUMERIC_FAULT') {
-																			console.log('value too small')
+														}
+													</Button>
+													<InputGroup
+														size='sm'
+													>
+														<Input
+															variant='outline'
+															placeholder='Custom'
+															style={{
+																border: useLPTokens && ((([2, 3, 5].indexOf(slippageTol1) === -1)) || slippageTolAmount1) ? '2px solid #3fa3fa' :
+																	!useLPTokens && ((([4, 6, 8].indexOf(slippageTol0) === -1)) || slippageTolAmount0) ? '2px solid #3fa3fa' : '',
+															}}
+															value={useLPTokens ? slippageTolAmount1 : slippageTolAmount0}
+															onChange={(e) => {
+																if (isNaN(e.target.value)) {
+																	if (useLPTokens) setSlippageTolAmount1(prev => prev)
+																	if (!useLPTokens) setSlippageTolAmount0(prev => prev)
+																}
+																else {
+																	if (useLPTokens) setSlippageTolAmount1(String(e.target.value))
+																	if (!useLPTokens) setSlippageTolAmount0(String(e.target.value))
+																	if(Number(e.target.value) >= 0) {
+																		try {
+																			if (useLPTokens) setSlippageTol1(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																			if (!useLPTokens) setSlippageTol0(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																		}
+																		catch(err) {
+																			if (err.code === 'NUMERIC_FAULT') {
+																				console.log('value too small')
+																			}
 																		}
 																	}
 																}
-															}
-														}}
-													/>
-													<InputRightElement>
-														<>
+															}}
+														/>
+														<InputRightElement>
+															<>
 															%
-														</>
-													</InputRightElement>
-												</InputGroup>
+															</>
+														</InputRightElement>
+													</InputGroup>
+												</Flex>
 											</Flex>
-										</Flex>
 
-										<FormControl
-											d='flex'
-											pointerEvents={tabIndex === 1 ? 'none' : ''}
-											opacity={tabIndex === 1 ? '0.55' : '1'}
-											mt={{ base: '3.2rem', md: '' }}
-											borderTop='1px solid rgb(102, 101, 129)'
-											borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
-											pt='2.1rem'
-											pb={{ base: '2.1rem', md: '0' }}
-											w='100%'
-											flexDir='row'
-											justifyContent='space-between'
-										>
-											<FormLabel
-												htmlFor='useLPTokens'
-												fontWeight='bolder'
+											<FormControl
+												d='flex'
+												pointerEvents={tabIndex === 1 ? 'none' : ''}
+												opacity={tabIndex === 1 ? '0.55' : '1'}
+												mt={{ base: '3.2rem', md: '' }}
+												borderTop='1px solid rgb(102, 101, 129)'
+												borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
+												pt='2.1rem'
+												pb={{ base: '2.1rem', md: '0' }}
+												w='100%'
+												flexDir='row'
+												justifyContent='space-between'
 											>
+												<FormLabel
+													htmlFor='useLPTokens'
+													fontWeight='bolder'
+												>
 											Use LP tokens instead
-											</FormLabel>
-											<Switch
-												id='useLPTokens'
-												size='lg'
-												isChecked={useLPTokens}
-												onChange={() => setUseLPTokens(!useLPTokens)}/>
-										</FormControl>
-									</Flex>
+												</FormLabel>
+												<Switch
+													id='useLPTokens'
+													size='lg'
+													isChecked={useLPTokens}
+													onChange={() => setUseLPTokens(!useLPTokens)}/>
+											</FormControl>
+										</Flex>
+									}
 								</Flex>
 							</Flex>
 
@@ -835,7 +843,7 @@ const Bond = (props) => {
 									p={{ base: '1.8rem 0.6rem', md: '1.8rem 1.8rem 1.8rem 0.9rem' }}
 									minH={{ base: '', md: '526.4px' }}
 									justifyContent='space-between'
-									gridGap='12px'
+									gridGap={ preCommit.started.data ? '12px' : '3px' }
 									flexDir='column'>
 
 									{useBreakpointValue({

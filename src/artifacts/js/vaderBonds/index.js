@@ -3,6 +3,7 @@ const bonds = [
 		'name': 'Uniswap V2 VADER / ETH LP',
 		'address':'0x1b96d82b8b13c75d4ce347a53284b10d93b63684',
 		'zap': '0x781b2844605298fb45c653dc1ef0d0b941293323',
+		'precommit': undefined,
 		'principal': {
 			'address':'0x452c60e1e3ae0965cd27db1c7b3a525d197ca0aa',
 			'name':'Uniswap VADER/ETH LP',
@@ -36,11 +37,12 @@ const bonds = [
 const bondsKovan = [
 	{
 		...bonds[0],
-		'address':'0xd932cc11F49df7638999E2a313e5808667363750',
+		'address':'0xa8ac19c394783eacdd36e53686db037715c87fcd',
 		'zap':'0x6D51Ef96C362fdea02c61Ce2dD1A263B5ABbd4B9',
+		'precommit':'0xc2BB0EE1f78cC83317727edCC7FDfc1CaF808d0F',
 		'principal': {
 			...bonds[0].principal,
-			'address':'0xC42706E83433580dd8d865a30e2Ae61082056007',
+			'address':'0xd0a1e359811322d97991e03f863a0c30c2cf029c',
 		},
 		'token0': {
 			...bonds[0].token0,

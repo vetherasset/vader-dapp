@@ -116,11 +116,7 @@ const Bonds = (props) => {
 							return (
 								<BondItem
 									key={index}
-									address={item.address}
-									principal={item.principal}
-									token0={item.token0}
-									token1={item.token1}
-									payout={item.payout}
+									bond={item}
 								/>
 							)
 						})}
