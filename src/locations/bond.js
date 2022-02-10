@@ -1010,23 +1010,59 @@ const Bond = (props) => {
 													<>
 														{!working &&
 															<>
-																{tabIndex === 0 &&
+																{preCommit.started.data &&
 																	<>
-																		{token0 && !token0Approved &&
-																	<>
-																		Approve {token0.symbol}
-																	</>
+																		{tabIndex === 0 &&
+																			<>
+																				{token0 && !token0Approved &&
+																					<>
+																						Approve {token0.symbol}
+																					</>
+																				}
+																				{token0 && token0Approved &&
+																					<>
+																						Purchase
+																					</>
+																				}
+																			</>
 																		}
-																		{token0 && token0Approved &&
-																	<>
-																		Purchase
-																	</>
+																		{tabIndex === 1 &&
+																			<>
+																				Claim
+																			</>
 																		}
 																	</>
 																}
-																{tabIndex === 1 &&
+																{!preCommit.started.data &&
 																	<>
-																		Claim
+																		{tabIndex === 0 &&
+																			<>
+																				{token0 && !token0Approved &&
+																					<>
+																						Approve {token0.symbol}
+																					</>
+																				}
+																				{token0 && token0Approved &&
+																					<>
+																						{preCommitOption &&
+																							<>
+																								Deposit
+																							</>
+																						}
+																						{!preCommitOption &&
+																							<>
+																								Withdraw
+																							</>
+																						}
+																					</>
+																				}
+																			</>
+																		}
+																		{tabIndex === 1 &&
+																			<>
+																				Claim
+																			</>
+																		}
 																	</>
 																}
 															</>
@@ -1042,7 +1078,25 @@ const Bond = (props) => {
 													<>
 														{tabIndex === 0 &&
 															<>
-																Purchase
+																{preCommit.started.data &&
+																	<>
+																		Purchase
+																	</>
+																}
+																{!preCommit.started.data &&
+																	<>
+																		{preCommitOption &&
+																			<>
+																				Deposit
+																			</>
+																		}
+																		{!preCommitOption &&
+																			<>
+																				Withdraw
+																			</>
+																		}
+																	</>
+																}
 															</>
 														}
 														{tabIndex === 1 &&
