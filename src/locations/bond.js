@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSessionStorage } from 'react-use'
+import { useLocalStorage, useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
 import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
 	useToast, Container, Tag, TagLeftIcon, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
-	FormControl, FormLabel, useBreakpointValue } from '@chakra-ui/react'
+	FormControl, FormLabel, useBreakpointValue, HStack, useRadioGroup, useRadio } from '@chakra-ui/react'
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
 import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
@@ -50,8 +50,7 @@ const Bond = (props) => {
 	const [pendingPayout, setPendingPayoutBlock] = useBondPendingPayout(bond?.[0]?.address)
 	const { data: maxPayout, refetch: refetchMaxPayout } = useBondMaxPayout(bond?.[0]?.address)
 	const preCommit = usePreCommit(bond?.[0]?.precommit)
-
-	console.log(preCommit)
+	const [preCommitOption, setPrecommitOption] = useLocalStorage('preCommitOption23049', true)
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -499,8 +498,6 @@ const Bond = (props) => {
 										pointerEvents={{ base: '', md: `${tabIndex === 1 ? 'none' : ''}` }}
 										opacity={{ base: '1', md: `${tabIndex === 1 ? '0.55' : '1'}` }}
 										flexDir='column'
-										h={{ base: '', md: `${!preCommit.started.data ? '66%' : 'auto'}` }}
-										justifyContent={{ base: '', md: `${!preCommit.started.data ? 'flex-start' : ''}` }}
 									>
 										{useBreakpointValue({
 											base: <PriceOverview
@@ -671,6 +668,19 @@ const Bond = (props) => {
 											</Flex>
 										</Flex>
 									</Flex>
+
+									{!preCommit.started.data &&
+										<PreCommitOptions
+											pointerEvents={tabIndex === 1 ? 'none' :
+												''}
+											opacity={
+												tabIndex === 1 ? '0.5' :
+													'1'
+											}
+											set={setPrecommitOption}
+											setting={preCommitOption}
+										/>
+									}
 
 									{preCommit.started.data &&
 										<Flex
@@ -843,7 +853,7 @@ const Bond = (props) => {
 									p={{ base: '1.8rem 0.6rem', md: '1.8rem 1.8rem 1.8rem 0.9rem' }}
 									minH={{ base: '', md: '526.4px' }}
 									justifyContent='space-between'
-									gridGap={ preCommit.started.data ? '12px' : '3px' }
+									gridGap={'12px'}
 									flexDir='column'>
 
 									{useBreakpointValue({
@@ -887,18 +897,20 @@ const Bond = (props) => {
 											>
 												{treasuryBalance &&
 													<>
-														{treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
-														<>
-															{purchaseValue !== '' &&
-																prettifyCurrency(
-																	purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
-																	0,
-																	2,
-																	'VADER')
-															}
-														</>
+														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
+															!preCommit.started.data) &&
+															<>
+																{purchaseValue !== '' &&
+																	prettifyCurrency(
+																		purchaseValue !== '' ? ethers.utils.formatUnits(purchaseValue, 18) : 0,
+																		0,
+																		2,
+																		'VADER')
+																}
+															</>
 														}
-														{treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+														preCommit.started.data === true) &&
 															<>
 																Sold Out
 															</>
@@ -915,7 +927,8 @@ const Bond = (props) => {
 											>
 												{treasuryBalance &&
 													<>
-														{treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
+														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
+															!preCommit.started.data) &&
 															<>
 																<Badge
 																	as='div'
@@ -926,7 +939,8 @@ const Bond = (props) => {
 																</Badge>
 															</>
 														}
-														{treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+														preCommit.started.data === true) &&
 															<>
 																<Badge
 																	as='div'
@@ -946,7 +960,7 @@ const Bond = (props) => {
 									{tabIndex == 1 &&
 										<Flex
 											minH='76px'
-											m='1.66rem 0'
+											m={ preCommit.started.data ? '1.66rem 0' : '.50rem 0 1.60rem' }
 											fontSize={{ base: '1.35rem', md: '1.5rem' }}
 											fontWeight='bolder'
 											justifyContent='center' alignItems='center' flexDir='column'
@@ -1051,6 +1065,90 @@ const Bond = (props) => {
 	}
 	return (
 		<Redirect to={'/bond'} />
+	)
+}
+
+const RadioCard = (props) => {
+
+	RadioCard.propTypes = {
+		children: PropTypes.any,
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+		pointerEvents: PropTypes.string,
+	}
+
+	const { getInputProps, getCheckboxProps } = useRadio(props)
+	const input = getInputProps()
+	const checkbox = getCheckboxProps()
+
+	return (
+		<>
+			<Box as='label' width='100%'>
+				<input {...input}/>
+				<Box
+					{...checkbox}
+
+					borderWidth='1px'
+					borderRadius='12px'
+					fontWeight='600'
+					textAlign='center'
+					cursor='pointer'
+					pointerEvents={props.pointerEvents}
+					_hover={{
+						background: 'rgba(255,255,255, 0.08)',
+					}}
+					_checked={{
+						color: 'bluish.300',
+						borderColor: 'bluish.300',
+						borderWidth: '2px',
+					}}
+					p='0.75rem 1.25rem'
+				>
+					{props.children}
+				</Box>
+			</Box>
+		</>
+	)
+}
+
+const PreCommitOptions = (props) => {
+
+	PreCommitOptions.propTypes = {
+		set: PropTypes.func.isRequired,
+		setting: PropTypes.bool.isRequired,
+		opacity: PropTypes.string,
+		pointerEvents: PropTypes.string,
+	}
+
+	const options = ['Uncommit', 'Commit']
+
+	const { getRootProps, getRadioProps } = useRadioGroup({
+		name: 'action',
+		value: !props.setting ? 'Uncommit' : 'Commit',
+		onChange: () => props.set(!props.setting),
+	})
+	const group = getRootProps()
+
+	return (
+		<HStack
+			{...group}
+			mt='0.7rem'
+			lineHeight='normal'
+			opacity={props.opacity}
+			pointerEvents={props.pointerEvents}
+		>
+			{options.map((value) => {
+				const radio = getRadioProps({ value })
+				return (
+					<RadioCard
+						set={props.set}
+						setting={props.setting}
+						key={value} {...radio}>
+						{value}
+					</RadioCard>
+				)
+			})}
+		</HStack>
 	)
 }
 
