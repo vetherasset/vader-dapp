@@ -8,7 +8,7 @@ import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spi
 	useToast, Container, Tag, TagLeftIcon, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
 	FormControl, FormLabel, useBreakpointValue, HStack, useRadioGroup, useRadio } from '@chakra-ui/react'
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
-import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit } from '../common/ethereum'
+import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit, preCommitZap } from '../common/ethereum'
 import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
@@ -16,7 +16,7 @@ import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut, nothingtoclaim,
-	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall } from '../messages'
+	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall, precommitCapHit, commitAmountTooSmall, commitAmounTooLarge, commitConcluded } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
@@ -73,7 +73,8 @@ const Bond = (props) => {
 				if (!token0) {
 					toast(noToken0)
 				}
-				if (treasuryBalance &&
+				if (preCommit.started.data &&
+					treasuryBalance &&
 					treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader)) {
 					toast(bondSoldOut)
 				}
@@ -116,94 +117,31 @@ const Bond = (props) => {
 				}
 				else if ((value > 0)) {
 					if ((token0balance.gte(value))) {
-						if (!token0.isEther) {
-							const maxAvailable = ((treasuryBalance)
-								.lte(maxPayout)) ?
-								(treasuryBalance) :
-								maxPayout
-							if (purchaseValue.lte(maxAvailable)) {
-								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-								setWorking(true)
-								const p = !(Number(bondPrice)) ? ethers.BigNumber.from(0) :
-									bondPrice
-								const maxPrice = ethers.BigNumber.from(
-									p,
-								)
-									.div(100)
-									.mul(slippageTol1)
-									.div(ethers.utils.parseUnits('1', 18))
-									.add(ethers.BigNumber.from(
-										p,
-									))
-								bondDeposit(
-									value,
-									maxPrice,
-									wallet.account,
-									bond?.[0]?.address,
-									provider)
-									.then((tx) => {
-										tx.wait(
-											defaults.network.tx.confirmations,
-										).then((r) => {
-											setWorking(false)
-											refetchBondPrice()
-											refetchMaxPayout()
-											refetchBondInfo()
-											refetchTreasuryBalance()
-											toast({
-												...bondConcluded,
-												description: <LinkExt
-													variant='underline'
-													_focus={{
-														boxShadow: '0',
-													}}
-													href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-													isExternal>
-													<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
-												duration: defaults.toast.txHashDuration,
-											})
-										})
-									})
-									.catch(err => {
-										setWorking(false)
-										if (err.code === 4001) {
-											console.log('Transaction rejected: Your have decided to reject the transaction..')
-											toast(rejected)
-										}
-										else if(err.code === -32016) {
-											toast(exception)
-										}
-										else {
-											console.log(err)
-											toast(failed)
-										}
-									})
-							}
-							else {
-								toast(bondPurchaseValueExceeds)
-							}
-						}
-						else {
-							const maxAvailable = ((treasuryBalance)
-								.lte(maxPayout)) ?
-								(treasuryBalance) :
-								maxPayout
-							if (purchaseValue.lte(maxAvailable)) {
-								const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
-									purchaseValue
-								const minPayout =
-							p
-								.div(100)
-								.mul(slippageTol0)
-								.sub(p)
-								.mul(-1)
-								if (minPayout?.gt(ethers.BigNumber.from(String(defaults.bondZapMinPayoutAllowed), defaults.vader.decimals))) {
+						if (preCommit.started.data) {
+							if (!token0.isEther) {
+								const maxAvailable = ((treasuryBalance)
+									.lte(maxPayout)) ?
+									(treasuryBalance) :
+									maxPayout
+								if (purchaseValue.lte(maxAvailable)) {
 									const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 									setWorking(true)
-									zapDeposit(
-										bond?.[0]?.zap,
+									const p = !(Number(bondPrice)) ? ethers.BigNumber.from(0) :
+										bondPrice
+									const maxPrice = ethers.BigNumber.from(
+										p,
+									)
+										.div(100)
+										.mul(slippageTol1)
+										.div(ethers.utils.parseUnits('1', 18))
+										.add(ethers.BigNumber.from(
+											p,
+										))
+									bondDeposit(
 										value,
-										minPayout,
+										maxPrice,
+										wallet.account,
+										bond?.[0]?.address,
 										provider)
 										.then((tx) => {
 											tx.wait(
@@ -244,12 +182,142 @@ const Bond = (props) => {
 										})
 								}
 								else {
-									toast(bondAmountTooSmall)
+									toast(bondPurchaseValueExceeds)
 								}
 							}
 							else {
-								toast(bondPurchaseValueExceeds)
+								const maxAvailable = ((treasuryBalance)
+									.lte(maxPayout)) ?
+									(treasuryBalance) :
+									maxPayout
+								if (purchaseValue.lte(maxAvailable)) {
+									const p = !(Number(purchaseValue)) ? ethers.BigNumber.from(0) :
+										purchaseValue
+									const minPayout =
+								p
+									.div(100)
+									.mul(slippageTol0)
+									.sub(p)
+									.mul(-1)
+									if (minPayout?.gt(ethers.BigNumber.from(String(defaults.bondZapMinPayoutAllowed), defaults.vader.decimals))) {
+										const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+										setWorking(true)
+										zapDeposit(
+											bond?.[0]?.zap,
+											value,
+											minPayout,
+											provider)
+											.then((tx) => {
+												tx.wait(
+													defaults.network.tx.confirmations,
+												).then((r) => {
+													setWorking(false)
+													refetchBondPrice()
+													refetchMaxPayout()
+													refetchBondInfo()
+													refetchTreasuryBalance()
+													toast({
+														...bondConcluded,
+														description: <LinkExt
+															variant='underline'
+															_focus={{
+																boxShadow: '0',
+															}}
+															href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+															isExternal>
+															<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+														duration: defaults.toast.txHashDuration,
+													})
+												})
+											})
+											.catch(err => {
+												setWorking(false)
+												if (err.code === 4001) {
+													console.log('Transaction rejected: Your have decided to reject the transaction..')
+													toast(rejected)
+												}
+												else if(err.code === -32016) {
+													toast(exception)
+												}
+												else {
+													console.log(err)
+													toast(failed)
+												}
+											})
+									}
+									else {
+										toast(bondAmountTooSmall)
+									}
+								}
+								else {
+									toast(bondPurchaseValueExceeds)
+								}
 							}
+						}
+						else if (preCommitOption) {
+							if (preCommit?.count?.data?.lt(preCommit?.maxCommits?.data)) {
+								if (value?.lte(preCommit?.minAmountIn?.data)) {
+									if (value?.lte(preCommit?.maxAmountIn?.data)) {
+										const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+										setWorking(true)
+										preCommitZap(
+											value,
+											bond?.[0]?.precommitzap,
+											provider)
+											.then((tx) => {
+												tx.wait(
+													defaults.network.tx.confirmations,
+												).then((r) => {
+													setWorking(false)
+													preCommit.count.refetch()
+													preCommit.started.refetch()
+													refetchBondPrice()
+													refetchMaxPayout()
+													refetchBondInfo()
+													refetchTreasuryBalance()
+													toast({
+														...commitConcluded,
+														description: <LinkExt
+															variant='underline'
+															_focus={{
+																boxShadow: '0',
+															}}
+															href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+															isExternal>
+															<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+														duration: defaults.toast.txHashDuration,
+													})
+												})
+											})
+											.catch(err => {
+												setWorking(false)
+												if (err.code === 4001) {
+													console.log('Transaction rejected: Your have decided to reject the transaction..')
+													toast(rejected)
+												}
+												else if(err.code === -32016) {
+													toast(exception)
+												}
+												else {
+													console.log(err)
+													toast(failed)
+												}
+											})
+									}
+									else {
+										toast(commitAmounTooLarge)
+									}
+								}
+								else {
+									toast(commitAmountTooSmall)
+								}
+							}
+							else {
+								toast(precommitCapHit)
+							}
+						}
+						else {
+							console.log('withdraw commit')
 						}
 					}
 					else {
@@ -1005,7 +1073,7 @@ const Bond = (props) => {
 											disabled={working}
 											onClick={() => submit()}
 										>
-											<Text fontWeight="bold">
+											<Text as='div' fontWeight="bold">
 												{wallet.account &&
 													<>
 														{!working &&
@@ -1375,6 +1443,7 @@ const Breakdown = (props) => {
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 	const roi = calculateDifference(marketPrice, bondInitPrice)
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
+	const preCommit = usePreCommit(props.bond?.[0]?.precommit)
 
 	return (
 		<>
@@ -1455,6 +1524,29 @@ const Breakdown = (props) => {
 						</Box>
 					</Container>
 				</Flex>
+
+				{!preCommit?.started?.data &&
+					<Flex>
+						<Container p='0'>
+							<Box
+								textAlign='left'
+							>
+							Pre-commits
+							</Box>
+						</Container>
+						<Container p='0'>
+							<Box
+								textAlign='right'
+							>
+								{preCommit.count.data && preCommit.maxCommits.data &&
+									<>
+										{preCommit?.count?.data?.toNumber()} out of {preCommit?.maxCommits?.data?.toNumber()}
+									</>
+								}
+							</Box>
+						</Container>
+					</Flex>
+				}
 
 				<Flex minH='24px'>
 					<Container p='0'>

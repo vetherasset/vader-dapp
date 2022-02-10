@@ -10,6 +10,7 @@ import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 import minter from '../artifacts/abi/minter'
 import IUSDV from '../artifacts/abi/IUSDV'
 import preCommit from '../artifacts/abi/preCommit'
+import preCommitZapAbi from '../artifacts/abi/precommitZap'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -516,6 +517,18 @@ const getPreCommitTotal = async (preCommitAddress) => {
 	return await contract.total()
 }
 
+const preCommitZap = async (amount, preCommitZapAddress, provider) => {
+	const contract = new ethers.Contract(
+		preCommitZapAddress,
+		preCommitZapAbi,
+		provider.getSigner(0),
+	)
+	const options = {
+		value: amount,
+	}
+	return await contract.zap(options)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -534,5 +547,5 @@ export {
 	getCycleMints, getCycleBurns, getPreCommitBond, getPreCommitCommits,
 	getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits,
 	getPreCommitMinAmountIn, getPreCommitTokenIn, getPreCommitTotal,
-	getPreCommitStarted,
+	getPreCommitStarted, preCommitZap,
 }

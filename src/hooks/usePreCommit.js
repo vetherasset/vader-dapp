@@ -120,6 +120,7 @@ export const usePreCommit = (preCommitAddress, rpc = true, pollInterval = defaul
 			bond: bond,
 			count: count,
 			maxAmountIn: maxAmountIn,
+			minAmountIn: minAmountIn,
 			maxCommits: maxCommits,
 			started: started,
 			tokenIn: tokenIn,

@@ -218,9 +218,27 @@ const bondConcluded = {
 	position: defaults.toast.position,
 }
 
+const commitConcluded = {
+	title: 'Bond pre-commit succesfull',
+	description: 'The bond pre-commit has been made.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const bondPurchaseValueExceeds = {
 	title: 'Purchase exceeds transaction cap',
-	description: 'Your can\'t purchase more than is transaction cap.',
+	description: 'You can\'t purchase more than is transaction cap.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const precommitCapHit = {
+	title: 'The maximum number of pre-commits has been hit.',
+	description: 'No more pre-commits than is the cap can be made.',
 	status: 'error',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -245,6 +263,24 @@ const bondAmountTooSmall = {
 	position: defaults.toast.position,
 }
 
+const commitAmountTooSmall = {
+	title: 'Amount to commit is too small',
+	description: 'Please input a larger amount.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const commitAmounTooLarge = {
+	title: 'Amount to commit is too large',
+	description: 'Please input a smaller amount.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const unstaked = {
 	title: 'xVADER tokens unstaked',
 	description: 'Your xVADER tokens have been unstaked succesfully.',
@@ -261,5 +297,6 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
-	notyetUnlocked, dailyLimitReached,
+	notyetUnlocked, dailyLimitReached, precommitCapHit, commitAmountTooSmall,
+	commitAmounTooLarge, commitConcluded,
 }
