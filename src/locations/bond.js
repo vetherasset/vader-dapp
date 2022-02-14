@@ -262,7 +262,7 @@ const Bond = (props) => {
 						}
 						else if (preCommitOption) {
 							if (preCommit?.count?.data?.lt(preCommit?.maxCommits?.data)) {
-								if (value?.lte(preCommit?.minAmountIn?.data)) {
+								if (value?.gte(preCommit?.minAmountIn?.data)) {
 									if (value?.lte(preCommit?.maxAmountIn?.data)) {
 										const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 										setWorking(true)
