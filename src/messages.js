@@ -163,6 +163,16 @@ const nothingtoclaim = {
 	position: defaults.toast.position,
 }
 
+const nothingtoUncommit = {
+	title: 'No commits to withdraw',
+	description: 'You have no commits that can be withdrawn.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+
 const nomorethaneligible = {
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
@@ -236,6 +246,14 @@ const commitWithdrawn = {
 	position: defaults.toast.position,
 }
 
+const noCommitSelected = {
+	title: 'No commit selected',
+	description: 'Please select a commit to withdraw.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
 
 const bondPurchaseValueExceeds = {
 	title: 'Purchase exceeds transaction cap',
@@ -308,5 +326,6 @@ export {
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
 	notyetUnlocked, dailyLimitReached, precommitCapHit, commitAmountTooSmall,
-	commitAmounTooLarge, commitConcluded, commitWithdrawn,
+	commitAmounTooLarge, commitConcluded, commitWithdrawn, noCommitSelected,
+	nothingtoUncommit,
 }

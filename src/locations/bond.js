@@ -18,7 +18,7 @@ import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut, nothingtoclaim,
-	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall, precommitCapHit, commitAmountTooSmall, commitAmounTooLarge, commitConcluded, commitWithdrawn } from '../messages'
+	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall, precommitCapHit, commitAmountTooSmall, commitAmounTooLarge, commitConcluded, commitWithdrawn, noCommitSelected, nothingtoUncommit } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
@@ -330,53 +330,64 @@ const Bond = (props) => {
 				}
 				else if (preCommit.open.data &&
 					!preCommitOption) {
-					if(commitIndex) {
-						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-						setWorking(true)
-						unCommit(
-							commitIndex,
-							bond?.[0]?.precommit,
-							provider)
-							.then((tx) => {
-								tx.wait(
-									defaults.network.tx.confirmations,
-								).then((r) => {
-									setWorking(false)
-									preCommit.count.refetch()
-									preCommit.open.refetch()
-									preCommits.refetch()
-									refetchBondPrice()
-									refetchMaxPayout()
-									refetchBondInfo()
-									refetchTreasuryBalance()
-									toast({
-										...commitWithdrawn,
-										description: <LinkExt
-											variant='underline'
-											_focus={{
-												boxShadow: '0',
-											}}
-											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-											isExternal>
-											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
-										duration: defaults.toast.txHashDuration,
+					const availableCommits = preCommits?.data?.accounts?.[0]?.commit?.filter((commit) => {
+						return commit?.isRemoved === false
+					})
+					if (availableCommits.length > 0) {
+						if (commitIndex) {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+							setWorking(true)
+							unCommit(
+								commitIndex,
+								bond?.[0]?.precommit,
+								provider)
+								.then((tx) => {
+									tx.wait(
+										defaults.network.tx.confirmations,
+									).then((r) => {
+										setWorking(false)
+										preCommit.count.refetch()
+										preCommit.open.refetch()
+										preCommits.refetch()
+										refetchBondPrice()
+										refetchMaxPayout()
+										refetchBondInfo()
+										refetchTreasuryBalance()
+										toast({
+											...commitWithdrawn,
+											description: <LinkExt
+												variant='underline'
+												_focus={{
+													boxShadow: '0',
+												}}
+												href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+												isExternal>
+												<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+											duration: defaults.toast.txHashDuration,
+										})
 									})
 								})
-							})
-							.catch(err => {
-								setWorking(false)
-								if (err.code === 4001) {
-									console.log('Transaction rejected: Your have decided to reject the transaction..')
-									toast(rejected)
-								}
-								else if(err.code === -32016) {
-									toast(exception)
-								}
-								else {
-									console.log(err)
-									toast(failed)
-								}
-							})
+								.catch(err => {
+									setWorking(false)
+									if (err.code === 4001) {
+										console.log('Transaction rejected: Your have decided to reject the transaction..')
+										toast(rejected)
+									}
+									else if(err.code === -32016) {
+										toast(exception)
+									}
+									else {
+										console.log(err)
+										toast(failed)
+									}
+								})
+						}
+						else {
+							toast(noCommitSelected)
+						}
+					}
+					else {
+						toast(nothingtoUncommit)
 					}
 				}
 				else {
