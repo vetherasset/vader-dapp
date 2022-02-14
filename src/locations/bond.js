@@ -277,6 +277,7 @@ const Bond = (props) => {
 													setWorking(false)
 													preCommit.count.refetch()
 													preCommit.open.refetch()
+													preCommits.refetch()
 													refetchBondPrice()
 													refetchMaxPayout()
 													refetchBondInfo()
@@ -811,7 +812,8 @@ const Bond = (props) => {
 										/>
 									}
 
-									{!preCommit.open.data &&
+									{preCommitOption !== false &&
+									!preCommit.open.data &&
 										<Flex
 											display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
 											mt={{ base: '1.2rem', md: '' }}
@@ -1278,24 +1280,30 @@ const PreCommitsSelect = (props) => {
 			<Select
 				variant='outline'
 				size='lg'
-				placeholder={preCommits?.data?.commitEvents?.length > 0 ? 'Select commit to withdraw' : 'No commits'}
+				placeholder={preCommits?.data?.accounts?.[0]?.commit?.length > 0 ? 'Select commit to withdraw' : 'No commits'}
 				onChange={(event) => {props.setCommitIndex(event.target.value)}}
 			>
-				{preCommits?.data?.commitEvents?.map((commit, index) => {
-					const time = renderToString(<TimeAgo date={getDateFromTimestamp(commit?.timestamp)} live={true}/>).replace(/<[^>]*>?/gm, '')
-					return (
+				{preCommits?.data?.accounts?.[0]?.commit?.filter((commit) => {
+					return commit?.isRemoved === false
+				}).sort((a, b) => {
+					return b?.commitEvent?.timestamp - a?.commitEvent?.timestamp
+				}).map((commit, index) => {
+					const time = renderToString(
+						<TimeAgo date={getDateFromTimestamp(commit?.commitEvent?.timestamp)} live={true}/>).replace(/<[^>]*>?/gm, '',
+					)
+					return(
 						<option
-							value={commit?.index}
+							value={commit?.commitEvent?.index}
 							key={index}
 						>
-									🪙&nbsp;{prettifyCurrency(
+								🪙&nbsp;{prettifyCurrency(
 								ethers.utils.formatEther(
 									ethers.BigNumber.from(commit?.amount),
 								),
 								0,
 								5,
 								'ETH',
-							)}&#32;🕐&#32;{time}&#32;#️⃣&#32;{prettifyAddress(commit?.id)}
+							)}&#32;🕐&#32;{time}&#32;#️⃣&#32;{prettifyAddress(commit?.commitEvent?.id)}
 						</option>
 					)
 				})}

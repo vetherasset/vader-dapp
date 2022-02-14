@@ -6,20 +6,22 @@ export const useAccountPreCommits = (address, first = 1000, skip = 0, pollInterv
 
 	const query = gql`
 	query {
-		commitEvents(
+		accounts(
 			first: ${first}
 			skip: ${skip}
-			orderBy: timestamp
-			orderDirection: desc
 			where: {
-				depositor: "${address}"
+				address: "${address}"
 			}
-		)
-		{
-			id
-			amount
-			index
-			timestamp
+		) {
+			commit {
+				amount
+				commitEvent {
+					id
+					index
+					timestamp
+				}
+				isRemoved
+			}
 		}
 	}`
 
