@@ -529,6 +529,15 @@ const preCommitZap = async (amount, preCommitZapAddress, provider) => {
 	return await contract.zap(options)
 }
 
+const unCommit = async (index, preCommitAddress, provider) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		provider.getSigner(0),
+	)
+	return await contract.uncommit(index)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -547,5 +556,5 @@ export {
 	getCycleMints, getCycleBurns, getPreCommitBond, getPreCommitCommits,
 	getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits,
 	getPreCommitMinAmountIn, getPreCommitTokenIn, getPreCommitTotal,
-	getPreCommitStarted, preCommitZap,
+	getPreCommitStarted, preCommitZap, unCommit,
 }

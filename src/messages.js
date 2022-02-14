@@ -227,6 +227,16 @@ const commitConcluded = {
 	position: defaults.toast.position,
 }
 
+const commitWithdrawn = {
+	title: 'Bond un-commit succesfull',
+	description: 'The bond commit has been withdrawn.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+
 const bondPurchaseValueExceeds = {
 	title: 'Purchase exceeds transaction cap',
 	description: 'You can\'t purchase more than is transaction cap.',
@@ -298,5 +308,5 @@ export {
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
 	notyetUnlocked, dailyLimitReached, precommitCapHit, commitAmountTooSmall,
-	commitAmounTooLarge, commitConcluded,
+	commitAmounTooLarge, commitConcluded, commitWithdrawn,
 }

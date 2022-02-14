@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { renderToString } from 'react-dom/server'
 import PropTypes from 'prop-types'
 import { useLocalStorage, useSessionStorage } from 'react-use'
 import { ethers } from 'ethers'
@@ -6,23 +7,26 @@ import { useWallet } from 'use-wallet'
 import { Redirect, Link, useParams } from 'react-router-dom'
 import { Box, Button, Flex, Text, InputGroup, Input, InputRightAddon, Image, Spinner,
 	useToast, Container, Tag, TagLeftIcon, TagLabel, Badge, Tabs, TabList, Tab, Switch, Link as LinkExt, InputRightElement,
-	FormControl, FormLabel, useBreakpointValue, HStack, useRadioGroup, useRadio } from '@chakra-ui/react'
+	FormControl, FormLabel, useBreakpointValue, HStack, useRadioGroup, useRadio, Select } from '@chakra-ui/react'
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons'
-import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit, preCommitZap } from '../common/ethereum'
-import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage } from '../common/utils'
+import { getERC20BalanceOf, getERC20Allowance, approveERC20ToSpend, bondDeposit, bondPayoutFor, bondRedeem, zapDeposit, preCommitZap,
+	unCommit } from '../common/ethereum'
+import { prettifyCurrency, prettifyNumber, calculateDifference, getPercentage, getDateFromTimestamp, prettifyAddress } from '../common/utils'
 import { useBondPrice } from '../hooks/useBondPrice'
 import defaults from '../common/defaults'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { walletNotConnected, noToken0, approved, rejected, exception,
 	insufficientBalance, failed, noAmount, bondPurchaseValueExceeds, bondSoldOut, nothingtoclaim,
-	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall, precommitCapHit, commitAmountTooSmall, commitAmounTooLarge, commitConcluded } from '../messages'
+	bondConcluded, tokenValueTooSmall, vaderclaimed, bondAmountTooSmall, precommitCapHit, commitAmountTooSmall, commitAmounTooLarge, commitConcluded, commitWithdrawn } from '../messages'
 import { useBondTerms } from '../hooks/useBondTerms'
 import { useTreasuryBalance } from '../hooks/useTreasuryBalance'
 import { useBondPendingPayout } from '../hooks/useBondPendingPayout'
 import { useBondInfo } from '../hooks/useBondInfo'
 import { useBondMaxPayout } from '../hooks/useBondMaxPayout'
 import { usePreCommit } from '../hooks/usePreCommit'
+import { useAccountPreCommits } from '../hooks/useAccountPreCommits'
+import TimeAgo from 'react-timeago'
 
 const Bond = (props) => {
 
@@ -51,6 +55,8 @@ const Bond = (props) => {
 	const { data: maxPayout, refetch: refetchMaxPayout } = useBondMaxPayout(bond?.[0]?.address)
 	const preCommit = usePreCommit(bond?.[0]?.precommit)
 	const [preCommitOption, setPrecommitOption] = useLocalStorage('preCommitOption23049', true)
+	const [commitIndex, setCommitIndex] = useState('')
+	const preCommits = useAccountPreCommits(wallet?.account?.toLowerCase())
 
 	const isBondAddress = useMemo(() => {
 		if(ethers.utils.isAddress(address)) {
@@ -316,12 +322,60 @@ const Bond = (props) => {
 								toast(precommitCapHit)
 							}
 						}
-						else {
-							console.log('withdraw commit')
-						}
 					}
 					else {
 						toast(insufficientBalance)
+					}
+				}
+				else if (!preCommit.started.data &&
+					!preCommitOption) {
+					if(commitIndex) {
+						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+						setWorking(true)
+						unCommit(
+							commitIndex,
+							bond?.[0]?.precommit,
+							provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setWorking(false)
+									preCommit.count.refetch()
+									preCommit.started.refetch()
+									preCommits.refetch()
+									refetchBondPrice()
+									refetchMaxPayout()
+									refetchBondInfo()
+									refetchTreasuryBalance()
+									toast({
+										...commitWithdrawn,
+										description: <LinkExt
+											variant='underline'
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></LinkExt>,
+										duration: defaults.toast.txHashDuration,
+									})
+								})
+							})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else if(err.code === -32016) {
+									toast(exception)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
 					}
 				}
 				else {
@@ -595,62 +649,63 @@ const Bond = (props) => {
 											md:	'',
 										})}
 
-										<Flex
-											display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
-											flexDir='column'
-										>
+										{preCommitOption !== false &&
 											<Flex
-												alignItems='center'
-												justifyContent='space-between'>
-												<Text
-													as='h4'
-													fontSize={{ base: '1rem', md: '1.24rem' }}
-													fontWeight='bolder'>
-													Amount
-												</Text>
-											</Flex>
-											<Flex
-												layerStyle='inputLike'
+												display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
+												flexDir='column'
 											>
-												<InputGroup>
-													<Input
-														variant='transparent'
-														flex='1'
-														fontSize='1.3rem'
-														fontWeight='bold'
-														placeholder='0.0'
-														value={inputAmount}
-														onChange={(e) => {
-															if (isNaN(e.target.value)) {
-																setInputAmount(prev => prev)
-															}
-															else {
-																setInputAmount(String(e.target.value))
-																if(Number(e.target.value) >= 0) {
-																	try {
-																		setValue(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
-																	}
-																	catch(err) {
-																		if (err.code === 'NUMERIC_FAULT') {
-																			toast(tokenValueTooSmall)
+												<Flex
+													alignItems='center'
+													justifyContent='space-between'>
+													<Text
+														as='h4'
+														fontSize={{ base: '1rem', md: '1.24rem' }}
+														fontWeight='bolder'>
+													Amount
+													</Text>
+												</Flex>
+												<Flex
+													layerStyle='inputLike'
+												>
+													<InputGroup>
+														<Input
+															variant='transparent'
+															flex='1'
+															fontSize='1.3rem'
+															fontWeight='bold'
+															placeholder='0.0'
+															value={inputAmount}
+															onChange={(e) => {
+																if (isNaN(e.target.value)) {
+																	setInputAmount(prev => prev)
+																}
+																else {
+																	setInputAmount(String(e.target.value))
+																	if(Number(e.target.value) >= 0) {
+																		try {
+																			setValue(ethers.utils.parseUnits(String(e.target.value), token0.decimals))
+																		}
+																		catch(err) {
+																			if (err.code === 'NUMERIC_FAULT') {
+																				toast(tokenValueTooSmall)
+																			}
 																		}
 																	}
 																}
-															}
-														}}/>
-													<InputRightAddon
-														width='auto'
-														borderTopLeftRadius='0.375rem'
-														borderBottomLeftRadius='0.375rem'
-														paddingInlineStart='0.5rem'
-														paddingInlineEnd='0.5rem'
-													>
-														<Flex
-															cursor='default'
-															zIndex='1'
+															}}/>
+														<InputRightAddon
+															width='auto'
+															borderTopLeftRadius='0.375rem'
+															borderBottomLeftRadius='0.375rem'
+															paddingInlineStart='0.5rem'
+															paddingInlineEnd='0.5rem'
 														>
-															<Box d='flex' alignItems='center'>
-																{token0 && token0?.logoURI &&
+															<Flex
+																cursor='default'
+																zIndex='1'
+															>
+																<Box d='flex' alignItems='center'>
+																	{token0 && token0?.logoURI &&
 																		<Image
 																			width='24px'
 																			height='24px'
@@ -659,82 +714,88 @@ const Bond = (props) => {
 																			src={token0?.logoURI}
 																			alt={`${token0?.name} token`}
 																		/>
-																}
-																{token0?.address && !token0?.logoURI &&
+																	}
+																	{token0?.address && !token0?.logoURI &&
 																		<TokenJazzicon address={token0.address} />
-																}
-																<Box
-																	as='h3'
-																	m='0'
-																	fontSize='1.02rem'
-																	fontWeight='bold'
-																	textTransform='capitalize'>{token0?.symbol}</Box>
-															</Box>
-														</Flex>
-													</InputRightAddon>
-												</InputGroup>
-											</Flex>
-											<Flex
-												mt='.6rem'
-												justifyContent='flex-end'
-												flexDir='row'
-											>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													onClick={() => {
-														setInputAmount(
-															ethers.utils.formatUnits(
-																token0balance.div(100).mul(25),
-																token0.decimals),
-														)
-														setValue(token0balance.div(100).mul(25))
-													}}>
+																	}
+																	<Box
+																		as='h3'
+																		m='0'
+																		fontSize='1.02rem'
+																		fontWeight='bold'
+																		textTransform='capitalize'>{token0?.symbol}</Box>
+																</Box>
+															</Flex>
+														</InputRightAddon>
+													</InputGroup>
+												</Flex>
+												<Flex
+													mt='.6rem'
+													justifyContent='flex-end'
+													flexDir='row'
+												>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														onClick={() => {
+															setInputAmount(
+																ethers.utils.formatUnits(
+																	token0balance.div(100).mul(25),
+																	token0.decimals),
+															)
+															setValue(token0balance.div(100).mul(25))
+														}}>
 													25%
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													onClick={() => {
-														setInputAmount(
-															ethers.utils.formatUnits(
-																token0balance.div(100).mul(50),
-																token0.decimals),
-														)
-														setValue(token0balance.div(100).mul(50))
-													}}>
+													</Button>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														onClick={() => {
+															setInputAmount(
+																ethers.utils.formatUnits(
+																	token0balance.div(100).mul(50),
+																	token0.decimals),
+															)
+															setValue(token0balance.div(100).mul(50))
+														}}>
 													50%
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													onClick={() => {
-														setInputAmount(
-															ethers.utils.formatUnits(
-																token0balance.div(100).mul(75),
-																token0.decimals),
-														)
-														setValue(token0balance.div(100).mul(75))
-													}}>
+													</Button>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														onClick={() => {
+															setInputAmount(
+																ethers.utils.formatUnits(
+																	token0balance.div(100).mul(75),
+																	token0.decimals),
+															)
+															setValue(token0balance.div(100).mul(75))
+														}}>
 													75%
-												</Button>
-												<Button
-													variant='outline'
-													size='sm'
-													mr='0.4rem'
-													onClick={() => {
-														setInputAmount(
-															ethers.utils.formatUnits(token0balance, token0.decimals),
-														)
-														setValue(token0balance)
-													}}>
+													</Button>
+													<Button
+														variant='outline'
+														size='sm'
+														mr='0.4rem'
+														onClick={() => {
+															setInputAmount(
+																ethers.utils.formatUnits(token0balance, token0.decimals),
+															)
+															setValue(token0balance)
+														}}>
 													MAX
-												</Button>
+													</Button>
+												</Flex>
 											</Flex>
-										</Flex>
+										}
+										{!preCommit.started.data &&
+											!preCommitOption &&
+											<PreCommitsSelect
+												setCommitIndex={setCommitIndex}/>
+										}
 									</Flex>
 
 									{!preCommit.started.data &&
@@ -1190,6 +1251,59 @@ const Bond = (props) => {
 	)
 }
 
+const PreCommitsSelect = (props) => {
+
+	PreCommitsSelect.propTypes = {
+		setCommitIndex: PropTypes.func.isRequired,
+	}
+
+	const wallet = useWallet()
+	const preCommits = useAccountPreCommits(wallet?.account?.toLowerCase())
+
+	return (
+		<Flex
+			flexDir='column'
+			pb='50px'
+		>
+			<Flex
+				alignItems='center'
+				justifyContent='space-between'>
+				<Text
+					as='h4'
+					fontSize={{ base: '1rem', md: '1.24rem' }}
+					fontWeight='bolder'>
+						Commit
+				</Text>
+			</Flex>
+			<Select
+				variant='outline'
+				size='lg'
+				placeholder={preCommits?.data?.commitEvents?.length > 0 ? 'Select commit to withdraw' : 'No commits'}
+				onChange={(event) => {props.setCommitIndex(event.target.value)}}
+			>
+				{preCommits?.data?.commitEvents?.map((commit, index) => {
+					const time = renderToString(<TimeAgo date={getDateFromTimestamp(commit?.timestamp)} live={true}/>).replace(/<[^>]*>?/gm, '')
+					return (
+						<option
+							value={commit?.index}
+							key={index}
+						>
+									🪙&nbsp;{prettifyCurrency(
+								ethers.utils.formatEther(
+									ethers.BigNumber.from(commit?.amount),
+								),
+								0,
+								5,
+								'ETH',
+							)}&#32;🕐&#32;{time}&#32;#️⃣&#32;{prettifyAddress(commit?.id)}
+						</option>
+					)
+				})}
+			</Select>
+		</Flex>
+	)
+}
+
 const RadioCard = (props) => {
 
 	RadioCard.propTypes = {
@@ -1457,7 +1571,7 @@ const Breakdown = (props) => {
 			>
 				<Text
 					as='h4'
-					fontSize='1.24rem'
+					fontSize={{ base: '1rem', md: '1.24rem' }}
 					fontWeight='bolder'>
 					Breakdown
 				</Text>

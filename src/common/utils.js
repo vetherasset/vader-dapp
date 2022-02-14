@@ -99,6 +99,11 @@ const getSecondsToGo = (date) => {
 	return (Number((date - time)))
 }
 
+const getDateFromTimestamp = (timestamp) => {
+	const date = new Date(timestamp * 1000)
+	return date
+}
+
 const promiseAllProgress = (promises, tickCallback) => {
 	const numPromises = promises.length
 	let progress = 0
@@ -214,5 +219,5 @@ export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
-	calculateDifference, getDateFromSeconds,
+	calculateDifference, getDateFromSeconds, getDateFromTimestamp,
 }
