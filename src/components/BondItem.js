@@ -32,6 +32,8 @@ export const BondItem = (props) => {
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
 	const preCommit = usePreCommit(props.bond.precommit)
 
+	console.log(preCommit)
+
 	return (
 		<>
 			<Link to={`/bond/${props.bond.address}`}>
@@ -90,7 +92,7 @@ export const BondItem = (props) => {
 								/> Purchased
 							</Tag>
 						}
-						{!preCommit.started.data &&
+						{preCommit.open.data &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
 								mt={{ base: '3px', md: '' }}

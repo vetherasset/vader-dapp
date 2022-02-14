@@ -79,7 +79,7 @@ const Bond = (props) => {
 				if (!token0) {
 					toast(noToken0)
 				}
-				if (preCommit.started.data &&
+				if (!preCommit.open.data &&
 					treasuryBalance &&
 					treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader)) {
 					toast(bondSoldOut)
@@ -123,7 +123,7 @@ const Bond = (props) => {
 				}
 				else if ((value > 0)) {
 					if ((token0balance.gte(value))) {
-						if (preCommit.started.data) {
+						if (!preCommit.open.data) {
 							if (!token0.isEther) {
 								const maxAvailable = ((treasuryBalance)
 									.lte(maxPayout)) ?
@@ -276,7 +276,7 @@ const Bond = (props) => {
 												).then((r) => {
 													setWorking(false)
 													preCommit.count.refetch()
-													preCommit.started.refetch()
+													preCommit.open.refetch()
 													refetchBondPrice()
 													refetchMaxPayout()
 													refetchBondInfo()
@@ -327,7 +327,7 @@ const Bond = (props) => {
 						toast(insufficientBalance)
 					}
 				}
-				else if (!preCommit.started.data &&
+				else if (preCommit.open.data &&
 					!preCommitOption) {
 					if(commitIndex) {
 						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
@@ -342,7 +342,7 @@ const Bond = (props) => {
 								).then((r) => {
 									setWorking(false)
 									preCommit.count.refetch()
-									preCommit.started.refetch()
+									preCommit.open.refetch()
 									preCommits.refetch()
 									refetchBondPrice()
 									refetchMaxPayout()
@@ -566,7 +566,7 @@ const Bond = (props) => {
 						flexDir='column'
 						layerStyle='colorful'
 						minH='541.217px'
-						h={{ base: '', md: `${!preCommit.started.data ? '541.217px' : 'auto'}` }}
+						h={{ base: '', md: `${preCommit.open.data ? '541.217px' : 'auto'}` }}
 					>
 						<Flex
 							height='100%'
@@ -598,7 +598,7 @@ const Bond = (props) => {
 													boxShadow: 'none',
 												}}>
 												<Text as='h3' m='0' fontSize='1.24rem'>
-													{preCommit.started.data ? 'Bond' : 'Pre-commit'}
+													{!preCommit.open.data ? 'Bond' : 'Pre-commit'}
 												</Text>
 											</Tab>
 											<Tab
@@ -791,14 +791,14 @@ const Bond = (props) => {
 												</Flex>
 											</Flex>
 										}
-										{!preCommit.started.data &&
+										{preCommit.open.data &&
 											!preCommitOption &&
 											<PreCommitsSelect
 												setCommitIndex={setCommitIndex}/>
 										}
 									</Flex>
 
-									{!preCommit.started.data &&
+									{preCommit.open.data &&
 										<PreCommitOptions
 											pointerEvents={tabIndex === 1 ? 'none' :
 												''}
@@ -811,7 +811,7 @@ const Bond = (props) => {
 										/>
 									}
 
-									{preCommit.started.data &&
+									{!preCommit.open.data &&
 										<Flex
 											display={{ base: `${tabIndex === 1 ? 'none' : ''}`, md: 'flex' }}
 											mt={{ base: '1.2rem', md: '' }}
@@ -1027,7 +1027,7 @@ const Bond = (props) => {
 												{treasuryBalance &&
 													<>
 														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
-															!preCommit.started.data) &&
+															preCommit.open.data) &&
 															<>
 																{purchaseValue !== '' &&
 																	prettifyCurrency(
@@ -1039,7 +1039,7 @@ const Bond = (props) => {
 															</>
 														}
 														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-														preCommit.started.data === true) &&
+														!preCommit.open.data) &&
 															<>
 																Sold Out
 															</>
@@ -1057,7 +1057,7 @@ const Bond = (props) => {
 												{treasuryBalance &&
 													<>
 														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
-															!preCommit.started.data) &&
+															preCommit.open.data) &&
 															<>
 																<Badge
 																	as='div'
@@ -1069,7 +1069,7 @@ const Bond = (props) => {
 															</>
 														}
 														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-														preCommit.started.data === true) &&
+														!preCommit.open.data) &&
 															<>
 																<Badge
 																	as='div'
@@ -1089,7 +1089,7 @@ const Bond = (props) => {
 									{tabIndex == 1 &&
 										<Flex
 											minH='76px'
-											m={ preCommit.started.data ? '1.66rem 0' : '.50rem 0 1.60rem' }
+											m={ !preCommit.open.data ? '1.66rem 0' : '.50rem 0 1.60rem' }
 											fontSize={{ base: '1.35rem', md: '1.5rem' }}
 											fontWeight='bolder'
 											justifyContent='center' alignItems='center' flexDir='column'
@@ -1139,7 +1139,7 @@ const Bond = (props) => {
 													<>
 														{!working &&
 															<>
-																{preCommit.started.data &&
+																{!preCommit.open.data &&
 																	<>
 																		{tabIndex === 0 &&
 																			<>
@@ -1162,7 +1162,7 @@ const Bond = (props) => {
 																		}
 																	</>
 																}
-																{!preCommit.started.data &&
+																{preCommit.open.data &&
 																	<>
 																		{tabIndex === 0 &&
 																			<>
@@ -1207,12 +1207,12 @@ const Bond = (props) => {
 													<>
 														{tabIndex === 0 &&
 															<>
-																{preCommit.started.data &&
+																{!preCommit.open.data &&
 																	<>
 																		Purchase
 																	</>
 																}
-																{!preCommit.started.data &&
+																{preCommit.open.data &&
 																	<>
 																		{preCommitOption &&
 																			<>
@@ -1639,7 +1639,7 @@ const Breakdown = (props) => {
 					</Container>
 				</Flex>
 
-				{!preCommit?.started?.data &&
+				{preCommit?.open?.data &&
 					<Flex>
 						<Container p='0'>
 							<Box

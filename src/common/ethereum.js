@@ -490,13 +490,13 @@ const getPreCommitMinAmountIn = async (preCommitAddress) => {
 	return await contract.minAmountIn()
 }
 
-const getPreCommitStarted = async (preCommitAddress) => {
+const getPrecommitOpen = async (preCommitAddress) => {
 	const contract = new ethers.Contract(
 		preCommitAddress,
 		preCommit,
 		defaults.network.provider,
 	)
-	return await contract.started()
+	return await contract.open()
 }
 
 const getPreCommitTokenIn = async (preCommitAddress) => {
@@ -556,5 +556,5 @@ export {
 	getCycleMints, getCycleBurns, getPreCommitBond, getPreCommitCommits,
 	getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits,
 	getPreCommitMinAmountIn, getPreCommitTokenIn, getPreCommitTotal,
-	getPreCommitStarted, preCommitZap, unCommit,
+	getPrecommitOpen, preCommitZap, unCommit,
 }

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useQuery as useApolloQuery, gql } from '@apollo/client'
 import { useQuery } from 'react-query'
-import { getPreCommitBond, getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits, getPreCommitMinAmountIn, getPreCommitStarted, getPreCommitTokenIn, getPreCommitTotal } from '../common/ethereum'
+import { getPreCommitBond, getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits, getPreCommitMinAmountIn, getPrecommitOpen, getPreCommitTokenIn, getPreCommitTotal } from '../common/ethereum'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 
@@ -77,10 +77,10 @@ export const usePreCommit = (preCommitAddress, rpc = true, pollInterval = defaul
 			},
 		)
 
-		const started = useQuery(`${preCommitAddress}_started`,
+		const open = useQuery(`${preCommitAddress}_started`,
 			async () => {
 				if (preCommitAddress) {
-					return await getPreCommitStarted(
+					return await getPrecommitOpen(
 						preCommitAddress,
 					)
 				}
@@ -122,7 +122,7 @@ export const usePreCommit = (preCommitAddress, rpc = true, pollInterval = defaul
 			maxAmountIn: maxAmountIn,
 			minAmountIn: minAmountIn,
 			maxCommits: maxCommits,
-			started: started,
+			open: open,
 			tokenIn: tokenIn,
 			total: total,
 		}
