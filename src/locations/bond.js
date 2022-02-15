@@ -121,7 +121,9 @@ const Bond = (props) => {
 							}
 						})
 				}
-				else if ((value > 0)) {
+				else if (
+					(value > 0 && preCommit.open.data && preCommitOption) ||
+					(value > 0 && !preCommit.open.data)) {
 					if ((token0balance.gte(value))) {
 						if (!preCommit.open.data) {
 							if (!token0.isEther) {
@@ -1272,6 +1274,10 @@ const PreCommitsSelect = (props) => {
 
 	const wallet = useWallet()
 	const preCommits = useAccountPreCommits(wallet?.account?.toLowerCase())
+
+	useEffect(() => {
+		return () => props.setCommitIndex('')
+	}, [])
 
 	return (
 		<Flex
