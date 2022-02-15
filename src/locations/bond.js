@@ -1299,12 +1299,13 @@ const PreCommitsSelect = (props) => {
 				}).sort((a, b) => {
 					return b?.commitEvent?.timestamp - a?.commitEvent?.timestamp
 				}).map((commit, index) => {
+					const idIndex = commit?.id?.substring(43)
 					const time = renderToString(
 						<TimeAgo date={getDateFromTimestamp(commit?.commitEvent?.timestamp)} live={true}/>).replace(/<[^>]*>?/gm, '',
 					)
 					return(
 						<option
-							value={commit?.commitEvent?.index}
+							value={idIndex}
 							key={index}
 						>
 								🪙&nbsp;{prettifyCurrency(
