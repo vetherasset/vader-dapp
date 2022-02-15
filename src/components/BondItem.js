@@ -118,8 +118,10 @@ export const BondItem = (props) => {
 										fontSize={{ base: '0.67rem', md: '0.83rem' }}
 										colorScheme='gray'>
 										{prettifyCurrency(
-											Number(ethers.utils.formatUnits(price, 18)) *
-											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+											props.bond.principal ? (Number(ethers.utils.formatUnits(price, 18)) *
+											(Number(usdcEth?.pairs?.[0]?.token0Price) *
+											Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(price, 18)) *
+											(Number(usdcEth?.pairs?.[0]?.token0Price))),
 											0, 5)}
 									</Tag>
 								</>

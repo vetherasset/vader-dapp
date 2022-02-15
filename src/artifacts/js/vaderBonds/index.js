@@ -36,10 +36,8 @@ const bonds = [
 	{
 		'name': 'Reserve Bond',
 		'address':'0x74876acb3D2a007687c285B5A75A0d7b470B3D69',
-		'zap': undefined,
 		'precommit': '0x0c6ad91DD183f953389D0bf5687025340a19E6e0',
 		'precommitzap': '0xdfdbeFa9A5E93a369cd0fCcA7820C5C5caB3082f',
-		'principal': undefined,
 		'token0': {
 			'name':'ETHER',
 			'symbol':'ETH',
@@ -58,10 +56,8 @@ const bonds = [
 	{
 		'name': 'Reserve Bond 2',
 		'address':'0xbea19c6AB7F5C90481147Ad69Ff0De2Dba879b5C',
-		'zap': undefined,
 		'precommit': '0x3db19DE4263284c957B09efe53Cb0e7042228C59',
 		'precommitzap': '0xD936219f3acA9CA1fa675aA69752FaD2BE85A90a',
-		'principal': undefined,
 		'token0': {
 			'name':'ETHER',
 			'symbol':'ETH',
