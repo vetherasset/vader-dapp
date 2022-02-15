@@ -445,8 +445,10 @@ const Bond = (props) => {
 	}, [address])
 
 	useEffect(() => {
-		if(useLPTokens) {
-			setToken0(bond?.[0]?.principal)
+		if (bond?.[0]?.principal) {
+			if(useLPTokens) {
+				setToken0(bond?.[0]?.principal)
+			}
 		}
 		return () => setToken0(defaults.ether)
 	}, [useLPTokens, bond])
@@ -523,6 +525,8 @@ const Bond = (props) => {
 			}
 		}
 	}, [value, useLPTokens, principalEth?.principalPrice])
+
+	console.log(purchaseValue)
 
 	if (isBondAddress) {
 		return (
@@ -958,31 +962,33 @@ const Bond = (props) => {
 												</Flex>
 											</Flex>
 
-											<FormControl
-												d='flex'
-												pointerEvents={tabIndex === 1 ? 'none' : ''}
-												opacity={tabIndex === 1 ? '0.55' : '1'}
-												mt={{ base: '3.2rem', md: '' }}
-												borderTop='1px solid rgb(102, 101, 129)'
-												borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
-												pt='2.1rem'
-												pb={{ base: '2.1rem', md: '0' }}
-												w='100%'
-												flexDir='row'
-												justifyContent='space-between'
-											>
-												<FormLabel
-													htmlFor='useLPTokens'
-													fontWeight='bolder'
+											{bond?.[0]?.principal &&
+												<FormControl
+													d='flex'
+													pointerEvents={tabIndex === 1 ? 'none' : ''}
+													opacity={tabIndex === 1 ? '0.55' : '1'}
+													mt={{ base: '3.2rem', md: '' }}
+													borderTop='1px solid rgb(102, 101, 129)'
+													borderBottom={{ base: '1px solid rgb(102, 101, 129)', md: 'none' }}
+													pt='2.1rem'
+													pb={{ base: '2.1rem', md: '0' }}
+													w='100%'
+													flexDir='row'
+													justifyContent='space-between'
 												>
-											Use LP tokens instead
-												</FormLabel>
-												<Switch
-													id='useLPTokens'
-													size='lg'
-													isChecked={useLPTokens}
-													onChange={() => setUseLPTokens(!useLPTokens)}/>
-											</FormControl>
+													<FormLabel
+														htmlFor='useLPTokens'
+														fontWeight='bolder'
+													>
+														Use LP tokens instead
+													</FormLabel>
+													<Switch
+														id='useLPTokens'
+														size='lg'
+														isChecked={useLPTokens}
+														onChange={() => setUseLPTokens(!useLPTokens)}/>
+												</FormControl>
+											}
 										</Flex>
 									}
 								</Flex>
@@ -1447,8 +1453,9 @@ const PriceOverview = (props) => {
 							{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
 								<>
 									{prettifyCurrency(
-										Number(ethers.utils.formatUnits(bondPrice, 18)) *
-										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
+										props.bond.principal ? (Number(ethers.utils.formatUnits(bondPrice, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(bondPrice, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price))),
 										0, 5)}
 								</>
 							}
@@ -1578,8 +1585,9 @@ const Breakdown = (props) => {
 	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
 	const { data: terms } = useBondTerms(props.bond?.[0]?.address, true)
 
-	const bondInitPrice = (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
-	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
+	const bondInitPrice = props.bond?.[0]?.principal ? (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
 	const roi = calculateDifference(marketPrice, bondInitPrice)
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
