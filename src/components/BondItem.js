@@ -19,11 +19,11 @@ export const BondItem = (props) => {
 	}
 
 	const wallet = useWallet()
-	const { data: bondInfo } = useBondInfo(props.bond.address, wallet.account, true)
-	const [vaderEth] = useUniswapV2Price(props.bond.principal.address)
+	const { data: bondInfo } = useBondInfo(props.bond?.address, wallet.account, true)
+	const [vaderEth] = useUniswapV2Price(props.bond?.principal?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
-	const [principalEth] = useUniswapV2Price(props.bond.principal.address, true)
-	const { data: price } = useBondPrice(props.bond.address)
+	const [principalEth] = useUniswapV2Price(props.bond?.principal?.address, true)
+	const { data: price } = useBondPrice(props.bond?.address)
 
 	const bondInitPrice = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
@@ -31,8 +31,6 @@ export const BondItem = (props) => {
 	const roi = calculateDifference(marketPrice, bondInitPrice)
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
 	const preCommit = usePreCommit(props.bond.precommit)
-
-	console.log(preCommit)
 
 	return (
 		<>
@@ -70,6 +68,7 @@ export const BondItem = (props) => {
 							src={props.bond.token0?.logoURI}
 							alt={`${props.bond.token0?.name} token`}
 						/>
+						{props.bond?.token1?.logoURI &&
 						<Image
 							width='23px'
 							height='23px'
@@ -78,7 +77,8 @@ export const BondItem = (props) => {
 							src={props.bond.token1?.logoURI}
 							alt={`${props.bond.token1?.name} token`}
 						/>
-						{props.bond.token0?.symbol}{props.bond.token1 ? ` / ${props.bond.token1.symbol}` : ''}
+						}
+						{props.bond.token0?.symbol}{props.bond.token1 ? ` / ${props.bond.token1.symbol}` : `${String.fromCharCode(8194)}${props.bond.name}`}
 						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}

@@ -34,7 +34,7 @@ const bonds = [
 		},
 	},
 	{
-		'name': 'ETH Reserve Bond Short Term',
+		'name': 'Reserve Bond',
 		'address':'0x74876acb3D2a007687c285B5A75A0d7b470B3D69',
 		'zap': undefined,
 		'precommit': '0x0c6ad91DD183f953389D0bf5687025340a19E6e0',
@@ -56,7 +56,7 @@ const bonds = [
 		},
 	},
 	{
-		'name': 'ETH Reserve Bond Long Term',
+		'name': 'Reserve Bond 2',
 		'address':'0xbea19c6AB7F5C90481147Ad69Ff0De2Dba879b5C',
 		'zap': undefined,
 		'precommit': '0x3db19DE4263284c957B09efe53Cb0e7042228C59',

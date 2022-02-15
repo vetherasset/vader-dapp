@@ -112,14 +112,17 @@ const Bonds = (props) => {
 								}
 							`}
 						</style>
-						{defaults.bonds?.map((item, index) => {
-							return (
-								<BondItem
-									key={index}
-									bond={item}
-								/>
-							)
-						})}
+						{defaults.bonds
+							.slice(0)
+							.reverse()
+							.map((item, index) => {
+								return (
+									<BondItem
+										key={index}
+										bond={item}
+									/>
+								)
+							})}
 					</Box>
 					<Flex
 						flexDir='row'
