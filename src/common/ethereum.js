@@ -9,6 +9,8 @@ import zapEth from '../artifacts/abi/zapEth'
 import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 import minter from '../artifacts/abi/minter'
 import IUSDV from '../artifacts/abi/IUSDV'
+import preCommit from '../artifacts/abi/preCommit'
+import preCommitZapAbi from '../artifacts/abi/precommitZap'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -434,6 +436,108 @@ const getLocks = async (address, lockIndex) => {
 	return await contract.locks(address, lockIndex)
 }
 
+const getPreCommitBond = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.bond()
+}
+
+const getPreCommitCommits = async (depositorAddress, preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.commits(depositorAddress)
+}
+
+const getPreCommitCount = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.count()
+}
+
+const getPreCommitMaxAmountIn = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.maxAmountIn()
+}
+
+const getPreCommitMaxCommits = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.maxCommits()
+}
+
+const getPreCommitMinAmountIn = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.minAmountIn()
+}
+
+const getPrecommitOpen = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.open()
+}
+
+const getPreCommitTokenIn = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.tokenIn()
+}
+
+const getPreCommitTotal = async (preCommitAddress) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		defaults.network.provider,
+	)
+	return await contract.total()
+}
+
+const preCommitZap = async (amount, preCommitZapAddress, provider) => {
+	const contract = new ethers.Contract(
+		preCommitZapAddress,
+		preCommitZapAbi,
+		provider.getSigner(0),
+	)
+	const options = {
+		value: amount,
+	}
+	return await contract.zap(options)
+}
+
+const unCommit = async (index, preCommitAddress, provider) => {
+	const contract = new ethers.Contract(
+		preCommitAddress,
+		preCommit,
+		provider.getSigner(0),
+	)
+	return await contract.uncommit(index)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -449,5 +553,8 @@ export {
 	getMinterLbt, minterMint, minterBurn,
 	getPublicFee, usdvClaim, getMinterDailyLimits,
 	usdvClaimAll, getLockCount, getLocks,
-	getCycleMints, getCycleBurns,
+	getCycleMints, getCycleBurns, getPreCommitBond, getPreCommitCommits,
+	getPreCommitCount, getPreCommitMaxAmountIn, getPreCommitMaxCommits,
+	getPreCommitMinAmountIn, getPreCommitTokenIn, getPreCommitTotal,
+	getPrecommitOpen, preCommitZap, unCommit,
 }
