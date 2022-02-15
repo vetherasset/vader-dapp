@@ -262,7 +262,8 @@ const Bond = (props) => {
 								}
 							}
 						}
-						else if (preCommitOption) {
+						else if (preCommit.open.data &&
+							preCommitOption) {
 							if (preCommit?.count?.data?.lt(preCommit?.maxCommits?.data)) {
 								if (value?.gte(preCommit?.minAmountIn?.data)) {
 									if (value?.lte(preCommit?.maxAmountIn?.data)) {
