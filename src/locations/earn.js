@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useLocalStorage } from 'react-use'
-import { useXvaderPrice } from '../hooks/useXvaderPrice'
 import { Box, Button,	Flex, Text, Tab, TabList, Tabs, TabPanels, TabPanel,
-	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Badge, Spinner, Link,
-	ScaleFade, Fade, Tooltip,
+	Input, InputGroup, InputRightAddon, useToast, Image, Container, Heading, Spinner, Link,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
@@ -18,39 +15,13 @@ import {
 } from '../common/ethereum'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	unstaked, tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
-import { prettifyNumber, getPercentage } from '../common/utils'
-import { useXvaderAPR } from '../hooks/useXvaderAPR'
 
 const Earn = (props) => {
 
 	const wallet = useWallet()
 	const [token0balance, setToken0balance] = useState(ethers.BigNumber.from('0'))
 	const [token1balance, setToken1balance] = useState(ethers.BigNumber.from('0'))
-	const [daysApr, setDaysApr] = useLocalStorage('daysApr23049', 7)
 	const [refreshDataToken, setRefreshDataToken] = useState(Date.now())
-	const [xvdrExchangeRate, xvdrExchangeRateLoading] = useXvaderPrice(0)
-	const [stakingApr] = useXvaderAPR('Day', defaults.xVaderAPRBasedNumberOfRecords, daysApr)
-
-	const drawPeriod = () => {
-		let name
-		switch (daysApr) {
-		case 7: name = '7 days'; break
-		case 14: name = '2 weeks'; break
-		case 30: name = '1 month'; break
-		case 90: name = '3 months'; break
-		case 180: name = '6 months'; break
-		case 365: name = '1 year'
-		}
-		return name
-	}
-
-	const stakedNow = `
-		@keyframes colorAnimation {
-			0% { color: white; }
-			50% { color: #f44ca2; }
-			100% { color: white; }
-		}
-	`
 
 	useEffect(() => {
 		if (wallet.account) {
@@ -93,259 +64,27 @@ const Earn = (props) => {
 			{...props}
 		>
 			<Flex
+				marginBottom={{ base: '1.2rem', md: '0' }}
+			>
+				<Container mb='23px' p='0'>
+					<>
+						<Heading
+							as='h1'
+							size='md'
+							textAlign='center'
+							fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
+						<Box
+							as='p'
+							mb='0.65rem'
+							textAlign='center'
+							fontSize={{ base: '0.9rem', md: '1rem' }}
+						>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
+					</>
+				</Container>
+			</Flex>
+			<Flex
 				flexDir={{ base: 'column', md: 'row' }}
 			>
-				<Flex
-					flexDir='column'
-					w='100%'
-					paddingRight={{ base: '0', md: '2rem' }}
-					paddingTop={{ base: '0', md: '2.33rem' }}
-					justifyContent='flex-start'
-				>
-					<Flex
-						marginBottom={{ base: '1.2rem', md: '0' }}
-					>
-						<Container mb='23px' p='0'>
-							<>
-								<Heading
-									as='h1'
-									size='md'
-									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
-								<Box
-									as='p'
-									mb='0.65rem'
-									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '0.9rem', md: '1rem' }}
-								>Stake your <i>VADER</i> for <i>xVADER</i> and maximize your yield. No&nbsp;Impermanent Loss.</Box>
-								<Box
-									as='p'
-									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '0.9rem', md: '1rem' }}
-								><b>xVADER</b> is fully composable, which means it can interact with other protocols. By staking <i>VADER</i>, you will be able to participate in governance, get access to ecosystem airdrops, obtain priority whitelist for new <i>VADER</i> ecosystem projects, and get paid from liquidity incentives - all by holding the token.
-								</Box>
-								<Box
-									as='p'
-									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '0.9rem', md: '1rem' }}>
-									<i>xVADER</i> continuously yields compound, and when you unstake your <i>xVADER</i>, you&lsquo;ll receive your original deposited <b>VADER</b> plus any additional <i>VADER</i> accrued.
-								</Box>
-							</>
-						</Container>
-					</Flex>
-
-					<Flex
-						minH='94.1167px'
-					>
-						{((xvdrExchangeRate?.global?.value > 0) || (stakingApr > 0)) &&
-							<>
-								<Container p='0'>
-									{xvdrExchangeRate?.global?.value > 0 &&
-										<ScaleFade
-											initialScale={0.9}
-											in={!xvdrExchangeRateLoading}>
-											<Box textAlign={{ base: 'center', md: 'left' }}>
-												<Badge
-													fontSize={{ base: '0.9rem', md: '1rem' }}
-													colorScheme='accent'
-												>xVADER RATE</Badge>
-											</Box>
-											<Box
-												fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-												lineHeight='1.2'
-												fontWeight='normal'
-												mb='23px'
-												textAlign={{ base: 'center', md: 'left' }}>
-												{prettifyNumber(ethers.utils.formatUnits(xvdrExchangeRate?.global?.value, 18), 0, 5)}
-											</Box>
-										</ScaleFade>
-									}
-								</Container>
-
-								<Container p='0'>
-									{Number(stakingApr) >= 0 &&
-								<ScaleFade
-									initialScale={0.9}
-									in={stakingApr >= 0}>
-									<Box textAlign={{ base: 'center', md: 'left' }}>
-										<Tooltip
-											hasArrow
-											label='Press to cycle'
-											color='black'
-											openDelay={1325}
-											placement='right'>
-											<Badge
-												_hover={{
-													cursor: 'pointer',
-												}}
-												onClick={() => {
-													if (daysApr === 7) {
-														setDaysApr(14)
-													}
-													else if (daysApr === 14) {
-														setDaysApr(30)
-													}
-													else if (daysApr === 30) {
-														setDaysApr(90)
-													}
-													else if (daysApr === 90) {
-														setDaysApr(180)
-													}
-													else if (daysApr === 180) {
-														setDaysApr(365)
-													}
-													else if (daysApr === 365) {
-														setDaysApr(7)
-													}
-												}}
-												fontSize={{ base: '0.9rem', md: '1rem' }}
-												colorScheme='accent'
-											>{drawPeriod()} RETURN</Badge>
-										</Tooltip>
-									</Box>
-									<Box
-										fontSize={{ base: '1.1rem', md: '2.3rem', lg: '2.3rem' }}
-										lineHeight='1.2'
-										fontWeight='normal'
-										mb='23px'
-										textAlign={{ base: 'center', md: 'left' }}>
-										{getPercentage(stakingApr)}
-									</Box>
-								</ScaleFade>
-									}
-								</Container>
-							</>
-						}
-					</Flex>
-
-					{token1balance.gt(0) &&
-							<>
-								<Fade
-									in={token1balance.gt(0)}>
-									<style>
-										{stakedNow}
-									</style>
-									<Heading
-										as='h2'
-										size='sm'
-										textAlign={{ base: 'center', md: 'left' }}
-										animation='5s ease-in-out infinite colorAnimation'
-										transition='all 0.3s ease 0s'>
-										YOU&#39;RE STAKING NOW
-									</Heading>
-								</Fade>
-							</>
-					}
-
-					{((token0balance.gt(0)) && (!token1balance.gt(0))) &&
-							<>
-								<Fade
-									in={((token0balance.gt(0)) && (!token1balance.gt(0)))}>
-									<Heading
-										as='h2'
-										size='sm'
-										textAlign={{ base: 'center', md: 'left' }}
-									>
-										YOUR BALANCE
-									</Heading>
-								</Fade>
-							</>
-					}
-
-					{((token1balance.gt(0)) || (token0balance.gt(0))) &&
-						<Flex
-							flexDir='column'
-							marginBottom='2.33rem'
-						>
-							{token1balance.gt(0) &&
-								<>
-									<Fade
-										in={token1balance.gt(0)}>
-										<Flex mb='0.354rem'>
-											<Container p='0'>
-												<Box
-													textAlign={{ base: 'center', md: 'left' }}
-												>
-													<Flex
-														justifyContent={{ base: 'center', md: 'flex-start' }}
-														fontWeight='bolder'>
-														<Image
-															width='24px'
-															height='24px'
-															mr='5px'
-															src={defaults.unstakeable[0].logoURI}
-															alt={`${defaults.unstakeable[0].name} token`}
-														/>
-														xVADER
-													</Flex>
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign={{ base: 'center', md: 'left' }}
-												>
-													{token1balance.gt(0) &&
-													prettifyNumber(
-														ethers.utils.formatUnits(
-															token1balance,
-															defaults.unstakeable[0].decimals,
-														),
-														0,
-														5)
-													}
-												</Box>
-											</Container>
-										</Flex>
-									</Fade>
-								</>
-							}
-							{token0balance.gt(0) &&
-								<>
-									<Fade
-										in={token0balance.gt(0)}>
-										<Flex>
-											<Container p='0'>
-												<Box
-													textAlign={{ base: 'center', md: 'left' }}>
-													<Flex
-														justifyContent={{ base: 'center', md: 'flex-start' }}
-														fontWeight='bolder'>
-														<Image
-															width='24px'
-															height='24px'
-															mr='14px'
-															src={defaults.stakeable[0].logoURI}
-															alt={`${defaults.stakeable[0].name} token`}
-														/>
-														VADER
-													</Flex>
-												</Box>
-											</Container>
-											<Container p='0'>
-												<Box
-													textAlign={{ base: 'center', md: 'left' }}
-												>
-													{token0balance.gt(0) &&
-													prettifyNumber(
-														ethers.utils.formatUnits(
-															token0balance,
-															defaults.stakeable[0].decimals,
-														),
-														0,
-														5)
-													}
-												</Box>
-											</Container>
-										</Flex>
-									</Fade>
-								</>
-							}
-						</Flex>
-
-					}
-
-				</Flex>
-
 				<Flex
 					w={{ base: '100%', md: '77%' }}
 					margin={{ base: '1.3rem auto 0 auto', md: '0 auto' }}
@@ -366,7 +105,7 @@ const Earn = (props) => {
 									borderRadius: '24px 0 0 0',
 								}}>
 									<Text as='h3' m='0' fontSize='1.24rem'>
-            		Stake
+            				Deposit
 									</Text>
 								</Tab>
 								<Tab p='1.5rem 0' _focus={{
@@ -374,7 +113,7 @@ const Earn = (props) => {
 									borderRadius: '0 24px 0 0',
 								}}>
 									<Text as='h3' m='0' fontSize='1.24rem'>
-            		Unstake
+									Withdraw
 									</Text>
 								</Tab>
 							</TabList>
@@ -383,14 +122,12 @@ const Earn = (props) => {
 							>
 								<TabPanel p='0'>
 									<StakePanel
-										exchangeRate={xvdrExchangeRate?.global?.value}
 										balance={token0balance}
 										refreshData={setRefreshDataToken}
 									/>
 								</TabPanel>
 								<TabPanel p='0'>
 									<UnstakePanel
-										exchangeRate={xvdrExchangeRate?.global?.value}
 										balance={token1balance}
 										refreshData={setRefreshDataToken}
 									/>
@@ -399,35 +136,102 @@ const Earn = (props) => {
 						</Tabs>
 					</Flex>
 				</Flex>
+
+				<Flex
+					flexDir='column'
+					w='100%'
+					paddingRight={{ base: '0', md: '2rem' }}
+					paddingTop={{ base: '0', md: '2.33rem' }}
+					justifyContent='center'
+				>
+					<Flex
+						flexDir='column'
+						marginBottom='2.3rem'
+						padding='0 3rem'
+						gridGap='17px'
+					>
+						<Container p='0'>
+							<Box textAlign='left'>APR</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
+								18%
+							</Box>
+						</Container>
+
+						<Container p='0'>
+							<Box textAlign='left'>
+								TVL
+							</Box>
+							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
+								$23M
+							</Box>
+						</Container>
+					</Flex>
+					<Flex
+						marginBottom={{ base: '1.2rem', md: '0' }}
+						padding='0 3rem'
+					>
+						<Container
+							display='flex'
+							flexDir='column'
+							gridGap='5px'
+							mb='23px'
+							p='0'>
+							<Text
+								as='h4'
+								mb='0'
+								fontSize='1.24rem'
+								fontWeight='bolder'>
+								Overview
+							</Text>
+							<hr style={{
+								margin: '0 0 .5rem',
+								borderTop: '1px solid #3fa3fa',
+								borderBottom: '1px solid #3fa3fa',
+								borderRadius: '2px',
+							}}/>
+							<Flex>
+								<Container p='0'>
+									<Box
+										textAlign='left'
+									>
+										Earned
+									</Box>
+								</Container>
+								<Container p='0'>
+									<Box
+										textAlign='right'
+									>
+										123,399 VADER
+									</Box>
+								</Container>
+							</Flex>
+							<Flex>
+								<Container p='0'>
+									<Box
+										textAlign='left'
+									>
+										Total deposit
+									</Box>
+								</Container>
+								<Container p='0'>
+									<Box
+										textAlign='right'
+									>
+										66,399 USDV
+									</Box>
+								</Container>
+							</Flex>
+						</Container>
+					</Flex>
+				</Flex>
 			</Flex>
 		</Box>
-	)
-}
-
-const ExchangeRate = (props) => {
-
-	ExchangeRate.propTypes = {
-		rate: PropTypes.string,
-	}
-
-	return (
-		<>
-			{props.rate > 0 &&
-				<>
-					<Fade
-						in={props.rate > 0}>
-						1 xVADER = {prettifyNumber(ethers.utils.formatUnits(props.rate, 18), 0, 5)} VADER
-					</Fade>
-				</>
-			}
-		</>
 	)
 }
 
 const StakePanel = (props) => {
 
 	StakePanel.propTypes = {
-		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -567,12 +371,6 @@ const StakePanel = (props) => {
 						fontSize={{ base: '1rem', md: '1.24rem' }}
 						fontWeight='bolder'>
 							Amount
-					</Text>
-					<Text
-						as='h4'
-						fontSize={{ base: '0.8rem', md: '1rem' }}
-					>
-						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
 				<Flex
@@ -742,7 +540,6 @@ const StakePanel = (props) => {
 const UnstakePanel = (props) => {
 
 	UnstakePanel.propTypes = {
-		exchangeRate: PropTypes.string,
 		balance: PropTypes.object.isRequired,
 		refreshData: PropTypes.func,
 	}
@@ -885,7 +682,6 @@ const UnstakePanel = (props) => {
 					<Text
 						fontSize={{ base: '0.8rem', md: '1rem' }}
 						as='h4'>
-						<ExchangeRate rate={props.exchangeRate} />
 					</Text>
 				</Flex>
 				<Flex

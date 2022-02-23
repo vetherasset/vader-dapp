@@ -48,11 +48,13 @@ export const Header = (props) => {
 			{...props}>
 			<Flex>
 				<Logotype margin='0 8px 0' />
-				<Flex w='auto'
+				<Flex
+					w='auto'
 					alignItems='center'
 					justifyContent='space-around'
 					textTransform='capitalize'
 					borderRadius='12px'
+					gridGap='7px'
 					p='0.3rem 0.2rem'
 					display={{ base: 'none', md: 'flex' }}
 				>
