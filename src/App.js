@@ -89,6 +89,7 @@ const App = () => {
 const maskTransform = () => {
 	const location = useLocation()
 	if(
+		location.pathname.includes('earn') ||
 		location.pathname.includes('bond') ||
 		location.pathname.includes('pool') ||
 		location.pathname === '/'

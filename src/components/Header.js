@@ -47,7 +47,7 @@ export const Header = (props) => {
 			minH={defaults.layout.header.minHeight}
 			{...props}>
 			<Flex>
-				<Logotype margin='0 8px 0' />
+				<Logotype />
 				<Flex
 					w='auto'
 					alignItems='center'
@@ -56,6 +56,7 @@ export const Header = (props) => {
 					borderRadius='12px'
 					gridGap='7px'
 					p='0.3rem 0.2rem'
+					ml='.44rem'
 					display={{ base: 'none', md: 'flex' }}
 				>
 					{pages.map(p =>
