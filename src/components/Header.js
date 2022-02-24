@@ -56,7 +56,7 @@ export const Header = (props) => {
 					borderRadius='12px'
 					gridGap='7px'
 					p='0.3rem 0.2rem'
-					ml='.44rem'
+					ml='.84rem'
 					display={{ base: 'none', md: 'flex' }}
 				>
 					{pages.map(p =>

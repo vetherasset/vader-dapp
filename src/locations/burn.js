@@ -74,7 +74,6 @@ import { useBurnLimitRemains } from '../hooks/useBurnLimitRemains'
 
 const Burn = (props) => {
 
-
 	const wallet = useWallet()
 	const toast = useToast()
 	const { isOpen, onOpen, onClose } = useDisclosure()

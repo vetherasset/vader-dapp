@@ -31,6 +31,7 @@ export const TokenJazzicon = (props) => {
 			alignItems='center'
 			mr='5px'
 			ref={ref}
+			{...props}
 		/>
 	)
 
