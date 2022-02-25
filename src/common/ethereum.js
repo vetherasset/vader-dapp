@@ -9,6 +9,7 @@ import zapEth from '../artifacts/abi/zapEth'
 import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 import minter from '../artifacts/abi/minter'
 import IUSDV from '../artifacts/abi/IUSDV'
+import stakingRewards from '../artifacts/abi/stakingRewards'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -434,6 +435,51 @@ const getLocks = async (address, lockIndex) => {
 	return await contract.locks(address, lockIndex)
 }
 
+const stakeForRewards = async (amount, provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		provider.getSigner(0),
+	)
+	return await contract.stake(amount)
+}
+
+const getStakingRewards = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		provider.getSigner(0),
+	)
+	return await contract.getReward()
+}
+
+const exitStakingRewards = async (provider) => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		provider.getSigner(0),
+	)
+	return await contract.exit()
+}
+
+const getStakingRewardsBalanceOf = async (address) => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		defaults.network.provider,
+	)
+	return await contract.balanceOf(address)
+}
+
+const getStakingRewardsEarned = async (address) => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		defaults.network.provider,
+	)
+	return await contract.earned(address)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -449,5 +495,7 @@ export {
 	getMinterLbt, minterMint, minterBurn,
 	getPublicFee, usdvClaim, getMinterDailyLimits,
 	usdvClaimAll, getLockCount, getLocks,
-	getCycleMints, getCycleBurns,
+	getCycleMints, getCycleBurns, stakeForRewards,
+	getStakingRewards, exitStakingRewards, getStakingRewardsBalanceOf,
+	getStakingRewardsEarned,
 }

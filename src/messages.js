@@ -163,6 +163,24 @@ const nothingtoclaim = {
 	position: defaults.toast.position,
 }
 
+const noRewardToWithdraw = {
+	title: 'No reward to withdraw',
+	description: 'You have no earned reward to be withdrawn.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const noDepositToWithdraw = {
+	title: 'No deposit to withdraw',
+	description: 'You have no deposit to be withdrawn.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 const nomorethaneligible = {
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
@@ -203,6 +221,15 @@ const positionOpened = {
 const staked = {
 	title: 'VADER tokens staked',
 	description: 'Your VADER tokens have been staked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const stakedForRewards = {
+	title: 'Depoist has been made',
+	description: 'Your tokens have been deposited succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -261,5 +288,6 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
-	notyetUnlocked, dailyLimitReached,
+	notyetUnlocked, dailyLimitReached, noRewardToWithdraw, noDepositToWithdraw,
+	stakedForRewards,
 }

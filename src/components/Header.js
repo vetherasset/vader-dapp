@@ -65,7 +65,7 @@ export const Header = (props) => {
 							to={p.link}
 							style={ {
 								color: 'rgb(213, 213, 213)',
-								padding: '0.4rem 0.8rem',
+								padding: '0.3rem 0.7rem',
 								...(location.pathname === '/' && p.name === 'Stake' && current),
 								...(p.link === location.pathname && current),
 								...(p.link === '/bond' && location.pathname.includes('bond') && current),

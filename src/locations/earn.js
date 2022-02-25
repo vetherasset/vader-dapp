@@ -10,14 +10,23 @@ import { ethers } from 'ethers'
 import {
 	getERC20Allowance,
 	approveERC20ToSpend,
-	stakeVader,
+	stakeForRewards,
+	getStakingRewards,
+	exitStakingRewards,
 } from '../common/ethereum'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { useERC20Balance } from '../hooks/useERC20Balance'
 import { approved, rejected, failed, walletNotConnected, noAmount, staked,
-	tokenValueTooSmall, noToken0, exception, insufficientBalance } from '../messages'
+	tokenValueTooSmall, noToken0, exception, insufficientBalance, noRewardToWithdraw, noDepositToWithdraw, stakedForRewards } from '../messages'
+import { useStakingRewardsBalanceOf } from '../hooks/useStakingRewardsBalanceOf'
+import { useStakingRewardsEarned } from '../hooks/useStakingRewardsEarned'
+import { prettifyNumber, prettifyCurrency } from '../common/utils'
 
 const Earn = (props) => {
+
+	const wallet = useWallet()
+	const balance = useStakingRewardsBalanceOf(wallet?.account)
+	const earned = useStakingRewardsEarned(wallet?.account)
 
 	return (
 		<Box
@@ -136,6 +145,7 @@ const Earn = (props) => {
 							display='flex'
 							flexDir='column'
 							gridGap='5px'
+							minH='109.5px'
 							mb='23px'
 							p='0'>
 							<Text
@@ -163,20 +173,25 @@ const Earn = (props) => {
 									<Box
 										textAlign='right'
 										fontWeight='bold'
-										lineHeight='1'
+										lineHeight='1.3'
+										minH='28.5px'
 									>
-										<Image
-											width='24px'
-											height='24px'
-											display='inline-block'
-											position='relative'
-											top='6px'
-											borderRadius='50%'
-											m='0 5px'
-											src={defaults?.vader?.logoURI}
-											alt={`${defaults?.vader?.name} token`}
-										/>
-										120,399 VADER
+										{earned?.data &&
+											<>
+												<Image
+													width='24px'
+													height='24px'
+													display='inline-block'
+													position='relative'
+													top='6px'
+													borderRadius='50%'
+													m='0 5px'
+													src={defaults?.vader?.logoURI}
+													alt={`${defaults?.vader?.name} token`}
+												/>
+												{prettifyCurrency(ethers.utils.formatEther(earned?.data), 0, 2, 'VADER')}
+											</>
+										}
 									</Box>
 								</Container>
 							</Flex>
@@ -192,8 +207,28 @@ const Earn = (props) => {
 									<Box
 										textAlign='right'
 										fontWeight='bold'
+										lineHeight='1.3'
 									>
-										$ 66,399
+										{balance?.data &&
+											<>
+												<Box
+													display='inline-block'
+													position='relative'
+													ml='5px'
+													top='4px'>
+													<TokenJazzicon
+														address={defaults.usdv3crvf.address}
+														display='inline-block'
+													/>
+												</Box>
+												{prettifyNumber(
+													ethers.utils.formatEther(balance?.data),
+													0,
+													2,
+												)}
+												&nbsp;USDV3CRV-f
+											</>
+										}
 									</Box>
 								</Container>
 							</Flex>
@@ -229,7 +264,7 @@ const StakePanel = () => {
 				setWorking(true)
 				approveERC20ToSpend(
 					token0.address,
-					defaults.address.xvader,
+					defaults.address.stakingRewards,
 					defaults.network.erc20.maxApproval,
 					provider,
 				).then((tx) => {
@@ -265,7 +300,7 @@ const StakePanel = () => {
 				if ((balance?.data?.gte(value))) {
 					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
-					stakeVader(
+					stakeForRewards(
 						value,
 						provider)
 						.then((tx) => {
@@ -274,7 +309,7 @@ const StakePanel = () => {
 							).then((r) => {
 								setWorking(false)
 								toast({
-									...staked,
+									...stakedForRewards,
 									description: <Link
 										variant='underline'
 										_focus={{
@@ -318,7 +353,7 @@ const StakePanel = () => {
 			getERC20Allowance(
 				token0.address,
 				wallet.account,
-				defaults.address.xvader,
+				defaults.address.stakingRewards,
 				defaults.network.provider,
 			).then((n) => {
 				setWorking(false)
@@ -489,7 +524,7 @@ const StakePanel = () => {
 											}
 											{token0 && token0Approved &&
 												<>
-													Stake
+													Deposit
 												</>
 											}
 										</>
@@ -516,9 +551,106 @@ const StakePanel = () => {
 
 const UnstakePanel = () => {
 
+	const wallet = useWallet()
+	const toast = useToast()
+	const [working, setWorking] = useState(false)
 	const [rewardsOnly, setRewardsOnly] = useLocalStorage('earnRewardsOnly23049', true)
+	const balance = useStakingRewardsBalanceOf(wallet?.account)
+	const earned = useStakingRewardsEarned(wallet?.account)
 
 	const submit = () => {
+		if(!working) {
+			if(!wallet.account) {
+				toast(walletNotConnected)
+			}
+			else {
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+				if (rewardsOnly) {
+					if (earned?.data?.gt(0)) {
+						setWorking(true)
+						getStakingRewards(
+							provider)
+							.then((tx) => {
+								tx.wait(
+									defaults.network.tx.confirmations,
+								).then((r) => {
+									setWorking(false)
+									toast({
+										...staked,
+										description: <Link
+											variant='underline'
+											_focus={{
+												boxShadow: '0',
+											}}
+											href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+											isExternal>
+											<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+										duration: defaults.toast.txHashDuration,
+									})
+								})
+							})
+							.catch(err => {
+								setWorking(false)
+								if (err.code === 4001) {
+									console.log('Transaction rejected: Your have decided to reject the transaction..')
+									toast(rejected)
+								}
+								else if(err.code === -32016) {
+									toast(exception)
+								}
+								else {
+									console.log(err)
+									toast(failed)
+								}
+							})
+					}
+					else {
+						toast(noRewardToWithdraw)
+					}
+				}
+				else if (balance?.data?.gt(0)) {
+					setWorking(true)
+					exitStakingRewards(
+						provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								toast({
+									...staked,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else if(err.code === -32016) {
+								toast(exception)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(noDepositToWithdraw)
+				}
+			}
+		}
 	}
 
 	return (
@@ -607,6 +739,7 @@ const UnstakePanel = () => {
 						minWidth='230px'
 						size='lg'
 						variant='solidRadial'
+						disabled={working}
 						onClick={() => submit()}
 					>
 						<Text as="span" fontWeight="bold">
