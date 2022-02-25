@@ -27,6 +27,7 @@ const Earn = (props) => {
 	const wallet = useWallet()
 	const balance = useStakingRewardsBalanceOf(wallet?.account)
 	const earned = useStakingRewardsEarned(wallet?.account)
+	const tvl = useERC20Balance(defaults.address.usdv3crvf, defaults.address.stakingRewards)
 
 	return (
 		<Box
@@ -122,18 +123,32 @@ const Earn = (props) => {
 						gridGap='17px'
 					>
 						<Container p='0'>
-							<Box textAlign='left'>APR</Box>
-							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
-								18%
+							<Box
+								color='#c6c6c6'
+								textAlign='left'
+							>1 WEEK REWARDS</Box>
+							<Box
+								fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
+								minH='55.2px'
+							>
+								{prettifyNumber(1000000)} VADER
 							</Box>
 						</Container>
 
 						<Container p='0'>
-							<Box textAlign='left'>
+							<Box
+								color='#c6c6c6'
+								textAlign='left'>
 								TVL
 							</Box>
-							<Box fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
-								$23M
+							<Box
+								minH='55.2px'
+								fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
+								{tvl.data &&
+									<>
+										{prettifyCurrency(ethers.utils.formatEther(tvl?.data, 0, 2))}
+									</>
+								}
 							</Box>
 						</Container>
 					</Flex>
@@ -722,7 +737,7 @@ const UnstakePanel = () => {
 					<Text
 						color='#d7d1d1'
 						as='p'>
-							Select what would you like to get
+							Select an option
 					</Text>
 				</Flex>
 				<RadioGroup
