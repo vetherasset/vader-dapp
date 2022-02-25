@@ -5,7 +5,7 @@ import { getERC20BalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
 import { useWallet } from 'use-wallet'
 
-export const useERC20Balance = (tokenAddress, rpc = true, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
+export const useERC20Balance = (tokenAddress, address, rpc = true, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
 
 	const wallet = useWallet()
 
@@ -14,18 +14,19 @@ export const useERC20Balance = (tokenAddress, rpc = true, pollInterval = default
 	}
 	else {
 
-		const balance = useQuery(`${tokenAddress}_erc20Balanceof_${wallet?.account}`,
+		const balance = useQuery(`${tokenAddress}_erc20Balanceof_${address ? address : wallet?.account}`,
 			async () => {
-				if (wallet?.account && tokenAddress) {
+				if ((address || wallet?.account) &&
+				tokenAddress) {
 					return await getERC20BalanceOf(
 						tokenAddress,
-						wallet?.account,
+						address ? address : wallet?.account,
 						defaults.network.provider,
 					)
 				}
 			}, {
 				staleTime: defaults.api.staleTime,
-				enabled: (!!wallet?.account && !!tokenAddress),
+				enabled: ((address || !!wallet?.account) && !!tokenAddress),
 			},
 		)
 
