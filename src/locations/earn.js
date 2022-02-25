@@ -16,7 +16,7 @@ import {
 } from '../common/ethereum'
 import { TokenJazzicon } from '../components/TokenJazzicon'
 import { useERC20Balance } from '../hooks/useERC20Balance'
-import { approved, rejected, failed, walletNotConnected, noAmount, staked,
+import { approved, rejected, failed, walletNotConnected, noAmount,
 	tokenValueTooSmall, noToken0, exception, insufficientBalance, noRewardToWithdraw, noDepositToWithdraw, stakedForRewards, rewardsWithdrawn, rewardsExited } from '../messages'
 import { useStakingRewardsBalanceOf } from '../hooks/useStakingRewardsBalanceOf'
 import { useStakingRewardsEarned } from '../hooks/useStakingRewardsEarned'

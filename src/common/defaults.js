@@ -191,13 +191,11 @@ defaults.address.uniswapV2.usdcEthPair = (
 )
 defaults.address.usdv3crvf = (
 	defaults.network.chainId === 1 ? '0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c' :
-		defaults.network.chainId === 42 ? '0x00ba37fd79ba75b631e74de45299bb8021611e22' :
-			undefined
+		undefined
 )
 defaults.address.stakingRewards = (
 	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
-		defaults.network.chainId === 42 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
-			undefined
+		undefined
 )
 
 defaults.tokenList = {}
