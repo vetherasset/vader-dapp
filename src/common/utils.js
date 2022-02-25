@@ -210,9 +210,14 @@ const getMerkleProofForAccount = (account, snapshot) => {
 const calculateDifference = (value1, value2) => value1 > value2 ?
 	(value1 - value2) / value2 : (value1 - value2) / value1
 
+const openNewTabURL = (url) => {
+	const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+	if (newWindow) newWindow.opener = null
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
-	calculateDifference, getDateFromSeconds,
+	calculateDifference, getDateFromSeconds, openNewTabURL,
 }

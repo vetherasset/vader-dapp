@@ -20,7 +20,7 @@ import { approved, rejected, failed, walletNotConnected, noAmount, staked,
 	tokenValueTooSmall, noToken0, exception, insufficientBalance, noRewardToWithdraw, noDepositToWithdraw, stakedForRewards } from '../messages'
 import { useStakingRewardsBalanceOf } from '../hooks/useStakingRewardsBalanceOf'
 import { useStakingRewardsEarned } from '../hooks/useStakingRewardsEarned'
-import { prettifyNumber, prettifyCurrency } from '../common/utils'
+import { prettifyNumber, prettifyCurrency, openNewTabURL } from '../common/utils'
 
 const Earn = (props) => {
 
@@ -141,42 +141,43 @@ const Earn = (props) => {
 						marginBottom={{ base: '1.2rem', md: '0' }}
 						padding='0 3rem'
 					>
-						<Container
-							display='flex'
-							flexDir='column'
-							gridGap='5px'
-							minH='109.5px'
-							mb='23px'
-							p='0'>
-							<Text
-								as='h4'
-								mb='0'
-								fontSize='1.24rem'
-								fontWeight='bolder'>
+						{(balance?.data?.gt(0) || earned?.data?.gt(0)) &&
+							<Container
+								display='flex'
+								flexDir='column'
+								gridGap='5px'
+								minH='109.5px'
+								mb='23px'
+								p='0'>
+								<Text
+									as='h4'
+									mb='0'
+									fontSize='1.24rem'
+									fontWeight='bolder'>
 								Overview
-							</Text>
-							<hr style={{
-								margin: '0 0 .5rem',
-								borderTop: '1px solid #3fa3fa',
-								borderBottom: '1px solid #3fa3fa',
-								borderRadius: '2px',
-							}}/>
-							<Flex>
-								<Container p='0'>
-									<Box
-										textAlign='left'
-									>
+								</Text>
+								<hr style={{
+									margin: '0 0 .5rem',
+									borderTop: '1px solid #3fa3fa',
+									borderBottom: '1px solid #3fa3fa',
+									borderRadius: '2px',
+								}}/>
+								<Flex>
+									<Container p='0'>
+										<Box
+											textAlign='left'
+										>
 										Reward earned
-									</Box>
-								</Container>
-								<Container p='0'>
-									<Box
-										textAlign='right'
-										fontWeight='bold'
-										lineHeight='1.3'
-										minH='28.5px'
-									>
-										{earned?.data &&
+										</Box>
+									</Container>
+									<Container p='0'>
+										<Box
+											textAlign='right'
+											fontWeight='bold'
+											lineHeight='1.3'
+											minH='28.5px'
+										>
+											{earned?.data &&
 											<>
 												<Image
 													width='24px'
@@ -191,25 +192,25 @@ const Earn = (props) => {
 												/>
 												{prettifyCurrency(ethers.utils.formatEther(earned?.data), 0, 2, 'VADER')}
 											</>
-										}
-									</Box>
-								</Container>
-							</Flex>
-							<Flex>
-								<Container p='0'>
-									<Box
-										textAlign='left'
-									>
+											}
+										</Box>
+									</Container>
+								</Flex>
+								<Flex>
+									<Container p='0'>
+										<Box
+											textAlign='left'
+										>
 										Total deposit
-									</Box>
-								</Container>
-								<Container p='0'>
-									<Box
-										textAlign='right'
-										fontWeight='bold'
-										lineHeight='1.3'
-									>
-										{balance?.data &&
+										</Box>
+									</Container>
+									<Container p='0'>
+										<Box
+											textAlign='right'
+											fontWeight='bold'
+											lineHeight='1.3'
+										>
+											{balance?.data &&
 											<>
 												<Box
 													display='inline-block'
@@ -228,11 +229,43 @@ const Earn = (props) => {
 												)}
 												&nbsp;USDV3CRV-f
 											</>
-										}
+											}
+										</Box>
+									</Container>
+								</Flex>
+							</Container>
+						}
+						{(!balance?.data?.gt(0) && !earned?.data?.gt(0)) &&
+							<Container
+								mb='23px'
+								p='0'>
+								<>
+									<Heading
+										as='h2'
+										size='sm'
+										textAlign='left'
+									>
+										HOW TO PROVIDE LIQUIDITY IN ORDER TO PARTICIPATE
+									</Heading>
+									<Box
+										as='p'
+										mb='0.65rem'
+									>
+										Navigate to
+										<Button
+											overflow='hidden'
+											height='38px'
+											variant='linkAccent'
+											onClick={() => openNewTabURL('https://curve.fi/factory/82/deposit')}
+											rightIcon={<Image src='/svg/curvefi.svg' width='32px'/>}
+										>
+												USDV3CRV-f pool
+										</Button> to provide desired assets.
+										When done deposit your LP tokens and start earning.
 									</Box>
-								</Container>
-							</Flex>
-						</Container>
+								</>
+							</Container>
+						}
 					</Flex>
 				</Flex>
 			</Flex>
