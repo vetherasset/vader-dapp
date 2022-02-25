@@ -172,6 +172,23 @@ const nothingtoUncommit = {
 	position: defaults.toast.position,
 }
 
+const noRewardToWithdraw = {
+	title: 'No reward to withdraw',
+	description: 'You have no earned reward to be withdrawn.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const noDepositToWithdraw = {
+	title: 'No deposit to withdraw',
+	description: 'You have no deposit to be withdrawn.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
 
 const nomorethaneligible = {
 	title: 'Cannot burn more than eligible',
@@ -213,6 +230,15 @@ const positionOpened = {
 const staked = {
 	title: 'VADER tokens staked',
 	description: 'Your VADER tokens have been staked succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const stakedForRewards = {
+	title: 'Depoist has been made',
+	description: 'Your tokens have been deposited succesfully.',
 	status: 'success',
 	duration: defaults.toast.duration,
 	isClosable: defaults.toast.closable,
@@ -318,6 +344,24 @@ const unstaked = {
 	position: defaults.toast.position,
 }
 
+const rewardsWithdrawn = {
+	title: 'VADER reward tokens withdrawn',
+	description: 'Your VADER rewards tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const rewardsExited = {
+	title: 'All tokens withdrawn',
+	description: 'All of your tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
@@ -327,5 +371,6 @@ export {
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
 	notyetUnlocked, dailyLimitReached, precommitCapHit, commitAmountTooSmall,
 	commitAmounTooLarge, commitConcluded, commitWithdrawn, noCommitSelected,
-	nothingtoUncommit,
+	nothingtoUncommit, noRewardToWithdraw, noDepositToWithdraw,
+	stakedForRewards, rewardsWithdrawn, rewardsExited,
 }
