@@ -138,9 +138,25 @@ const Earn = (props) => {
 						</Container>
 					</Flex>
 					<Flex
+						flexDir='column'
 						marginBottom={{ base: '1.2rem', md: '0' }}
 						padding='0 3rem'
 					>
+						{balance?.data?.gt(0) &&
+							<>
+								<style>
+									{stakedNow}
+								</style>
+								<Heading
+									as='h2'
+									size='sm'
+									textAlign={{ base: 'center', md: 'left' }}
+									animation='5s ease-in-out infinite colorAnimation'
+									transition='all 0.3s ease 0s'>
+										YOU&#39;RE EARNING NOW
+								</Heading>
+							</>
+						}
 						{(balance?.data?.gt(0) || earned?.data?.gt(0)) &&
 							<Container
 								display='flex'
@@ -784,5 +800,13 @@ const UnstakePanel = () => {
 		</>
 	)
 }
+
+const stakedNow = `
+@keyframes colorAnimation {
+	0% { color: white; }
+	50% { color: #f44ca2; }
+	100% { color: white; }
+}
+`
 
 export default Earn
