@@ -281,6 +281,24 @@ const unstaked = {
 	position: defaults.toast.position,
 }
 
+const rewardsWithdrawn = {
+	title: 'VADER reward tokens withdrawn',
+	description: 'Your VADER rewards tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
+const rewardsExited = {
+	title: 'All tokens withdrawn',
+	description: 'All of your tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+}
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
@@ -289,5 +307,5 @@ export {
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
 	notyetUnlocked, dailyLimitReached, noRewardToWithdraw, noDepositToWithdraw,
-	stakedForRewards,
+	stakedForRewards, rewardsWithdrawn, rewardsExited,
 }
