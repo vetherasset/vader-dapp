@@ -372,6 +372,7 @@ const StakePanel = () => {
 								defaults.network.tx.confirmations,
 							).then((r) => {
 								setWorking(false)
+								balance?.refetch()
 								toast({
 									...stakedForRewards,
 									description: <Link
@@ -639,6 +640,8 @@ const UnstakePanel = () => {
 									defaults.network.tx.confirmations,
 								).then((r) => {
 									setWorking(false)
+									balance?.refetch()
+									earned?.refetch()
 									toast({
 										...rewardsWithdrawn,
 										description: <Link
@@ -681,6 +684,8 @@ const UnstakePanel = () => {
 								defaults.network.tx.confirmations,
 							).then((r) => {
 								setWorking(false)
+								balance?.refetch()
+								earned?.refetch()
 								toast({
 									...rewardsExited,
 									description: <Link
