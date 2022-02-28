@@ -10,6 +10,7 @@ import uniswapTWAP from '../artifacts/abi/uniswapTWAP'
 import minter from '../artifacts/abi/minter'
 import IUSDV from '../artifacts/abi/IUSDV'
 import stakingRewards from '../artifacts/abi/stakingRewards'
+import threePoolMetaPool from '../artifacts/abi/3poolMetaPool'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -480,6 +481,24 @@ const getStakingRewardsEarned = async (address) => {
 	return await contract.earned(address)
 }
 
+const getRewardRate = async () => {
+	const contract = new ethers.Contract(
+		defaults.address.stakingRewards,
+		stakingRewards,
+		defaults.network.provider,
+	)
+	return await contract.rewardRate()
+}
+
+const getVirtualPrice = async () => {
+	const contract = new ethers.Contract(
+		defaults.address.usdv3crvf,
+		threePoolMetaPool,
+		defaults.network.provider,
+	)
+	return await contract.get_virtual_price()
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -497,5 +516,5 @@ export {
 	usdvClaimAll, getLockCount, getLocks,
 	getCycleMints, getCycleBurns, stakeForRewards,
 	getStakingRewards, exitStakingRewards, getStakingRewardsBalanceOf,
-	getStakingRewardsEarned,
+	getStakingRewardsEarned, getRewardRate, getVirtualPrice,
 }

@@ -20,14 +20,17 @@ import { approved, rejected, failed, walletNotConnected, noAmount,
 	tokenValueTooSmall, noToken0, exception, insufficientBalance, noRewardToWithdraw, noDepositToWithdraw, stakedForRewards, rewardsWithdrawn, rewardsExited } from '../messages'
 import { useStakingRewardsBalanceOf } from '../hooks/useStakingRewardsBalanceOf'
 import { useStakingRewardsEarned } from '../hooks/useStakingRewardsEarned'
-import { prettifyNumber, prettifyCurrency, openNewTabURL } from '../common/utils'
+import { useRewardsAPY } from '../hooks/useRewardsAPY'
+import { useRewardsTVL } from '../hooks/useRewardsTVL'
+import { prettifyNumber, prettifyCurrency, openNewTabURL, getPercentage } from '../common/utils'
 
 const Earn = (props) => {
 
 	const wallet = useWallet()
 	const balance = useStakingRewardsBalanceOf(wallet?.account)
 	const earned = useStakingRewardsEarned(wallet?.account)
-	const tvl = useERC20Balance(defaults.address.usdv3crvf, defaults.address.stakingRewards)
+	const tvl = useRewardsTVL()
+	const apy = useRewardsAPY()
 
 	return (
 		<Box
@@ -126,12 +129,16 @@ const Earn = (props) => {
 							<Box
 								color='#c6c6c6'
 								textAlign='left'
-							>1 WEEK REWARDS</Box>
+							>APY</Box>
 							<Box
 								fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}
 								minH='55.2px'
 							>
-								{prettifyNumber(1000000)} VADER
+								{apy &&
+									<>
+										{getPercentage(apy)}
+									</>
+								}
 							</Box>
 						</Container>
 
@@ -144,9 +151,9 @@ const Earn = (props) => {
 							<Box
 								minH='55.2px'
 								fontSize={{ base: '1.3rem', md: '2.3rem', lg: '2.3rem' }}>
-								{tvl.data &&
+								{tvl &&
 									<>
-										{prettifyCurrency(ethers.utils.formatEther(tvl?.data, 0, 2))}
+										{prettifyCurrency(tvl, 0, 2)}
 									</>
 								}
 							</Box>
