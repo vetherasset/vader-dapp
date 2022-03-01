@@ -1429,6 +1429,7 @@ const PriceOverview = (props) => {
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
 	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(props.bond?.[0]?.principal?.address, true)
+	const preCommit = usePreCommit(props.bond.precommit)
 
 	return (
 		<Flex>
@@ -1445,18 +1446,39 @@ const PriceOverview = (props) => {
 						<Box
 							fontSize={{ base: '0.87rem', md: '1rem' }}
 						>
-							Bond Price</Box>
+							{preCommit?.open?.data &&
+									props?.bond?.discount &&
+									<>
+										Discount ROI
+									</>
+							}
+							{!preCommit?.open?.data &&
+									<>
+										Bond Price
+									</>
+							}
+						</Box>
 						<TagLabel
 							fontSize={{ base: '1.3rem', md: '2.1rem' }}
 						>
-							{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
-								<>
-									{prettifyCurrency(
-										props.bond.principal ? (Number(ethers.utils.formatUnits(bondPrice, 18)) *
-										(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(bondPrice, 18)) *
-										(Number(usdcEth?.pairs?.[0]?.token0Price))),
-										0, 5)}
-								</>
+							{preCommit?.open?.data &&
+									props?.bond?.discount &&
+									<>
+										{getPercentage(props?.bond?.discount)}
+									</>
+							}
+							{!preCommit?.open?.data &&
+									<>
+										{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+											<>
+												{prettifyCurrency(
+													props.bond.principal ? (Number(ethers.utils.formatUnits(bondPrice, 18)) *
+													(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(bondPrice, 18)) *
+													(Number(usdcEth?.pairs?.[0]?.token0Price))),
+													0, 5)}
+											</>
+										}
+									</>
 							}
 						</TagLabel>
 					</Tag>
@@ -1600,7 +1622,7 @@ const Breakdown = (props) => {
 				mt={{ base: '1.2rem', md: '' }}
 				marginBottom='.7rem'
 				opacity='0.87'
-				minH='133.767px'
+				minH='157.767px'
 			>
 				<Text
 					as='h4'
@@ -1639,38 +1661,42 @@ const Breakdown = (props) => {
 					</Container>
 				</Flex>
 
-				<Flex>
-					<Container p='0'>
-						<Box
-							textAlign='left'
-						>
-							Transaction Cap
-						</Box>
-					</Container>
-					<Container p='0'>
-						<Box
-							textAlign='right'
-						>
-							{props.treasuryBalance &&
-								<>
-									{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
-									prettifyCurrency(
-										props.treasuryBalance
-											.lte(props.maxPayout) ?
-											ethers.utils.formatUnits(props.treasuryBalance, 18) :
-											ethers.utils.formatUnits(props.maxPayout, 18),
-										0,
-										2,
-										'VADER',
-									)}
-									{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-										'Sold Out'
+				{!preCommit?.open?.data &&
+					<>
+						<Flex>
+							<Container p='0'>
+								<Box
+									textAlign='left'
+								>
+									Transaction Cap
+								</Box>
+							</Container>
+							<Container p='0'>
+								<Box
+									textAlign='right'
+								>
+									{props.treasuryBalance &&
+										<>
+											{props.treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) &&
+											prettifyCurrency(
+												props.treasuryBalance
+													.lte(props.maxPayout) ?
+													ethers.utils.formatUnits(props.treasuryBalance, 18) :
+													ethers.utils.formatUnits(props.maxPayout, 18),
+												0,
+												2,
+												'VADER',
+											)}
+											{props.treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
+												'Sold Out'
+											}
+										</>
 									}
-								</>
-							}
-						</Box>
-					</Container>
-				</Flex>
+								</Box>
+							</Container>
+						</Flex>
+					</>
+				}
 
 				{preCommit?.open?.data &&
 					<Flex>
@@ -1703,12 +1729,21 @@ const Breakdown = (props) => {
 						</Box>
 					</Container>
 					<Container p='0'>
-						{roiPercentage &&
 						<Box
 							textAlign='right'>
-							{roiPercentage}
+							{preCommit?.open?.data &&
+									props?.bond?.discount &&
+									<>
+										{getPercentage(props?.bond?.discount)}&nbsp;discount on sale initialization spot price
+									</>
+							}
+							{!preCommit?.open?.data &&
+							roiPercentage &&
+									<>
+										{roiPercentage}
+									</>
+							}
 						</Box>
-						}
 					</Container>
 				</Flex>
 
