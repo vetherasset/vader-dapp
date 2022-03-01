@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useQuery as useApolloQuery, gql } from '@apollo/client'
 import { useQuery } from 'react-query'
-import { getERC20BalanceOf, getStakingRewardsBalanceOf } from '../common/ethereum'
+import { getStakingRewardsBalanceOf } from '../common/ethereum'
 import defaults from '../common/defaults'
 
 export const useStakingRewardsBalanceOf = (address, rpc = true, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useQuery as useApolloQuery, gql } from '@apollo/client'
 import { useQuery } from 'react-query'
-import { getERC20BalanceOf, getStakingRewardsBalanceOf } from '../common/ethereum'
+import { getStakingRewardsEarned } from '../common/ethereum'
 import defaults from '../common/defaults'
 
 export const useStakingRewardsEarned = (address, rpc = true, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
@@ -14,7 +14,7 @@ export const useStakingRewardsEarned = (address, rpc = true, pollInterval = defa
 		const earned = useQuery(`${defaults.address.stakingRewards}_stakingRewardsEarned_${address}`,
 			async () => {
 				if (address) {
-					return await getStakingRewardsBalanceOf(
+					return await getStakingRewardsEarned(
 						address,
 					)
 				}
