@@ -167,6 +167,10 @@ defaults.address.usdv = (
 		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
+defaults.address.wrappedEth = (
+	defaults.network.chainId === 1 ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' :
+		undefined
+)
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
 		defaults.network.chainId === 42 ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
