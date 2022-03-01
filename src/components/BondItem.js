@@ -113,24 +113,38 @@ export const BondItem = (props) => {
 						gridGap='0.7rem'
 					>
 						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
-								<>
-									<Tag
-										fontSize={{ base: '0.67rem', md: '0.83rem' }}
-										colorScheme='gray'>
-										{prettifyCurrency(
-											props.bond.principal ? (Number(ethers.utils.formatUnits(price, 18)) *
-											(Number(usdcEth?.pairs?.[0]?.token0Price) *
-											Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(price, 18)) *
-											(Number(usdcEth?.pairs?.[0]?.token0Price))),
-											0, 5)}
-									</Tag>
-								</>
+							<>
+								<Tag
+									fontSize={{ base: '0.67rem', md: '0.83rem' }}
+									colorScheme='gray'>
+									{prettifyCurrency(
+										props.bond.principal ? (Number(ethers.utils.formatUnits(price, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price) *
+										Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(price, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price))),
+										0, 5)}
+								</Tag>
+							</>
 						}
-						{roiPercentage &&
+						{((!preCommit?.open?.data &&
+									roiPercentage) ||
+							(!preCommit?.open?.data &&
+							roiPercentage)) &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
 								colorScheme='gray'>
-								{roiPercentage}
+								{preCommit?.open?.data &&
+									props?.bond?.discount &&
+									<>
+										{getPercentage(props?.bond?.discount)}
+									</>
+								}
+								{!preCommit?.open?.data &&
+									roiPercentage &&
+									<>
+										{roiPercentage}
+									</>
+								}
 							</Tag>
 						}
 					</Flex>
