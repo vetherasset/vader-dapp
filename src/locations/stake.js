@@ -111,7 +111,7 @@ const Stake = (props) => {
 									as='h1'
 									size='md'
 									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
+									fontSize={{ base: '1.10rem', md: '1.25rem' }}>Maximize your Vader by staking.</Heading>
 								<Box
 									as='p'
 									mb='0.65rem'

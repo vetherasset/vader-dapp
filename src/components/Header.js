@@ -18,6 +18,11 @@ export const Header = (props) => {
 			link: '/stake',
 		},
 		{
+			name: 'Earn',
+			text: 'Earn',
+			link: '/earn',
+		},
+		{
 			name: 'Bond',
 			text: 'Bond',
 			link: '/bond',
@@ -41,35 +46,36 @@ export const Header = (props) => {
 			style={{ justifyContent: 'space-between', alignItems: 'center' }}
 			minH={defaults.layout.header.minHeight}
 			{...props}>
-			<Flex w={{ md: '100%', sm: '30%' }}>
-				<Logotype margin='0 8px 0' />
-			</Flex>
-			<Flex w='auto'
-				minW='216px'
-				alignItems='center'
-				justifyContent='space-around'
-				textTransform='capitalize'
-				layerStyle='colorful'
-				borderRadius='12px'
-				p='0.3rem 0.2rem'
-				display={{ base: 'none', md: 'flex' }}
-			>
-				{pages.map(p =>
-					<Link
-						key={p.name}
-						to={p.link}
-						style={ {
-							color: 'rgb(213, 213, 213)',
-							padding: '0.4rem 0.8rem',
-							...(location.pathname === '/' && p.name === 'Stake' && current),
-							...(p.link === location.pathname && current),
-							...(p.link === '/bond' && location.pathname.includes('bond') && current),
-							...(p.link === '/pool' && location.pathname.includes('pool') && current),
-						}}
-					>
-						{p.text}
-					</Link>)
-				}
+			<Flex>
+				<Logotype />
+				<Flex
+					w='auto'
+					alignItems='center'
+					justifyContent='space-around'
+					textTransform='capitalize'
+					borderRadius='12px'
+					gridGap='7px'
+					p='0.3rem 0.2rem'
+					ml='.84rem'
+					display={{ base: 'none', md: 'flex' }}
+				>
+					{pages.map(p =>
+						<Link
+							key={p.name}
+							to={p.link}
+							style={ {
+								color: 'rgb(213, 213, 213)',
+								padding: '0.3rem 0.7rem',
+								...(location.pathname === '/' && p.name === 'Stake' && current),
+								...(p.link === location.pathname && current),
+								...(p.link === '/bond' && location.pathname.includes('bond') && current),
+								...(p.link === '/pool' && location.pathname.includes('pool') && current),
+							}}
+						>
+							{p.text}
+						</Link>)
+					}
+				</Flex>
 			</Flex>
 			<Flex
  				w={{ md: '100%', sm: '70%' }}

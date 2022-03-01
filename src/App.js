@@ -6,6 +6,7 @@ import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
 import Stake from './locations/stake'
+import Earn from './locations/earn'
 import Bonds from './locations/bonds'
 import Bond from './locations/bond'
 import defaults from './common/defaults'
@@ -31,6 +32,9 @@ const App = () => {
 					<Switch>
 						<Route path='/' exact render={() =>
 							<Stake position='relative' zIndex='1'/>
+						}/>
+						<Route path='/earn' exact render={() =>
+							<Earn position='relative' zIndex='1'/>
 						}/>
 						<Route path='/bond' exact render={() =>
 							<Bonds position='relative' zIndex='1'/>
@@ -85,6 +89,7 @@ const App = () => {
 const maskTransform = () => {
 	const location = useLocation()
 	if(
+		location.pathname.includes('earn') ||
 		location.pathname.includes('bond') ||
 		location.pathname.includes('pool') ||
 		location.pathname === '/'

@@ -189,6 +189,14 @@ defaults.address.uniswapV2.usdcEthPair = (
 		defaults.network.chainId === 42 ? '0x00ba37fd79ba75b631e74de45299bb8021611e22' :
 			undefined
 )
+defaults.address.usdv3crvf = (
+	defaults.network.chainId === 1 ? '0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c' :
+		undefined
+)
+defaults.address.stakingRewards = (
+	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
+		undefined
+)
 
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
@@ -237,6 +245,14 @@ defaults.vether = {
 	'symbol':'VETH',
 	'decimals':18,
 	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
+}
+
+defaults.usdv3crvf = {
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.usdv3crvf,
+	'name':'USDV3CRV-f',
+	'symbol':'USDV3CRV-f',
+	'decimals':18,
 }
 
 defaults.redeemables = [
