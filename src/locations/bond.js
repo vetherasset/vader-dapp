@@ -1043,10 +1043,9 @@ const Bond = (props) => {
 											<Box
 												minH={{ base: '32.4px', md: '36px' }}
 											>
-												{treasuryBalance &&
+												{treasuryBalance && !preCommit?.open?.data &&
 													<>
-														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
-															preCommit?.open?.data) &&
+														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader)) &&
 															<>
 																{purchaseValue !== '' &&
 																	prettifyCurrency(
@@ -1057,8 +1056,7 @@ const Bond = (props) => {
 																}
 															</>
 														}
-														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-														!preCommit?.open?.data) &&
+														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader)) &&
 															<>
 																Sold Out
 															</>
@@ -1073,10 +1071,9 @@ const Bond = (props) => {
 												textAlign='center'
 												fontSize='1rem'
 											>
-												{treasuryBalance &&
+												{treasuryBalance && !preCommit?.open?.data &&
 													<>
-														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader) ||
-															preCommit.open.data) &&
+														{(treasuryBalance.gt(defaults.bondConsideredSoldOutMinVader)) &&
 															<>
 																<Badge
 																	as='div'
@@ -1087,8 +1084,7 @@ const Bond = (props) => {
 																</Badge>
 															</>
 														}
-														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader) &&
-														!preCommit.open.data) &&
+														{(treasuryBalance.lte(defaults.bondConsideredSoldOutMinVader)) &&
 															<>
 																<Badge
 																	as='div'
