@@ -197,6 +197,10 @@ defaults.address.usdv3crvf = (
 	defaults.network.chainId === 1 ? '0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c' :
 		undefined
 )
+defaults.address.crv3pool = (
+	defaults.network.chainId === 1 ? '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' :
+		undefined
+)
 defaults.address.stakingRewards = (
 	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
 		undefined
@@ -321,5 +325,8 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
+
+defaults.tooltip = {}
+defaults.tooltip.delay = 800
 
 export default defaults
