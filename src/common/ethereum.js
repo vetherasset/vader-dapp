@@ -594,9 +594,9 @@ const getRewardRate = async () => {
 	return await contract.rewardRate()
 }
 
-const getVirtualPrice = async () => {
+const getVirtualPrice = async (poolAddress) => {
 	const contract = new ethers.Contract(
-		defaults.address.usdv3crvf,
+		poolAddress,
 		threePoolMetaPool,
 		defaults.network.provider,
 	)

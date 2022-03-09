@@ -140,6 +140,7 @@ export default {
 			},
 		}),
 		ghost: () => ({
+			borderRadius: '12px',
 			_hover: {
 				background: 'transparent',
 			},
