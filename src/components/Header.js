@@ -81,7 +81,7 @@ export const Header = (props) => {
 			<Flex
  				w={{ md: '100%', sm: '70%' }}
  				justifyContent='flex-end'
-				gridGap={{ base: '7.3px', sm: '12.3px' }}
+				gridGap='12.3px'
 			>
 				{useBreakpointValue({
 					base:	<>
