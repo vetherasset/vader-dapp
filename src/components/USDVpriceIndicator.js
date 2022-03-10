@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Image, Tooltip } from '@chakra-ui/react'
+import { Box, Image, Tooltip, useBreakpointValue } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { prettifyNumber } from '../common/utils'
 import { useUSDVprice } from '../hooks/useUSDVprice'
@@ -7,6 +7,12 @@ import { useUSDVprice } from '../hooks/useUSDVprice'
 export const USDVpriceIndicator = () => {
 
 	const price = useUSDVprice()
+
+	const maxd = useBreakpointValue({
+		base: '2',
+		md: '2',
+		lg: '5',
+	})
 
 	return (
 		<>
@@ -18,18 +24,12 @@ export const USDVpriceIndicator = () => {
 					openDelay={defaults.tooltip.delay}
 					placement='bottom'>
 					<Box
-						fontSize={{ base: '0.65rem', sm: 'sm' }}
+						fontSize={{ sm: 'sm' }}
 						display='inline-flex'
 						alignItems='center'
 						justifyContent='center'
 						borderRadius='12px'
 						background='#000'
-						p='7px 10px'
-						gridGap='13px'
-						transform={{
-							base: 'scale(0.86)',
-							sm: 'scale(1)',
-						}}
 					>
 						<Box
 							d='flex'
@@ -47,7 +47,7 @@ export const USDVpriceIndicator = () => {
 								m='0'
 								textTransform='capitalize'>
 								<Box as='span' fontSize='1rem'>$</Box>
-								{prettifyNumber(price, 0, 5, 'us')}
+								{prettifyNumber(price, 0, maxd, 'us')}
 							</Box>
 						</Box>
 					</Box>
