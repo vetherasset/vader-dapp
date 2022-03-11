@@ -1464,7 +1464,7 @@ const PriceOverview = (props) => {
 							}
 							{!preCommit?.open?.data &&
 									<>
-										{bondPrice && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+										{bondPrice && usdcEth?.pairs?.[0]?.token0Price &&
 											<>
 												{prettifyCurrency(
 													props?.bond?.[0]?.principal ? (Number(ethers.utils.formatUnits(bondPrice, 18)) *
@@ -1606,7 +1606,7 @@ const Breakdown = (props) => {
 	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(bondPrice ? bondPrice : '0', 18)) *
 	(Number(usdcEth?.pairs?.[0]?.token0Price)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
-	const roi = calculateDifference(marketPrice, bondInitPrice)
+	const roi = calculateDifference(marketPrice, bondInitPrice) / 2
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
 	const preCommit = usePreCommit(props.bond?.[0]?.precommit)
 	const totalCommits = useERC20Balance(defaults.address.wrappedEth, props?.bond?.[0]?.precommit)
