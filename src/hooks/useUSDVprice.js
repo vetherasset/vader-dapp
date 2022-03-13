@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { useQuery as useApolloQuery, gql } from '@apollo/client'
 import { useQuery } from 'react-query'
-import { getVirtualPrice } from '../common/ethereum'
+import { getVirtualPrice, getDy } from '../common/ethereum'
+import { utils } from 'ethers'
 import defaults from '../common/defaults'
 
 export const useUSDVprice = (rpc = true, pollInterval = defaults.api.graphql.pollInterval, staleTime = defaults.api.staleTime) => {
@@ -11,9 +12,9 @@ export const useUSDVprice = (rpc = true, pollInterval = defaults.api.graphql.pol
 	}
 	else {
 
-		const usdv3crvfPrice = useQuery(`virtualPrice_${defaults.address.usdv3crvf}`,
+		const usdv3crvfPrice = useQuery(`get_dy_${defaults.address.usdv3crvf}`,
 			async () => {
-				return await getVirtualPrice(defaults.address.usdv3crvf)
+				return await getDy(0, 1, utils.parseEther('1'), defaults.address.usdv3crvf)
 			}, {
 				staleTime: defaults.api.staleTime,
 			},
@@ -30,7 +31,7 @@ export const useUSDVprice = (rpc = true, pollInterval = defaults.api.graphql.pol
 		if (
 			usdv3crvfPrice?.data &&
 			crv3poolPrice?.data) {
-			return Number(usdv3crvfPrice?.data?.toString()) / Number(crv3poolPrice?.data?.toString())
+			return utils.formatEther(String(Number(usdv3crvfPrice?.data?.toString() / 1e18) * Number(crv3poolPrice?.data?.toString())))
 		}
 	}
 

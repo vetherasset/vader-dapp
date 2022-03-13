@@ -603,6 +603,15 @@ const getVirtualPrice = async (poolAddress) => {
 	return await contract.get_virtual_price()
 }
 
+const getDy = async (i, J, dx, poolAddress) => {
+	const contract = new ethers.Contract(
+		poolAddress,
+		threePoolMetaPool,
+		defaults.network.provider,
+	)
+	return await contract.get_dy(i, J, dx)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -624,4 +633,5 @@ export {
 	getPrecommitOpen, preCommitZap, unCommit, stakeForRewards,
 	getStakingRewards, exitStakingRewards, getStakingRewardsBalanceOf,
 	getStakingRewardsEarned, getRewardRate, getVirtualPrice,
+	getDy,
 }
