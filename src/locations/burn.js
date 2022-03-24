@@ -143,7 +143,6 @@ const Burn = (props) => {
 				toast(noToken0)
 			}
 			else if (!tokenApproved && !submitOption) {
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if (tokenSelect.symbol === 'VETH' &&
 				balance?.data &&
 				!vethAccountLeafClaimed) {
@@ -153,6 +152,7 @@ const Burn = (props) => {
 							toast(notBurnEligible)
 						}
 						else {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
 							approveERC20ToSpend(
 								tokenSelect.address,
@@ -201,6 +201,7 @@ const Burn = (props) => {
 				if (tokenSelect.symbol !== 'VETH' &&
 				tokenSelect.symbol !== 'USDV' &&
 				!submitOption) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					approveERC20ToSpend(
 						tokenSelect.address,
@@ -278,10 +279,10 @@ const Burn = (props) => {
 			else if (!submitOption) {
 				if(value > 0) {
 					if ((balance?.data?.gte(value))) {
-						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 						if (tokenSelect.symbol === 'VETH') {
 							if (defaults.redeemables[0].snapshot[wallet.account] &&
 								Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
 								const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 								convert(
@@ -327,6 +328,7 @@ const Burn = (props) => {
 						}
 						else if (tokenSelect.symbol === 'USDV') {
 							if((burnLimitRemains && burnLimitRemains.gt(0))) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
 								const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 								const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
@@ -390,6 +392,7 @@ const Burn = (props) => {
 							}
 						}
 						else if(mintLimitRemains && mintLimitRemains?.gt(0)) {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
 							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))
