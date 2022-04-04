@@ -90,20 +90,22 @@ export const WalletConnectionToggle = props => {
 	})
 
 	useEffect(() => {
-		if (wallet.account !== null) {
-			setText(prettyAccount)
-			ref.current.appendChild(
-				Jazzicon(16, parseInt(wallet.account.slice(2, 10), 16)),
-			).style.marginLeft = '7px'
-			toast(connected)
-		}
-		return () => {
-			if (wallet.account) {
-				if (ref.current) ref.current.getElementsByTagName('div')[0].remove()
-				setText(initialText)
+		if (!working) {
+			if (wallet.account !== null) {
+				setText(prettyAccount)
+				ref.current.appendChild(
+					Jazzicon(16, parseInt(wallet.account.slice(2, 10), 16)),
+				).style.marginLeft = '7px'
+				toast(connected)
+			}
+			return () => {
+				if (wallet.account) {
+					if (ref.current) ref.current.getElementsByTagName('div')[0].remove()
+					setText(initialText)
+				}
 			}
 		}
-	}, [wallet.account, prettyAccount])
+	}, [wallet.account, prettyAccount, working])
 
 	return (
 		<>
