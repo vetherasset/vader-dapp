@@ -97,7 +97,7 @@ const Bonds = (props) => {
 											as='h4'
 											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
-											ROI
+											Discount
 										</Text>
 									</Flex>
 								</Flex>

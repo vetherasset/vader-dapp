@@ -594,13 +594,22 @@ const getRewardRate = async () => {
 	return await contract.rewardRate()
 }
 
-const getVirtualPrice = async () => {
+const getVirtualPrice = async (poolAddress) => {
 	const contract = new ethers.Contract(
-		defaults.address.usdv3crvf,
+		poolAddress,
 		threePoolMetaPool,
 		defaults.network.provider,
 	)
 	return await contract.get_virtual_price()
+}
+
+const getDy = async (i, J, dx, poolAddress) => {
+	const contract = new ethers.Contract(
+		poolAddress,
+		threePoolMetaPool,
+		defaults.network.provider,
+	)
+	return await contract.get_dy(i, J, dx)
 }
 
 export {
@@ -624,4 +633,5 @@ export {
 	getPrecommitOpen, preCommitZap, unCommit, stakeForRewards,
 	getStakingRewards, exitStakingRewards, getStakingRewardsBalanceOf,
 	getStakingRewardsEarned, getRewardRate, getVirtualPrice,
+	getDy,
 }

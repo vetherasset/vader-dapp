@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useWallet } from 'use-wallet'
 import { Menu, MenuButton, Button, Portal, MenuList,
-	MenuItem, Flex, Image, useToast, MenuDivider } from '@chakra-ui/react'
+	MenuItem, Flex, Image, useToast, MenuDivider, useBreakpointValue } from '@chakra-ui/react'
 import { AddIcon, CloseIcon } from '@chakra-ui/icons'
 import { prettifyAddress } from '../common/utils'
 import Jazzicon from '@metamask/jazzicon'
@@ -83,21 +83,29 @@ export const WalletConnectionToggle = props => {
 		}
 	}
 
+	const prettyAccount = useBreakpointValue({
+		base:  prettifyAddress(wallet?.account, 4),
+		md: prettifyAddress(wallet?.account, 0),
+		lg: prettifyAddress(wallet?.account, 4),
+	})
+
 	useEffect(() => {
-		if (wallet.account !== null) {
-			setText(prettifyAddress(wallet.account))
-			ref.current.appendChild(
-				Jazzicon(16, parseInt(wallet.account.slice(2, 10), 16)),
-			).style.marginLeft = '7px'
-			toast(connected)
-		}
-		return () => {
-			if (wallet.account) {
-				if (ref.current) ref.current.getElementsByTagName('div')[0].remove()
-				setText(initialText)
+		if (!working) {
+			if (wallet.account !== null) {
+				setText(prettyAccount)
+				ref.current.appendChild(
+					Jazzicon(16, parseInt(wallet.account.slice(2, 10), 16)),
+				).style.marginLeft = '7px'
+				toast(connected)
+			}
+			return () => {
+				if (wallet.account) {
+					if (ref.current) ref.current.getElementsByTagName('div')[0].remove()
+					setText(initialText)
+				}
 			}
 		}
-	}, [wallet.account])
+	}, [wallet.account, prettyAccount, working])
 
 	return (
 		<>

@@ -73,6 +73,11 @@ export const BalanceIndicator = () => {
 	}
 
 	const placement = useBreakpointValue({ base: 'bottom-end', md: 'auto' })
+	const viewUsdv =	useBreakpointValue({
+		base: false,
+		md: false,
+		lg: true,
+	})
 
 	return (
 		<>
@@ -97,10 +102,6 @@ export const BalanceIndicator = () => {
 									display='flex'
 									flexDirection='row'
 									alignItems='center'
-									transform={{
-										base: 'scale(0.86)',
-										sm: 'scale(1)',
-									}}
 								>
 									<Box
 										display='inline-flex'
@@ -131,26 +132,29 @@ export const BalanceIndicator = () => {
 											</Box>
 										}
 										{usdvBalance?.data?.gt(0) &&
-											<Box
-												d='flex'
-												alignItems='center'
-												overflow='hidden'>
-												<Image
-													width='24px'
-													height='24px'
-													mr='5px'
-													src={defaults.usdv.logoURI}
-													alt={`${defaults.usdv.name} token`}
-												/>
+											viewUsdv &&
+											<>
 												<Box
-													as='h3'
-													m='0'
-													fontSize='1.02rem'
-													fontWeight='bold'
-													textTransform='capitalize'>
-													{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2, 'us', 'compact')}
+													d='flex'
+													alignItems='center'
+													overflow='hidden'>
+													<Image
+														width='24px'
+														height='24px'
+														mr='5px'
+														src={defaults.usdv.logoURI}
+														alt={`${defaults.usdv.name} token`}
+													/>
+													<Box
+														as='h3'
+														m='0'
+														fontSize='1.02rem'
+														fontWeight='bold'
+														textTransform='capitalize'>
+														{prettifyNumber(utils.formatEther(usdvBalance?.data), 0, 2, 'us', 'compact')}
+													</Box>
 												</Box>
-											</Box>
+											</>
 										}
 									</Box>
 								</Button>

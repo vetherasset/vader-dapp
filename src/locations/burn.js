@@ -142,17 +142,60 @@ const Burn = (props) => {
 			else if (!tokenSelect) {
 				toast(noToken0)
 			}
+			else if (tokenSelect.symbol === 'VETH' &&
+			vethAccountLeafClaimed) {
+				if(vester?.[0]?.gt(0)) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+					setWorking(true)
+					claim(provider)
+						.then((tx) => {
+							tx.wait(
+								defaults.network.tx.confirmations,
+							).then((r) => {
+								setWorking(false)
+								setVethAccountLeafClaimed(true)
+								toast({
+									...vaderclaimed,
+									description: <Link
+										variant='underline'
+										_focus={{
+											boxShadow: '0',
+										}}
+										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
+										isExternal>
+										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
+									duration: defaults.toast.txHashDuration,
+								})
+							})
+						})
+						.catch(err => {
+							setWorking(false)
+							if (err.code === 4001) {
+								console.log('Transaction rejected: Your have decided to reject the transaction..')
+								toast(rejected)
+							}
+							else {
+								console.log(err)
+								toast(failed)
+							}
+						})
+				}
+				else {
+					toast(nothingtoclaim)
+				}
+			}
 			else if (!tokenApproved && !submitOption) {
-				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 				if (tokenSelect.symbol === 'VETH' &&
 				balance?.data &&
 				!vethAccountLeafClaimed) {
+					console.log('hit')
 					if ((balance?.data > 0 && value > 0)) {
 						if((!defaults.redeemables[0].snapshot[wallet.account]) ||
 						(!Number(defaults.redeemables[0].snapshot[wallet.account]) > 0)) {
 							toast(notBurnEligible)
 						}
 						else {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
 							approveERC20ToSpend(
 								tokenSelect.address,
@@ -201,6 +244,7 @@ const Burn = (props) => {
 				if (tokenSelect.symbol !== 'VETH' &&
 				tokenSelect.symbol !== 'USDV' &&
 				!submitOption) {
+					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 					setWorking(true)
 					approveERC20ToSpend(
 						tokenSelect.address,
@@ -233,55 +277,13 @@ const Burn = (props) => {
 						})
 				}
 			}
-			else if (tokenSelect.symbol === 'VETH' &&
-			vethAccountLeafClaimed) {
-				if(vester?.[0]?.gt(0)) {
-					const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-					setWorking(true)
-					claim(provider)
-						.then((tx) => {
-							tx.wait(
-								defaults.network.tx.confirmations,
-							).then((r) => {
-								setWorking(false)
-								setVethAccountLeafClaimed(true)
-								toast({
-									...vaderclaimed,
-									description: <Link
-										variant='underline'
-										_focus={{
-											boxShadow: '0',
-										}}
-										href={`${defaults.api.etherscanUrl}/tx/${r.transactionHash}`}
-										isExternal>
-										<Box>Click here to view transaction on <i><b>Etherscan</b></i>.</Box></Link>,
-									duration: defaults.toast.txHashDuration,
-								})
-							})
-						})
-						.catch(err => {
-							setWorking(false)
-							if (err.code === 4001) {
-								console.log('Transaction rejected: Your have decided to reject the transaction..')
-								toast(rejected)
-							}
-							else {
-								console.log(err)
-								toast(failed)
-							}
-						})
-				}
-				else {
-					toast(nothingtoclaim)
-				}
-			}
 			else if (!submitOption) {
 				if(value > 0) {
 					if ((balance?.data?.gte(value))) {
-						const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 						if (tokenSelect.symbol === 'VETH') {
 							if (defaults.redeemables[0].snapshot[wallet.account] &&
 								Number(defaults.redeemables[0].snapshot[wallet.account]) > 0) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
 								const proof = getMerkleProofForAccount(wallet.account, defaults.redeemables[0].snapshot)
 								convert(
@@ -327,6 +329,7 @@ const Burn = (props) => {
 						}
 						else if (tokenSelect.symbol === 'USDV') {
 							if((burnLimitRemains && burnLimitRemains.gt(0))) {
+								const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 								setWorking(true)
 								const feeAmount = usdcTWAP?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 								const amount = value?.mul(usdcTWAP).div(ethers.utils.parseUnits('1', 18))
@@ -390,6 +393,7 @@ const Burn = (props) => {
 							}
 						}
 						else if(mintLimitRemains && mintLimitRemains?.gt(0)) {
+							const provider = new ethers.providers.Web3Provider(wallet.ethereum)
 							setWorking(true)
 							const feeAmount = uniswapTWAP?.data?.mul(fee).div(ethers.utils.parseUnits('1', 18))
 							const amount = value?.mul(conversionFactor).div(ethers.utils.parseUnits('1', 18))

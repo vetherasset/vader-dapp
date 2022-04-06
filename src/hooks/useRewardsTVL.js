@@ -16,7 +16,7 @@ export const useRewardsTVL = (rpc = true, pollInterval = defaults.api.graphql.po
 
 		const virtualPrice = useQuery(`viretualPrice_${defaults.address.usdv3crvf}`,
 			async () => {
-				return await getVirtualPrice()
+				return await getVirtualPrice(defaults.address.usdv3crvf)
 			}, {
 				staleTime: defaults.api.staleTime,
 			},

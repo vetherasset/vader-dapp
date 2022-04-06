@@ -172,7 +172,7 @@ const Stake = (props) => {
 											hasArrow
 											label='Press to cycle'
 											color='black'
-											openDelay={1325}
+											openDelay={defaults.tooltip.delay}
 											placement='right'>
 											<Badge
 												_hover={{

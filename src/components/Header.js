@@ -7,6 +7,7 @@ import { Logotype } from './Logotype'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 import { BalanceIndicator } from '../components/BalanceIndicator'
 import { BurgerMenu } from './BurgerMenu'
+import { USDVpriceIndicator } from './USDVpriceIndicator'
 
 export const Header = (props) => {
 
@@ -80,14 +81,15 @@ export const Header = (props) => {
 			<Flex
  				w={{ md: '100%', sm: '70%' }}
  				justifyContent='flex-end'
-				gridGap={{ base: '7.3px', sm: '17.3px' }}
+				gridGap='12.3px'
 			>
 				{useBreakpointValue({
 					base:	<>
+						<USDVpriceIndicator/>
 						<BalanceIndicator/>
 					</>,
-					md: '',
-					lg: <>
+					md: <>
+						<USDVpriceIndicator/>
 						<LinkExt
 							isExternal href='https://curve.fi/factory/82'>
 							<Button
@@ -96,7 +98,11 @@ export const Header = (props) => {
 								variant='linkAccent'
 								rightIcon={<Image src='/svg/curvefi.svg' width='32px'/>}
 							>
-								USDV3CRV-f
+								{useBreakpointValue({
+									base: '',
+									md: '',
+									lg: 'USDV3CRV-f',
+								})}
 							</Button>
 						</LinkExt>
 						<BalanceIndicator/>

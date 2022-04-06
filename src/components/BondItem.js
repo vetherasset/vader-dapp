@@ -20,17 +20,19 @@ export const BondItem = (props) => {
 
 	const wallet = useWallet()
 	const { data: bondInfo } = useBondInfo(props.bond?.address, wallet.account, true)
-	const [vaderEth] = useUniswapV2Price(props.bond?.principal?.address)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
+	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
 	const [principalEth] = useUniswapV2Price(props.bond?.principal?.address, true)
 	const { data: price } = useBondPrice(props.bond?.address)
 
-	const bondInitPrice = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
-	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
+	const bondInitPrice = props?.bond?.principal ? (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) :
+		(Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+		(Number(usdcEth?.pairs?.[0]?.token0Price)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
-	const roi = calculateDifference(marketPrice, bondInitPrice)
+	const roi = calculateDifference(marketPrice, bondInitPrice) / 2
 	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
-	const preCommit = usePreCommit(props.bond.precommit)
+	const preCommit = usePreCommit(props?.bond?.precommit)
 
 	return (
 		<>
@@ -112,7 +114,7 @@ export const BondItem = (props) => {
 						justifyContent='flex-end'
 						gridGap='0.7rem'
 					>
-						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
+						{price > 0 && usdcEth?.pairs?.[0]?.token0Price &&
 							<>
 								<Tag
 									fontSize={{ base: '0.67rem', md: '0.83rem' }}
@@ -126,10 +128,10 @@ export const BondItem = (props) => {
 								</Tag>
 							</>
 						}
-						{((!preCommit?.open?.data &&
-									roiPercentage) ||
+						{((preCommit?.open?.data &&
+									props?.bond?.discount) ||
 							(!preCommit?.open?.data &&
-							roiPercentage)) &&
+							roi > 0)) &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
 								colorScheme='gray'>
@@ -140,7 +142,7 @@ export const BondItem = (props) => {
 									</>
 								}
 								{!preCommit?.open?.data &&
-									roiPercentage &&
+									roi &&
 									<>
 										{roiPercentage}
 									</>
