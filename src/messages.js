@@ -122,6 +122,24 @@ const nothingtoclaim = createToast({
 	status: 'success',
 })
 
+const nothingtoUncommit = createToast({
+	title: 'No commits to withdraw',
+	description: 'You have no commits that can be withdrawn.',
+	status: 'success',
+})
+
+const noRewardToWithdraw = createToast({
+	title: 'No reward to withdraw',
+	description: 'You have no earned reward to be withdrawn.',
+	status: 'success',
+})
+
+const noDepositToWithdraw = createToast({
+	title: 'No deposit to withdraw',
+	description: 'You have no deposit to be withdrawn.',
+	status: 'error',
+})
+
 const nomorethaneligible = createToast({
 	title: 'Cannot burn more than eligible',
 	description: 'Please specify burn amount that is up to eligible amount.',
@@ -152,15 +170,45 @@ const staked = createToast({
 	status: 'success',
 })
 
+const stakedForRewards = createToast({
+	title: 'Depoist has been made',
+	description: 'Your tokens have been deposited succesfully.',
+	status: 'success',
+})
+
 const bondConcluded = createToast({
 	title: 'Bond purchase succesfull',
 	description: 'The bond purchase has been concluded.',
 	status: 'success',
 })
 
+const commitConcluded = createToast({
+	title: 'Bond pre-commit succesfull',
+	description: 'The bond pre-commit has been made.',
+	status: 'success',
+})
+
+const commitWithdrawn = createToast({
+	title: 'Bond un-commit succesfull',
+	description: 'The bond commit has been withdrawn.',
+	status: 'success',
+})
+
+const noCommitSelected = createToast({
+	title: 'No commit selected',
+	description: 'Please select a commit to withdraw.',
+	status: 'error',
+})
+
 const bondPurchaseValueExceeds = createToast({
 	title: 'Purchase exceeds transaction cap',
-	description: 'Your can\'t purchase more than is transaction cap.',
+	description: 'You can\'t purchase more than is transaction cap.',
+	status: 'error',
+})
+
+const precommitCapHit = createToast({
+	title: 'The maximum number of pre-commits has been hit.',
+	description: 'No more pre-commits than is the cap can be made.',
 	status: 'error',
 })
 
@@ -176,6 +224,24 @@ const bondAmountTooSmall = createToast({
 	status: 'error',
 })
 
+const commitAmountTooSmall = createToast({
+	title: 'Amount to commit is too small',
+	description: 'Please input a larger amount.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+})
+
+const commitAmounTooLarge = createToast({
+	title: 'Amount to commit is too large',
+	description: 'Please input a smaller amount.',
+	status: 'error',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+})
+
 const unstaked = createToast({
 	title: 'xVADER tokens unstaked',
 	description: 'Your xVADER tokens have been unstaked succesfully.',
@@ -188,6 +254,24 @@ const copiedContractAddress = createToast({
 	status: 'success',
 })
 
+const rewardsWithdrawn = createToast({
+	title: 'VADER reward tokens withdrawn',
+	description: 'Your VADER rewards tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+})
+
+const rewardsExited = createToast({
+	title: 'All tokens withdrawn',
+	description: 'All of your tokens have been withdrawn succesfully.',
+	status: 'success',
+	duration: defaults.toast.duration,
+	isClosable: defaults.toast.closable,
+	position: defaults.toast.position,
+})
+
 export {
 	approved, connected, failed, rejected, insufficientBalance,
 	walletNotConnected, vaderconverted, vethupgraded, usdvredeemed,
@@ -195,5 +279,9 @@ export {
 	staked, unstaked, vaderclaimed, notBurnEligible, nothingtoclaim,
 	nomorethaneligible, featureNotAvailable, tokenNotAvailableToselect,
 	bondConcluded, bondPurchaseValueExceeds, bondSoldOut, bondAmountTooSmall,
-	copiedContractAddress, notyetUnlocked, dailyLimitReached,
+	notyetUnlocked, dailyLimitReached, precommitCapHit, commitAmountTooSmall,
+	commitAmounTooLarge, commitConcluded, commitWithdrawn, noCommitSelected,
+	nothingtoUncommit, noRewardToWithdraw, noDepositToWithdraw,
+	stakedForRewards, rewardsWithdrawn, rewardsExited,
+	copiedContractAddress,
 }

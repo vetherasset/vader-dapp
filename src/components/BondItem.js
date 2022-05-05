@@ -4,36 +4,39 @@ import { ethers } from 'ethers'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Flex, Image, Tag } from '@chakra-ui/react'
-import { CheckCircleIcon } from '@chakra-ui/icons'
+import { CheckCircleIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 import { prettifyCurrency, getPercentage, calculateDifference } from '../common/utils'
 import { useBondInfo } from '../hooks/useBondInfo'
 import { useUniswapV2Price } from '../hooks/useUniswapV2Price'
 import defaults from '../common/defaults'
 import { useBondPrice } from '../hooks/useBondPrice'
+import { usePreCommit } from '../hooks/usePreCommit'
 
 export const BondItem = (props) => {
 
 	BondItem.propTypes = {
-		address: PropTypes.string.isRequired,
-		principal: PropTypes.object.isRequired,
-		token0: PropTypes.object.isRequired,
-		token1: PropTypes.object,
-		payout: PropTypes.object.isRequired,
+		bond: PropTypes.object.isRequired,
 	}
 
 	const wallet = useWallet()
-	const { data: bondInfo } = useBondInfo(props.address, wallet.account, true)
-	const [vaderEth] = useUniswapV2Price(props.principal.address)
+	const { data: bondInfo } = useBondInfo(props.bond?.address, wallet.account, true)
 	const [usdcEth] = useUniswapV2Price(defaults.address.uniswapV2.usdcEthPair)
-	const [principalEth] = useUniswapV2Price(props.principal.address, true)
-	const { data: price } = useBondPrice(props.address)
-	const bondPirce = (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
-	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)))
+	const [vaderEth] = useUniswapV2Price(defaults.address.uniswapV2.vaderEthPair)
+	const [principalEth] = useUniswapV2Price(props.bond?.principal?.address, true)
+	const { data: price } = useBondPrice(props.bond?.address)
+
+	const bondInitPrice = props?.bond?.principal ? (Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+	(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice))) :
+		(Number(ethers.utils.formatUnits(price ? price : '0', 18)) *
+		(Number(usdcEth?.pairs?.[0]?.token0Price)))
 	const marketPrice = (Number(usdcEth?.pairs?.[0]?.token0Price) * Number(vaderEth?.pairs?.[0]?.token1Price))
+	const roi = calculateDifference(marketPrice, bondInitPrice) / 2
+	const roiPercentage = isFinite(roi) ? getPercentage(roi)?.replace('-0', '0') : ''
+	const preCommit = usePreCommit(props?.bond?.precommit)
 
 	return (
 		<>
-			<Link to={`/bond/${props.address}`}>
+			<Link to={`/bond/${props.bond.address}`}>
 				<Flex
 					width='100%'
 					alignItems='center'
@@ -64,18 +67,20 @@ export const BondItem = (props) => {
 							height='23px'
 							borderRadius='50%'
 							mr={{ base: '3px', md: '7px' }}
-							src={props.token0?.logoURI}
-							alt={`${props.token0?.name} token`}
+							src={props.bond.token0?.logoURI}
+							alt={`${props.bond.token0?.name} token`}
 						/>
+						{props.bond?.token1?.logoURI &&
 						<Image
 							width='23px'
 							height='23px'
 							borderRadius='50%'
 							mr={{ base: '2px', md: '10px' }}
-							src={props.token1?.logoURI}
-							alt={`${props.token1?.name} token`}
+							src={props.bond.token1?.logoURI}
+							alt={`${props.bond.token1?.name} token`}
 						/>
-						{props.token0?.symbol}{props.token1 ? ` / ${props.token1.symbol}` : ''}
+						}
+						{props.bond.token0?.symbol}{props.bond.token1 ? ` / ${props.bond.token1.symbol}` : `${String.fromCharCode(8194)}${props.bond.name}`}
 						{bondInfo?.[1] && bondInfo?.[1]?.gt(0) &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
@@ -89,6 +94,19 @@ export const BondItem = (props) => {
 								/> Purchased
 							</Tag>
 						}
+						{preCommit.open.data &&
+							<Tag
+								fontSize={{ base: '0.67rem', md: '0.83rem' }}
+								mt={{ base: '3px', md: '' }}
+								ml='10px'
+								borderRadius='11px'
+								variant='subtle'
+								colorScheme='purple'>
+								<ArrowForwardIcon
+									mr='5px'
+								/> Pre-commit
+							</Tag>
+						}
 					</Flex>
 					<Flex
 						flexDir='row'
@@ -96,23 +114,39 @@ export const BondItem = (props) => {
 						justifyContent='flex-end'
 						gridGap='0.7rem'
 					>
-						{price && usdcEth?.pairs?.[0]?.token0Price && principalEth?.principalPrice &&
-								<>
-									<Tag
-										fontSize={{ base: '0.67rem', md: '0.83rem' }}
-										colorScheme='gray'>
-										{prettifyCurrency(
-											Number(ethers.utils.formatUnits(price, 18)) *
-											(Number(usdcEth?.pairs?.[0]?.token0Price) * Number(principalEth?.principalPrice)),
-											0, 5)}
-									</Tag>
-								</>
+						{price > 0 && usdcEth?.pairs?.[0]?.token0Price &&
+							<>
+								<Tag
+									fontSize={{ base: '0.67rem', md: '0.83rem' }}
+									colorScheme='gray'>
+									{prettifyCurrency(
+										props.bond.principal ? (Number(ethers.utils.formatUnits(price, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price) *
+										Number(principalEth?.principalPrice))) : (Number(ethers.utils.formatUnits(price, 18)) *
+										(Number(usdcEth?.pairs?.[0]?.token0Price))),
+										0, 5)}
+								</Tag>
+							</>
 						}
-						{isFinite(calculateDifference(marketPrice, bondPirce)) && calculateDifference(marketPrice, bondPirce) > 0 &&
+						{((preCommit?.open?.data &&
+									props?.bond?.discount) ||
+							(!preCommit?.open?.data &&
+							roi > 0)) &&
 							<Tag
 								fontSize={{ base: '0.67rem', md: '0.83rem' }}
 								colorScheme='gray'>
-								{getPercentage(calculateDifference(marketPrice, bondPirce))}
+								{preCommit?.open?.data &&
+									props?.bond?.discount &&
+									<>
+										{getPercentage(props?.bond?.discount)}
+									</>
+								}
+								{!preCommit?.open?.data &&
+									roi &&
+									<>
+										{roiPercentage}
+									</>
+								}
 							</Tag>
 						}
 					</Flex>

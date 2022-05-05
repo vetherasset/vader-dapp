@@ -3,8 +3,10 @@ import { MerkleTree } from 'merkletreejs'
 import getTokenList from 'get-token-list'
 import defaults from './defaults'
 
-const prettifyAddress = (address) => {
-	return `${address.substring(0, 7)}...${address.substring(address.length - 4, address.length)}`
+const prettifyAddress = (address, prependN) => {
+	if (address) {
+		return `${prependN > 0 ? `${address.substring(0, prependN)}...` : ''}${address.substring(address.length - 4, address.length)}`
+	}
 }
 
 const prettifyCurrency = (amount, minFractionDigits = 0, maxFractionDigits = 2, currency = 'USD', locales = 'en-US') => {
@@ -97,6 +99,11 @@ const getDateFromSeconds = (seconds) => {
 const getSecondsToGo = (date) => {
 	const time = (Date.now() / 1000).toFixed()
 	return (Number((date - time)))
+}
+
+const getDateFromTimestamp = (timestamp) => {
+	const date = new Date(timestamp * 1000)
+	return date
 }
 
 const promiseAllProgress = (promises, tickCallback) => {
@@ -210,9 +217,14 @@ const getMerkleProofForAccount = (account, snapshot) => {
 const calculateDifference = (value1, value2) => value1 > value2 ?
 	(value1 - value2) / value2 : (value1 - value2) / value1
 
+const openNewTabURL = (url) => {
+	const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+	if (newWindow) newWindow.opener = null
+}
+
 export {
 	prettifyAddress, prettifyCurrency, prettifyNumber, getPercentage, getSecondsToGo,
 	promiseAllProgress, searchFor, isEthereumAddress, addUnknownTokenToList, getCombinedTokenListFromSources,
 	getTokenByAddress, getStartOfTheDayTimeStamp, getMerkleProofForAccount, getMerkleLeaf,
-	calculateDifference, getDateFromSeconds,
+	calculateDifference, getDateFromSeconds, getDateFromTimestamp, openNewTabURL,
 }

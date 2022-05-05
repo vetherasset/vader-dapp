@@ -21,15 +21,15 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		// {
-		// 	provider: new ethers.providers.InfuraProvider(
-		// 		defaults.network.chainId,
-		// 		process.env.REACT_APP_INFURA_KEY,
-		// 	),
-		// 	weight: 1,
-		// 	priority: 2,
-		// 	stallTimeout: 2000,
-		// },
+		{
+			provider: new ethers.providers.InfuraProvider(
+				defaults.network.chainId,
+				process.env.REACT_APP_INFURA_KEY,
+			),
+			weight: 1,
+			priority: 2,
+			stallTimeout: 2000,
+		},
 	],
 	1,
 )
@@ -167,6 +167,10 @@ defaults.address.usdv = (
 		defaults.network.chainId === 42 ? '0xF5783253A21E5E740908CEdB800183b70A004479' :
 			undefined
 ),
+defaults.address.wrappedEth = (
+	defaults.network.chainId === 1 ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' :
+		undefined
+)
 defaults.address.converter = (
 	defaults.network.chainId === 1 ? '0x6D4a43Ee4770a2Bab97460d3a3B783641D85d108' :
 		defaults.network.chainId === 42 ? '0x8A313Fa0cb3ed92bE4Cae3a4deF7C32c78181E09' :
@@ -188,6 +192,18 @@ defaults.address.uniswapV2.usdcEthPair = (
 	defaults.network.chainId === 1 ? '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' :
 		defaults.network.chainId === 42 ? '0x00ba37fd79ba75b631e74de45299bb8021611e22' :
 			undefined
+)
+defaults.address.usdv3crvf = (
+	defaults.network.chainId === 1 ? '0x7abD51BbA7f9F6Ae87aC77e1eA1C5783adA56e5c' :
+		undefined
+)
+defaults.address.crv3pool = (
+	defaults.network.chainId === 1 ? '0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7' :
+		undefined
+)
+defaults.address.stakingRewards = (
+	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
+		undefined
 )
 
 defaults.tokenList = {}
@@ -237,6 +253,14 @@ defaults.vether = {
 	'symbol':'VETH',
 	'decimals':18,
 	'logoURI':'https://raw.githubusercontent.com/vetherasset/branding/main/vether/vether-symbol-w-ring.png',
+}
+
+defaults.usdv3crvf = {
+	'chainId':defaults.network.chainId,
+	'address':defaults.address.usdv3crvf,
+	'name':'USDV3CRV-f',
+	'symbol':'USDV3CRV-f',
+	'decimals':18,
 }
 
 defaults.redeemables = [
@@ -301,5 +325,8 @@ defaults.toast.duration = 5000
 defaults.toast.txHashDuration = 8000
 defaults.toast.closable = true
 defaults.toast.position = 'top'
+
+defaults.tooltip = {}
+defaults.tooltip.delay = 800
 
 export default defaults

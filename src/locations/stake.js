@@ -86,7 +86,7 @@ const Stake = (props) => {
 
 	return (
 		<Box
-			minHeight='634.95px'
+			minHeight='688.617px'
 			maxWidth={defaults.layout.container.lg.width}
 			m='0 auto'
 			p={{ base: '5rem 0.4rem 0', md: '5rem 1.2rem 0' }}
@@ -111,7 +111,7 @@ const Stake = (props) => {
 									as='h1'
 									size='md'
 									textAlign={{ base: 'center', md: 'left' }}
-									fontSize={{ base: '1.10rem', md: '1.25rem' }}>EARN ADDITIONAL VADER.</Heading>
+									fontSize={{ base: '1.10rem', md: '1.25rem' }}>Maximize your Vader by staking.</Heading>
 								<Box
 									as='p'
 									mb='0.65rem'
@@ -172,7 +172,7 @@ const Stake = (props) => {
 											hasArrow
 											label='Press to cycle'
 											color='black'
-											openDelay={1325}
+											openDelay={defaults.tooltip.delay}
 											placement='right'>
 											<Badge
 												_hover={{

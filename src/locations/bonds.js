@@ -97,7 +97,7 @@ const Bonds = (props) => {
 											as='h4'
 											fontSize={{ base: '0.87rem', md: '1.1rem' }}
 											fontWeight='bolder'>
-											ROI
+											Discount
 										</Text>
 									</Flex>
 								</Flex>
@@ -112,18 +112,17 @@ const Bonds = (props) => {
 								}
 							`}
 						</style>
-						{defaults.bonds?.map((item, index) => {
-							return (
-								<BondItem
-									key={index}
-									address={item.address}
-									principal={item.principal}
-									token0={item.token0}
-									token1={item.token1}
-									payout={item.payout}
-								/>
-							)
-						})}
+						{defaults.bonds
+							.slice(0)
+							.reverse()
+							.map((item, index) => {
+								return (
+									<BondItem
+										key={index}
+										bond={item}
+									/>
+								)
+							})}
 					</Box>
 					<Flex
 						flexDir='row'
