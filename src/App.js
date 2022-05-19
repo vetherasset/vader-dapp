@@ -9,6 +9,7 @@ import Stake from './locations/stake'
 import Earn from './locations/earn'
 import Bonds from './locations/bonds'
 import Bond from './locations/bond'
+import Tokens from './locations/tokens'
 import defaults from './common/defaults'
 import { Footer } from './components/Footer'
 import { Wave } from './assets/svg/effects/Wave'
@@ -44,6 +45,9 @@ const App = () => {
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
+						}/>
+						<Route path='/tokens' exact render={() =>
+							<Tokens inverted position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />

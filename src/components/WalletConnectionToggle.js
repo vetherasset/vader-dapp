@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useWallet } from 'use-wallet'
 import { Menu, MenuButton, Button, Portal, MenuList,
 	MenuItem, Flex, Image, useToast, MenuDivider, useBreakpointValue } from '@chakra-ui/react'
@@ -10,62 +10,10 @@ import { connected } from '../messages'
 import { WalletConnectionModal } from './WalletConnectionModal'
 import defaults from '../common/defaults'
 
-const AddTokenItem = (props) => {
-
-	AddTokenItem.propTypes = {
-		name: PropTypes.string.isRequired,
-		icon: PropTypes.object.isRequired,
-		wallet: PropTypes.object.isRequired,
-		token: PropTypes.object.isRequired,
-	}
-
-	return (
-		<MenuItem
-			icon={props.icon}
-			onClick={() => {
-				try {
-					props.wallet?.ethereum?.request({
-						method: 'wallet_watchAsset',
-						params: {
-							type: 'ERC20',
-							options: {
-								address: props.token.address,
-								symbol: props.token.symbol,
-								decimals: props.token.decimals,
-								image: props.token.logoURI,
-							},
-						},
-					})
-				}
-				catch (err) {
-					console.log(err)
-				}
-			}}
-			{...props}
-		>
-			<Flex
-				gridGap={'7px'}
-			>
-				{props.name}
-				<Flex
-					justifyContent='flex-start'
-					fontWeight='bolder'>
-					<Image
-						width='24px'
-						height='24px'
-						mr='5px'
-						src={props.token.logoURI}
-						alt={`${props.token.name} token`}
-					/>
-					{`${props.token.symbol} into wallet`}
-				</Flex>
-			</Flex>
-		</MenuItem>
-	)
-}
-
 export const WalletConnectionToggle = props => {
 	const initialText = 'Connect'
+	const history = useHistory()
+	const location = useLocation()
 	const wallet = useWallet()
 	const ref = useRef()
 	const toast = useToast()
@@ -144,32 +92,52 @@ export const WalletConnectionToggle = props => {
 					</span>
 				</MenuButton>
 				<Portal>
-					<MenuList
-						zIndex={{ base: '2', md: '1' }}>
-						<AddTokenItem
-							name='Add'
-							icon={<AddIcon layerStyle='menuIcon' />}
-							wallet={wallet}
-							token={defaults.vader}
-						/>
-						<AddTokenItem
-							name='Add'
-							icon={<AddIcon layerStyle='menuIcon' />}
-							wallet={wallet}
-							token={defaults.xvader}
-						/>
-						<AddTokenItem
-							name='Add'
-							icon={<AddIcon layerStyle='menuIcon' />}
-							wallet={wallet}
-							token={defaults.usdv}
-						/>
-						<MenuDivider />
+					<MenuList zIndex={{ base: '2', md: '1' }}>
+						{/* TRACK TOKENS */}
+						{!location.pathname.includes('tokens') && (
+							<>
+								<MenuItem
+									icon={<AddIcon layerStyle='menuIcon' />}
+									onClick={() => history.push('/tokens')}
+								>
+									<Flex gridGap={'7px'}>
+										Track
+										<Flex justifyContent='flex-start' fontWeight='bolder'>
+											<Image
+												width='24px'
+												height='24px'
+												mr='5px'
+												src={defaults.vader.logoURI}
+												alt={`${defaults.vader.name} token`}
+											/>
+											<Image
+												width='24px'
+												height='24px'
+												mr='5px'
+												src={defaults.xvader.logoURI}
+												alt={`${defaults.xvader.name} token`}
+											/>
+											<Image
+												width='24px'
+												height='24px'
+												mr='5px'
+												src={defaults.usdv.logoURI}
+												alt={`${defaults.usdv.name} token`}
+											/>
+										</Flex>
+										in wallet
+									</Flex>
+								</MenuItem>
+								<MenuDivider />
+							</>
+						)}
+
+						{/* DISCONNECT */}
 						<MenuItem
 							icon={<CloseIcon layerStyle='menuIcon' />}
 							onClick={() => wallet?.reset()}
 						>
-      				Disconnect
+      						Disconnect
 						</MenuItem>
 					</MenuList>
 				</Portal>
