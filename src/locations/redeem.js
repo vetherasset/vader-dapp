@@ -21,6 +21,7 @@ const Burn = (props) => {
 
 	const wallet = useWallet()
 	const toast = useToast()
+	const [address, setAddress] = useState('')
 	const [eligible, setEligible] = useState(false)
 	const [working, setWorking] = useState(false)
 
@@ -145,6 +146,21 @@ const Burn = (props) => {
 									<Input
 										variant='outline'
 										placeholder='Address'
+										value={address}
+										onChange={(e) => {
+											const regex = new RegExp('^[a-fA-F0-9]+$')
+											const val = String(e.target.value)
+											if (val.length > 42 ||
+												val.length === 1 && val.slice(0, 1) !== '0' ||
+												val.length === 2 && val.slice(0, 2) !== '0x' ||
+												val.length > 2 && regex.test(val.substring(2)) === false
+											) {
+												setAddress(prev => prev)
+											}
+											else {
+												setAddress(String(e.target.value))
+											}
+										}}
 									/>
 								</InputGroup>
 							</Flex>
