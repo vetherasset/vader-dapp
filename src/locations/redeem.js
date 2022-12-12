@@ -69,7 +69,6 @@ const Burn = (props) => {
 							align='center'
 							fontSize={{ base: '0.91rem', md: '1.12rem' }}
 							display='block'
-							mb='2rem'
 						>
             	Claim a treasury share.
 						</Text>
@@ -95,13 +94,19 @@ const Burn = (props) => {
 								<>
 									{eligible &&
 										<>
-											<Icon as={CheckCircleIcon} {...iconSize}/>
+											<Icon
+												color='#6fc2ff'
+												as={CheckCircleIcon}
+												{...iconSize}/>
 											<Box as='span'>Your wallet account is eligible to claim proportional amount of the protocol treasury.</Box>
 										</>
 									}
 									{!eligible &&
 										<>
-											<Icon as={BsFillXCircleFill}{...iconSize}/>
+											<Icon
+												as={BsFillXCircleFill}
+												color='#ff9292'
+												{...iconSize}/>
 											<Box>
 												Your wallet account is not eligible to claim.
 											</Box>
@@ -113,7 +118,7 @@ const Burn = (props) => {
 					</Flex>
 
 					<Flex
-						m='1.66rem 0 1.2rem'
+						m='0 0 1.2rem'
 						flexDir='column'
 					>
 						<Flex
@@ -146,17 +151,6 @@ const Burn = (props) => {
 						</Flex>
 					</Flex>
 
-					<Flex
-						m='0 0 1.66rem 0'
-						fontSize={{ base: '1.35rem', md: '1.5rem' }}
-						fontWeight='bolder'
-						justifyContent='center' alignItems='center' flexDir='column'>
-						<>
-							<span>👻</span>
-						</>
-						<WhatYouGetTag/>
-					</Flex>
-
 					<Button
 						variant='solidRadial'
 						m='0 auto 2rem'
@@ -166,48 +160,20 @@ const Burn = (props) => {
 						disabled={working}
 						onClick={() => submit()}
 					>
-						{wallet.account &&
-							<>
-								{!working &&
-									<>
-										Claim
-									</>
-								}
-								{working &&
-									<>
-										<Spinner />
-									</>
-								}
-							</>
-						}
-						{!wallet.account &&
+						{!working &&
 							<>
 								Claim
+							</>
+						}
+						{working &&
+							<>
+								<Spinner />
 							</>
 						}
 					</Button>
 				</Flex>
 			</Box>
 		</>
-	)
-}
-
-const WhatYouGetTag = () => {
-	return (
-		<Box
-			as='h3'
-			fontWeight='bold'
-			textAlign='center'
-			fontSize='1rem'
-		>
-			<Badge
-				as='div'
-				fontSize={{ base: '0.6rem', md: '0.75rem' }}
-				background='rgb(214, 188, 250)'
-				color='rgb(128, 41, 251)'
-			>To Be Claimed
-			</Badge>
-		</Box>
 	)
 }
 
