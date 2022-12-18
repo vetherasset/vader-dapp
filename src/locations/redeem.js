@@ -16,14 +16,16 @@ import { BsFillXCircleFill, BsQuestionCircle } from 'react-icons/bs'
 import { useWallet } from 'use-wallet'
 import { walletNotConnected } from '../messages'
 import { useTreasuryClaimed } from '../hooks/useTreasuryClaimed'
+import { useTreasuryHasClaim } from '../hooks/useTreasuryHasClaim'
+import { treasuryClaim } from '../common/ethereum'
 
 const Burn = (props) => {
 
 	const wallet = useWallet()
 	const toast = useToast()
 	const { data: claimed } = useTreasuryClaimed()
-	const [address, setAddress] = useState('')
-	const [eligible, setEligible] = useState(false)
+	const [address, setAddress] = useState('0x00000000003b3cc22aF3aE1EAc0440BcEe416B40')
+	const hasClaim = useTreasuryHasClaim(address ? address : undefined)
 	const [working, setWorking] = useState(false)
 
 	const iconSize = {
@@ -33,6 +35,10 @@ const Burn = (props) => {
 
 	const submit = () => {
 		if(!working) {
+			if (wallet.account &&
+				!claimed) {
+				treasuryClaim(wallet.account)
+			}
 			if(!wallet.account) {
 				toast(walletNotConnected)
 			}
@@ -98,16 +104,7 @@ const Burn = (props) => {
 								}
 								{wallet.account &&
 									<>
-										{claimed &&
-											<>
-												<Icon
-													color='#6fc2ff'
-													as={CheckCircleIcon}
-													{...iconSize}/>
-												<Box as='span'>Treasury share has already been claimed.</Box>
-											</>
-										}
-										{eligible && !claimed &&
+										{hasClaim > 0 && !claimed &&
 											<>
 												<Icon
 													color='#6fc2ff'
@@ -116,7 +113,7 @@ const Burn = (props) => {
 												<Box as='span'>You can claim a portion of the protocol treasury with your wallet account.</Box>
 											</>
 										}
-										{!eligible &&
+										{hasClaim < 1 &&
 											<>
 												<Icon
 													as={BsFillXCircleFill}
@@ -128,6 +125,15 @@ const Burn = (props) => {
 												</Box>
 											</>
 										}
+									</>
+								}
+								{claimed &&
+									<>
+										<Icon
+											color='#6fc2ff'
+											as={CheckCircleIcon}
+											{...iconSize}/>
+										<Box as='span'>Treasury share has already been claimed.</Box>
 									</>
 								}
 							</Flex>
