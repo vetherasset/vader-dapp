@@ -4,8 +4,6 @@ import {
 	Flex,
 	Text,
 	Button,
-	Input,
-	InputGroup,
 	Icon,
 	Spinner,
 	useToast,
@@ -24,8 +22,7 @@ const Burn = (props) => {
 	const wallet = useWallet()
 	const toast = useToast()
 	const { data: claimed } = useTreasuryClaimed()
-	const [address, setAddress] = useState('0x00000000003b3cc22aF3aE1EAc0440BcEe416B40')
-	const hasClaim = useTreasuryHasClaim(address ? address : undefined)
+	const hasClaim = useTreasuryHasClaim(wallet.account)
 	const [working, setWorking] = useState(false)
 
 	const iconSize = {
@@ -120,8 +117,7 @@ const Burn = (props) => {
 													color='#ff9292'
 													{...iconSize}/>
 												<Box>
-													There are no claimable shares for your wallet account.<br/>
-													You can still make a claim for another one, though.
+													There are no claimable shares for your wallet account.
 												</Box>
 											</>
 										}
@@ -136,49 +132,6 @@ const Burn = (props) => {
 										<Box as='span'>Treasury share has already been claimed.</Box>
 									</>
 								}
-							</Flex>
-						</Flex>
-						<Flex
-							m='0 0 1.2rem'
-							flexDir='column'
-						>
-							<Flex
-								flexDir='column'
-							>
-								<Text
-									as='h4'
-									fontWeight='bolder'>
-									Claim for account
-								</Text>
-								<Flex
-									mt='.3rem'
-									justifyContent='flex-start'
-									flexDir='row'
-								>
-									<InputGroup
-										size='sm'
-									>
-										<Input
-											variant='outline'
-											placeholder='Address'
-											value={address}
-											onChange={(e) => {
-												const regex = new RegExp('^[a-fA-F0-9]+$')
-												const val = String(e.target.value)
-												if (val.length > 42 ||
-												val.length === 1 && val.slice(0, 1) !== '0' ||
-												val.length === 2 && val.slice(0, 2) !== '0x' ||
-												val.length > 2 && regex.test(val.substring(2)) === false
-												) {
-													setAddress(prev => prev)
-												}
-												else {
-													setAddress(String(e.target.value))
-												}
-											}}
-										/>
-									</InputGroup>
-								</Flex>
 							</Flex>
 						</Flex>
 					</Flex>
