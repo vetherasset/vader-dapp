@@ -135,7 +135,6 @@ const Burn = (props) => {
 							</Flex>
 						</Flex>
 					</Flex>
-
 					<Button
 						variant='solidRadial'
 						m='0 auto 2rem'
