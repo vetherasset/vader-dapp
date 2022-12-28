@@ -5,6 +5,7 @@ import theme from './themes/vader'
 import { UseWalletProvider } from 'use-wallet'
 import { Header } from './components/Header'
 import Burn from './locations/burn'
+import Redeem from './locations/redeem'
 import Stake from './locations/stake'
 import Earn from './locations/earn'
 import Bonds from './locations/bonds'
@@ -44,6 +45,9 @@ const App = () => {
 						}/>
 						<Route path='/acquire' exact render={() =>
 							<Burn position='relative' zIndex='1'/>
+						}/>
+						<Route path='/redeem' exact render={() =>
+							<Redeem position='relative' zIndex='1'/>
 						}/>
 						<Route path='*' render={() =>
 							<Redirect to={'/'} />

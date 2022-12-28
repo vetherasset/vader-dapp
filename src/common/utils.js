@@ -186,22 +186,31 @@ const getStartOfTheDayTimeStamp = () => {
 	return Math.floor(new Date(currentDate).getTime() / 1000)
 }
 
-const getMerkleLeaf = (account, amount) => {
+const getMerkleLeaf = (account, amount, salt) => {
 	if (account && amount) {
-		const digest = ethers.utils.solidityKeccak256(
-			[ 'address', 'uint256', 'uint256', 'uint256' ],
-			[ account, amount, defaults.redeemables[0].salt, defaults.network.chainId ],
-		)
-		return digest
+		if (salt) {
+			const digest = ethers.utils.solidityKeccak256(
+				[ 'address', 'uint256', 'uint256' ],
+				[ account, amount, salt ],
+			)
+			return digest
+		}
+		else {
+			const digest = ethers.utils.solidityKeccak256(
+				[ 'address', 'uint256', 'uint256', 'uint256' ],
+				[ account, amount, defaults.redeemables[0].salt, defaults.network.chainId ],
+			)
+			return digest
+		}
 	}
 }
 
-const getMerkleProofForAccount = (account, snapshot) => {
+const getMerkleProofForAccount = (account, snapshot, salt) => {
 	const keccak256 = require('keccak256')
 	const leaves = []
 	for (const [acc, amt] of Object.entries(snapshot)) {
 		if (amt != '0') {
-			const digest = getMerkleLeaf(acc, amt)
+			const digest = getMerkleLeaf(acc, amt, salt ? salt : undefined)
 			leaves.push(digest)
 		}
 	}
@@ -209,7 +218,7 @@ const getMerkleProofForAccount = (account, snapshot) => {
 		hashLeaves: false,
 		sortPairs: true,
 	})
-	const leaf = getMerkleLeaf(account, snapshot[account])
+	const leaf = getMerkleLeaf(account, snapshot[account], salt ? salt : undefined)
 	const proof = tree.getHexProof(leaf)
 	return proof
 }
