@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Box,
 	Flex,
@@ -7,6 +7,9 @@ import {
 	Icon,
 	Spinner,
 	useToast,
+	RadioGroup,
+	Stack,
+	Radio,
 } from '@chakra-ui/react'
 import defaults from '../common/defaults'
 import { CheckCircleIcon } from '@chakra-ui/icons'
@@ -21,12 +24,13 @@ import usdv from '../artifacts/json/treasuryMap/usdv'
 import vader from '../artifacts/json/treasuryMap/vader'
 import { ethers } from 'ethers'
 
-const Burn = (props) => {
+const Redeem = (props) => {
 
 	const wallet = useWallet()
 	const toast = useToast()
 	const { data: claimed } = useTreasuryClaimed(wallet.account)
 	const hasClaim = useTreasuryHasClaim(wallet.account)
+	const [asset, setAsset] = useState(true)
 	const [working, setWorking] = useState(false)
 
 	const iconSize = {
@@ -39,23 +43,31 @@ const Burn = (props) => {
 			if (wallet.account &&
 				hasClaim > 0 &&
 				!claimed) {
+				setWorking(true)
 				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
-				let amount = ''
-				let proof
 				const salt = '123456789'
-				if (hasClaim === 1) {
-					amount = Object.entries(usdv)
+				let amount0 = ''
+				let amount1 = ''
+				let proof0 = []
+				let proof1 = []
+				if (hasClaim === 1 ||
+					hasClaim > 2) {
+					amount0 = Object.entries(usdv)
 						.find(entry => entry.includes(wallet.account))
 						.at(1)
-					proof = getMerkleProofForAccount(wallet.account, usdv, salt)
+					proof0 = getMerkleProofForAccount(wallet.account, usdv, salt)
 				}
-				if (hasClaim === 2) {
-					amount = Object.entries(vader)
+				if (hasClaim > 1) {
+					amount1 = Object.entries(vader)
 						.find(entry => entry.includes(wallet.account))
 						.at(1)
-					proof = getMerkleProofForAccount(wallet.account, vader, salt)
+					proof1 = getMerkleProofForAccount(wallet.account, vader, salt)
 				}
-				treasuryClaim(wallet.account, amount, proof, provider)
+				treasuryClaim(
+					wallet.account,
+					asset ? amount1 : amount0,
+					asset ? proof1 : proof0,
+					provider)
 					.then((tx) => {
 						tx.wait(
 							defaults.network.tx.confirmations,
@@ -80,6 +92,12 @@ const Burn = (props) => {
 			}
 		}
 	}
+
+	useEffect(() => {
+		if (hasClaim === 1) setAsset(false)
+		if (hasClaim === 2) setAsset(true)
+	},
+	[hasClaim])
 
 	return (
 		<>
@@ -162,13 +180,41 @@ const Burn = (props) => {
 										}
 									</>
 								}
-								{claimed &&
+								{claimed && hasClaim < 3 &&
 									<>
 										<Icon
 											color='#6fc2ff'
 											as={CheckCircleIcon}
 											{...iconSize}/>
 										<Box as='span'>Treasury share has already been claimed.</Box>
+									</>
+								}
+							</Flex>
+							<Flex
+								flexDir='column'
+							>
+								{hasClaim > 2 &&
+									<>
+										<RadioGroup
+											value={asset ? 0 : 1}
+											onChange={() => setAsset(!asset)}
+										>
+											<Stack>
+												<Radio
+													size='md'
+													name='what'
+													value={0}
+												>
+													Claim share from VADER holdings
+												</Radio>
+												<Radio
+													size='md'
+													value={1}
+												>
+													Claim share from USDV holdings
+												</Radio>
+											</Stack>
+										</RadioGroup>
 									</>
 								}
 							</Flex>
@@ -180,7 +226,8 @@ const Burn = (props) => {
 						size='lg'
 						minWidth='230px'
 						textTransform='uppercase'
-						disabled={working}
+						disabled={(working ||
+							(claimed && hasClaim < 3))}
 						onClick={() => submit()}
 					>
 						{!working &&
@@ -200,4 +247,4 @@ const Burn = (props) => {
 	)
 }
 
-export default Burn
+export default Redeem
