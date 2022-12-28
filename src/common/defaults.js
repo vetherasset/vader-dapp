@@ -205,11 +205,6 @@ defaults.address.stakingRewards = (
 	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
 		undefined
 )
-defaults.address.treasuryMerkleMap = (
-	defaults.network.chainId === 1 ? '' :
-		'0xF79c9406c14AF5Aa8b3F1E5E538A026aDf4D0ff5'
-)
-
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
 defaults.tokenList.sources = tokenListSources

@@ -622,9 +622,9 @@ const getTreasuryClaimed = async (account, amount) => {
 	return await contract.claimed(account, amount)
 }
 
-const treasuryClaim = async (account, amount, proof, provider) => {
+const treasuryClaim = async (account, amount, proof, contractAddress, provider) => {
 	const contract = new ethers.Contract(
-		defaults.address.treasuryMerkleMap,
+		contractAddress,
 		treasuryMerkleMap,
 		provider.getSigner(0),
 	)
