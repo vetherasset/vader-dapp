@@ -67,8 +67,8 @@ const Redeem = (props) => {
 					wallet.account,
 					asset ? amount1 : amount0,
 					asset ? proof1 : proof0,
-					asset ? '0x78e7EEadCb7489518bF88eB72352f6D232a2ad9f' :
-						'0x78e7EEadCb7489518bF88eB72352f6D232a2ad9f',
+					asset ? '0xF5644345A5A9dc14076b58802DC908B83E62B0E1' :
+						'0x78e7EEadCb7489518bF88eB72352f6D232a2ad9fcd',
 					provider)
 					.then((tx) => {
 						tx.wait(
