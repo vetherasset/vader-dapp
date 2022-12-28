@@ -17,7 +17,7 @@ export const useTreasuryClaimed = (
 		return await getTreasuryClaimed(account ? account : wallet.account)
 	}, {
 		staleTime: staleTime,
-		enabled: !!account || !!wallet.account,
+		enabled: (!!account || !!wallet.account),
 	},
 	)
 

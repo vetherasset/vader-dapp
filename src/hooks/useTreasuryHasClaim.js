@@ -16,7 +16,10 @@ export const useTreasuryHasClaim = (
 	const hasUsdv = Object.prototype.hasOwnProperty.call(usdv, account ? account : wallet.account)
 	const hasVader = Object.prototype.hasOwnProperty.call(vader, account ? account : wallet.account)
 
-	if (hasUsdv || hasVader) return 1
-	if (hasUsdv && hasVader) return 2
+	if (hasUsdv || hasVader) {
+		if (hasUsdv) return 1
+		if (hasVader) return 2
+	}
+	if (hasUsdv && hasVader) return 3
 	return 0
 }

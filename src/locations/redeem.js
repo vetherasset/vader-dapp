@@ -12,16 +12,20 @@ import defaults from '../common/defaults'
 import { CheckCircleIcon } from '@chakra-ui/icons'
 import { BsFillXCircleFill, BsQuestionCircle } from 'react-icons/bs'
 import { useWallet } from 'use-wallet'
-import { walletNotConnected } from '../messages'
+import { failed, rejected, walletNotConnected } from '../messages'
 import { useTreasuryClaimed } from '../hooks/useTreasuryClaimed'
 import { useTreasuryHasClaim } from '../hooks/useTreasuryHasClaim'
 import { treasuryClaim } from '../common/ethereum'
+import { getMerkleProofForAccount } from '../common/utils'
+import usdv from '../artifacts/json/treasuryMap/usdv'
+import vader from '../artifacts/json/treasuryMap/vader'
+import { ethers } from 'ethers'
 
 const Burn = (props) => {
 
 	const wallet = useWallet()
 	const toast = useToast()
-	const { data: claimed } = useTreasuryClaimed()
+	const { data: claimed } = useTreasuryClaimed(wallet.account)
 	const hasClaim = useTreasuryHasClaim(wallet.account)
 	const [working, setWorking] = useState(false)
 
@@ -33,8 +37,43 @@ const Burn = (props) => {
 	const submit = () => {
 		if(!working) {
 			if (wallet.account &&
+				hasClaim > 0 &&
 				!claimed) {
-				treasuryClaim(wallet.account)
+				const provider = new ethers.providers.Web3Provider(wallet.ethereum)
+				let amount = ''
+				let proof
+				const salt = '123456789'
+				if (hasClaim === 1) {
+					amount = Object.entries(usdv)
+						.find(entry => entry.includes(wallet.account))
+						.at(1)
+					proof = getMerkleProofForAccount(wallet.account, usdv, salt)
+				}
+				if (hasClaim === 2) {
+					amount = Object.entries(vader)
+						.find(entry => entry.includes(wallet.account))
+						.at(1)
+					proof = getMerkleProofForAccount(wallet.account, vader, salt)
+				}
+				treasuryClaim(wallet.account, amount, proof, provider)
+					.then((tx) => {
+						tx.wait(
+							defaults.network.tx.confirmations,
+						).then((r) => {
+							setWorking(false)
+						})
+					})
+					.catch(err => {
+						setWorking(false)
+						if (err.code === 4001) {
+							console.log('Transaction rejected: You have decided to reject the transaction..')
+							toast(rejected)
+						}
+						else {
+							console.log(err)
+							toast(failed)
+						}
+					})
 			}
 			if(!wallet.account) {
 				toast(walletNotConnected)
