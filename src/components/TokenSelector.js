@@ -170,7 +170,7 @@ const TokenListSelectDialog = (props) => {
 						height='18px'
 					/>
 				</Button>
-				Manage
+					Manage
 				<ModalCloseButton
 					top='1.29rem'
 				/>

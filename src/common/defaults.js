@@ -21,15 +21,6 @@ defaults.network.provider = new ethers.providers.FallbackProvider(
 			priority: 1,
 			stallTimeout: 2000,
 		},
-		{
-			provider: new ethers.providers.InfuraProvider(
-				defaults.network.chainId,
-				process.env.REACT_APP_INFURA_KEY,
-			),
-			weight: 1,
-			priority: 2,
-			stallTimeout: 2000,
-		},
 	],
 	1,
 )
@@ -205,7 +196,6 @@ defaults.address.stakingRewards = (
 	defaults.network.chainId === 1 ? '0x2413e4594aadE7513AB6Dc43209D4C312cC35121' :
 		undefined
 )
-
 defaults.tokenList = {}
 defaults.tokenList.default = vaderTokens
 defaults.tokenList.sources = tokenListSources

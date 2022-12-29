@@ -13,6 +13,7 @@ import preCommit from '../artifacts/abi/preCommit'
 import preCommitZapAbi from '../artifacts/abi/precommitZap'
 import stakingRewards from '../artifacts/abi/stakingRewards'
 import threePoolMetaPool from '../artifacts/abi/3poolMetaPool'
+import treasuryMerkleMap from '../artifacts/abi/treasuryMerkleMap'
 
 const approveERC20ToSpend = async (tokenAddress, spenderAddress, amount, provider) => {
 	const contract = new ethers.Contract(
@@ -612,6 +613,24 @@ const getDy = async (i, J, dx, poolAddress) => {
 	return await contract.get_dy(i, J, dx)
 }
 
+const getTreasuryClaimed = async (account, amount) => {
+	const contract = new ethers.Contract(
+		defaults.address.treasuryMerkleMap,
+		treasuryMerkleMap,
+		defaults.network.provider,
+	)
+	return await contract.claimed(account, amount)
+}
+
+const treasuryClaim = async (account, amount, proof, contractAddress, provider) => {
+	const contract = new ethers.Contract(
+		contractAddress,
+		treasuryMerkleMap,
+		provider.getSigner(0),
+	)
+	return await contract.claim(account, amount, proof)
+}
+
 export {
 	approveERC20ToSpend, getERC20BalanceOf, resolveUnknownERC20,
 	estimateGasCost, getERC20Allowance,
@@ -633,5 +652,5 @@ export {
 	getPrecommitOpen, preCommitZap, unCommit, stakeForRewards,
 	getStakingRewards, exitStakingRewards, getStakingRewardsBalanceOf,
 	getStakingRewardsEarned, getRewardRate, getVirtualPrice,
-	getDy,
+	getDy, getTreasuryClaimed, treasuryClaim,
 }
