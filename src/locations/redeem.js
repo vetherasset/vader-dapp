@@ -155,7 +155,7 @@ const Redeem = (props) => {
 											as={BsQuestionCircle}
 											boxSize='1.33rem'
 											marginTop='3px'/>
-										<Box as='span'>Connect your wallet account or enter adddres below to check eligibility.</Box>
+										<Box as='span'>Connect your wallet account to check eligibility.</Box>
 									</>
 								}
 								{wallet.account &&
