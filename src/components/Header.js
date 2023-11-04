@@ -7,7 +7,6 @@ import { Logotype } from './Logotype'
 import { WalletConnectionToggle } from './WalletConnectionToggle'
 import { BalanceIndicator } from '../components/BalanceIndicator'
 import { BurgerMenu } from './BurgerMenu'
-import { USDVpriceIndicator } from './USDVpriceIndicator'
 
 export const Header = (props) => {
 
@@ -90,11 +89,9 @@ export const Header = (props) => {
 			>
 				{useBreakpointValue({
 					base:	<>
-						<USDVpriceIndicator/>
 						<BalanceIndicator/>
 					</>,
 					md: <>
-						<USDVpriceIndicator/>
 						<LinkExt
 							isExternal href='https://curve.fi/factory/82'>
 							<Button
